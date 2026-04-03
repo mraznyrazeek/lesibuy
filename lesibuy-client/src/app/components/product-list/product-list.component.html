@@ -1,0 +1,12 @@
+<h2>LesiBuy Products</h2>
+
+<div *ngIf="loading">Loading products…</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<ul *ngIf="!loading && !error">
+  <li *ngFor="let p of products">
+    <h3>{{ p.name }} — {{ p.price | currency }}</h3>
+    <p>{{ p.description }}</p>
+    <img [src]="p.imageUrl" [alt]="p.name" width="120" />
+  </li>
+</ul>
