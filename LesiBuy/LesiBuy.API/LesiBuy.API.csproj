@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LesiBuy.Application\LesiBuy.Application.csproj" />
+    <ProjectReference Include="..\LesiBuy.Domain\LesiBuy.Domain.csproj" />
+    <ProjectReference Include="..\LesiBuy.Infrastructure\LesiBuy.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

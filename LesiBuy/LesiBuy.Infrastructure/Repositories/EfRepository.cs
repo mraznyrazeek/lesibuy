@@ -1,5 +1,5 @@
 ﻿using LesiBuy.Domain.Interfaces;
-using LesiBuy.Domain.Interfaces.LesiBuy.Domain.Interfaces;
+//using LesiBuy.Domain.Interfaces.LesiBuy.Domain.Interfaces;
 using LesiBuy.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +8,7 @@ namespace LesiBuy.Infrastructure.Repositories
     public class EfRepository<T> : IRepository<T> where T : class
     {
         private readonly LesiBuyContext _context;
+
         public EfRepository(LesiBuyContext context) => _context = context;
 
         public async Task<T?> GetByIdAsync(int id) =>

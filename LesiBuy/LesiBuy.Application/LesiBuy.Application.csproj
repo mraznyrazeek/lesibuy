@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LesiBuy.Infrastructure\LesiBuy.Infrastructure.csproj" />
+    <ProjectReference Include="..\LesiBuy.Domain\LesiBuy.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
