@@ -1,1 +1,73 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --primary: #f4d35e;
+  --primary-dark: #e5be36;
+  --bg: #f6f7fb;
+  --card: rgba(255, 255, 255, 0.9);
+  --text: #111827;
+  --muted: #6b7280;
+  --success: #15803d;
+  --border: #e5e7eb;
+  --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 12px 30px rgba(15, 23, 42, 0.08);
+  --radius-xl: 24px;
+  --radius-lg: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, #fff8dc 0%, transparent 25%),
+    radial-gradient(circle at top right, #fef3c7 0%, transparent 20%),
+    var(--bg);
+  color: var(--text);
+}
+
+.container {
+  max-width: 1240px;
+  margin: auto;
+  padding: 28px 24px 60px;
+}
+
+.btn {
+  background: linear-gradient(135deg, var(--primary), #ffd54f);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border);
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
+}
+
+.grid {
+  display: grid;
+  gap: 24px;
+}

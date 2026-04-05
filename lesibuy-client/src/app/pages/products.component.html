@@ -1,0 +1,96 @@
+<div class="container">
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-tag">Trusted used & refurbished Apple devices</p>
+      <h1>Buy smarter with LesiBuy</h1>
+      <p class="hero-text">
+        Discover quality iPhones, iPads, MacBooks, Apple Watches, and audio devices at better prices with a cleaner, smarter shopping experience.
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn">Shop Now</button>
+        <button class="btn btn-secondary">Sell Your Device</button>
+      </div>
+
+      <div class="hero-chips">
+        <span>iPhone</span>
+        <span>iPad</span>
+        <span>MacBook</span>
+        <span>Watch</span>
+        <span>Audio</span>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="floating-card card small-card">
+        <p>Top picks</p>
+        <strong>Refurbished deals</strong>
+      </div>
+
+      <div class="hero-device card">
+        <img src="/images/Iphone/iPhone-13.jpg" alt="Featured iPhone" />
+      </div>
+
+      <div class="floating-card card price-card">
+        <p>Starting from</p>
+        <strong>Rs. 199.99</strong>
+      </div>
+    </div>
+  </section>
+
+  <h2 class="section-title">Featured Products</h2>
+
+  <section class="categories-section">
+  <div class="category-tile">
+    <div class="category-icon">📱</div>
+    <h3>iPhone</h3>
+    <p>Used and refurbished iPhones</p>
+  </div>
+
+  <div class="category-tile">
+    <div class="category-icon">📲</div>
+    <h3>iPad</h3>
+    <p>Powerful tablets at better prices</p>
+  </div>
+
+  <div class="category-tile">
+    <div class="category-icon">💻</div>
+    <h3>MacBook</h3>
+    <p>MacBook Air and Pro devices</p>
+  </div>
+
+  <div class="category-tile">
+    <div class="category-icon">⌚</div>
+    <h3>Watch</h3>
+    <p>Smart and stylish Apple Watches</p>
+  </div>
+
+  <div class="category-tile">
+    <div class="category-icon">🎧</div>
+    <h3>Audio</h3>
+    <p>AirPods and Apple audio devices</p>
+  </div>
+</section>
+
+  <div class="grid products-grid">
+    <div class="card product-card" *ngFor="let product of products">
+      <div class="image-wrap">
+        <img
+          [src]="product.imageUrl || 'https://via.placeholder.com/250'"
+          class="product-img"
+        />
+        <div class="badge">
+          {{ product.condition }}
+        </div>
+      </div>
+
+      <div class="product-body">
+        <h3>{{ product.name }}</h3>
+        <p class="desc">{{ product.description }}</p>
+        <p class="category">{{ getCategoryName(product.categoryId) }}</p>
+        <p class="price">Rs. {{ product.price }}</p>
+        <button class="btn">View Details</button>
+      </div>
+    </div>
+  </div>
+</div>

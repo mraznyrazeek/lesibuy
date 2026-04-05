@@ -1,10 +1,13 @@
 import { Component } from '@angular/core';
-import { ProductListComponent } from './components/product-list/product-list.component';
+import { RouterOutlet } from '@angular/router';
+import { Navbar } from './shared/navbar/navbar';
 
 @Component({
-  standalone:   true,
-  selector:     'app-root',
-  imports:      [ProductListComponent],
-  template:     `<app-product-list></app-product-list>`
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet, Navbar],
+  templateUrl: './app.html',
+  styleUrl: './app.css'
 })
-export class App {}
+export class App {
+}

@@ -72,3 +72,7 @@ app.MapGet("/weatherforecast", () =>
 ).WithName("GetWeatherForecast");
 
 app.Run();
+
+
+//dotnet build
+//dotnet run --project LesiBuy.API

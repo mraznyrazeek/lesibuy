@@ -8,10 +8,7 @@ namespace LesiBuy.Application.Mapping
     {
         public MappingProfile()
         {
-            // Entity → DTO
-            CreateMap<Product, ProductDto>();
-            // DTO → Entity
-            CreateMap<ProductDto, Product>();
+            CreateMap<Product, ProductDto>().ReverseMap();
         }
     }
 }
