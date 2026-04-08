@@ -4,7 +4,8 @@
       <p class="hero-tag">Trusted used & refurbished Apple devices</p>
       <h1>Buy smarter with LesiBuy</h1>
       <p class="hero-text">
-        Discover quality iPhones, iPads, MacBooks, Apple Watches, and audio devices at better prices with a cleaner, smarter shopping experience.
+        Discover quality iPhones, iPads, MacBooks, Apple Watches, and audio devices
+        at better prices with a cleaner, smarter shopping experience.
       </p>
 
       <div class="hero-actions">
@@ -13,17 +14,17 @@
       </div>
 
       <div class="hero-chips">
-        <span>iPhone</span>
-        <span>iPad</span>
-        <span>MacBook</span>
-        <span>Watch</span>
-        <span>Audio</span>
+        <span (click)="selectCategory('iPhone')">iPhone</span>
+        <span (click)="selectCategory('iPad')">iPad</span>
+        <span (click)="selectCategory('MacBook')">MacBook</span>
+        <span (click)="selectCategory('Apple Watch')">Watch</span>
+        <span (click)="selectCategory('Audio')">Audio</span>
       </div>
     </div>
 
     <div class="hero-visual">
       <div class="floating-card card small-card">
-        <p>Top picks</p>
+        <p>Top pick</p>
         <strong>Refurbished deals</strong>
       </div>
 
@@ -38,47 +39,58 @@
     </div>
   </section>
 
+  <section class="categories-section">
+    <div class="category-tile" (click)="selectCategory('iPhone')">
+      <div class="category-icon">📱</div>
+      <h3>iPhone</h3>
+      <p>Used and refurbished iPhones</p>
+    </div>
+
+    <div class="category-tile" (click)="selectCategory('iPad')">
+      <div class="category-icon">📲</div>
+      <h3>iPad</h3>
+      <p>Powerful tablets at better prices</p>
+    </div>
+
+    <div class="category-tile" (click)="selectCategory('MacBook')">
+      <div class="category-icon">💻</div>
+      <h3>MacBook</h3>
+      <p>MacBook Air and Pro devices</p>
+    </div>
+
+    <div class="category-tile" (click)="selectCategory('Apple Watch')">
+      <div class="category-icon">⌚</div>
+      <h3>Watch</h3>
+      <p>Smart and stylish Apple Watches</p>
+    </div>
+
+    <div class="category-tile" (click)="selectCategory('Audio')">
+      <div class="category-icon">🎧</div>
+      <h3>Audio</h3>
+      <p>AirPods and Apple audio devices</p>
+    </div>
+  </section>
+
   <h2 class="section-title">Featured Products</h2>
 
-  <section class="categories-section">
-  <div class="category-tile">
-    <div class="category-icon">📱</div>
-    <h3>iPhone</h3>
-    <p>Used and refurbished iPhones</p>
+  <div class="filter-bar">
+    <button class="filter-btn" [class.active]="selectedCategory === 'All'" (click)="selectCategory('All')">All</button>
+    <button class="filter-btn" [class.active]="selectedCategory === 'iPhone'"
+      (click)="selectCategory('iPhone')">iPhone</button>
+    <button class="filter-btn" [class.active]="selectedCategory === 'iPad'"
+      (click)="selectCategory('iPad')">iPad</button>
+    <button class="filter-btn" [class.active]="selectedCategory === 'MacBook'"
+      (click)="selectCategory('MacBook')">MacBook</button>
+    <button class="filter-btn" [class.active]="selectedCategory === 'Apple Watch'"
+      (click)="selectCategory('Apple Watch')">Watch</button>
+    <button class="filter-btn" [class.active]="selectedCategory === 'Audio'"
+      (click)="selectCategory('Audio')">Audio</button>
   </div>
 
-  <div class="category-tile">
-    <div class="category-icon">📲</div>
-    <h3>iPad</h3>
-    <p>Powerful tablets at better prices</p>
-  </div>
-
-  <div class="category-tile">
-    <div class="category-icon">💻</div>
-    <h3>MacBook</h3>
-    <p>MacBook Air and Pro devices</p>
-  </div>
-
-  <div class="category-tile">
-    <div class="category-icon">⌚</div>
-    <h3>Watch</h3>
-    <p>Smart and stylish Apple Watches</p>
-  </div>
-
-  <div class="category-tile">
-    <div class="category-icon">🎧</div>
-    <h3>Audio</h3>
-    <p>AirPods and Apple audio devices</p>
-  </div>
-</section>
-
-  <div class="grid products-grid">
-    <div class="card product-card" *ngFor="let product of products">
+    <div class="grid products-grid">
+    <div class="card product-card" *ngFor="let product of filteredProducts">
       <div class="image-wrap">
-        <img
-          [src]="product.imageUrl || 'https://via.placeholder.com/250'"
-          class="product-img"
-        />
+        <img [src]="product.imageUrl || 'https://via.placeholder.com/250'" class="product-img" />
         <div class="badge">
           {{ product.condition }}
         </div>
@@ -89,8 +101,12 @@
         <p class="desc">{{ product.description }}</p>
         <p class="category">{{ getCategoryName(product.categoryId) }}</p>
         <p class="price">Rs. {{ product.price }}</p>
-        <button class="btn">View Details</button>
+        <button class="btn" (click)="viewDetails(product.id)">View Details</button>
       </div>
     </div>
+  </div>
+
+  <div class="no-results" *ngIf="filteredProducts.length === 0">
+    No products match your search or selected category.
   </div>
 </div>

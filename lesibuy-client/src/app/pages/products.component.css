@@ -86,6 +86,8 @@
 }
 
 .hero-device {
+  position: relative;
+  z-index: 2;
   width: 100%;
   max-width: 340px;
   border-radius: 30px;
@@ -102,9 +104,12 @@
 
 .floating-card {
   position: absolute;
+  z-index: 3;
   padding: 14px 18px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 12px 24px rgba(17, 24, 39, 0.08);
+  max-width: 180px;
 }
 
 .floating-card p {
@@ -118,13 +123,13 @@
 }
 
 .small-card {
-  top: 10px;
+  top: 0;
   left: -10px;
 }
 
 .price-card {
   right: -10px;
-  bottom: 18px;
+  bottom: 20px;
 }
 
 .section-title {
@@ -213,6 +218,7 @@
 }
 
 .price {
+
   color: var(--success);
   font-weight: 900;
   font-size: 24px;
@@ -309,4 +315,37 @@
   .categories-section {
     grid-template-columns: 1fr;
   }
+}
+
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 24px;
+}
+
+.filter-btn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  background: rgba(244, 211, 94, 0.18);
+}
+
+.filter-btn.active {
+  background: linear-gradient(135deg, var(--primary), #ffd54f);
+  border-color: transparent;
+}
+
+
+.hero-chips span {
+  cursor: pointer;
 }

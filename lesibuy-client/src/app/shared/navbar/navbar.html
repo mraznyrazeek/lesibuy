@@ -1,18 +1,23 @@
 <nav class="navbar">
   <div class="nav-left">
-    <div class="logo">LesiBuy</div>
+    <a class="logo" href="/">LesiBuy</a>
   </div>
 
   <div class="nav-center">
-    <input type="text" placeholder="Search Apple devices..." class="search" />
+    <input
+  type="text"
+  placeholder="Search Apple devices..."
+  class="search"
+  (input)="search($any($event.target).value)"
+/>
   </div>
 
   <div class="nav-right">
-    <a>Home</a>
-    <a>iPhone</a>
-    <a>iPad</a>
-    <a>MacBook</a>
-    <a>Watch</a>
-    <a>Audio</a>
+    <a href="/">Home</a>
+    <a href="/?category=iPhone">iPhone</a>
+    <a href="/?category=iPad">iPad</a>
+    <a href="/?category=MacBook">MacBook</a>
+    <a href="/?category=Apple%20Watch">Watch</a>
+    <a href="/?category=Audio">Audio</a>
   </div>
 </nav>

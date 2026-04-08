@@ -71,3 +71,7 @@ body {
   display: grid;
   gap: 24px;
 }
+
+.floating-card {
+  max-width: 160px;
+}

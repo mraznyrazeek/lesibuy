@@ -1,0 +1,33 @@
+<div class="container" *ngIf="product">
+    <div class="details-card">
+        <div class="details-image">
+            <img [src]="product.imageUrl" [alt]="product.name" />
+        </div>
+
+        <div class="details-info">
+            <span class="condition-badge">{{ product.condition }}</span>
+            <p class="category">{{ getCategoryName(product.categoryId) }}</p>
+            <h1>{{ product.name }}</h1>
+            <p class="description">{{ product.description }}</p>
+            <p class="price">Rs. {{ product.price }}</p>
+
+            <div class="meta">
+                <p><strong>Availability:</strong> {{ product.isAvailable ? 'In Stock' : 'Out of Stock' }}</p>
+                <p><strong>Seller:</strong> {{ product.sellerType }}</p>
+            </div>
+
+            <h3>Specifications</h3>
+            <div class="spec-grid">
+                <div class="spec-item" *ngFor="let spec of specifications">
+                    <span class="spec-key">{{ spec.key }}</span>
+                    <span class="spec-value">{{ spec.value }}</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn">Buy Now</button>
+                <button class="btn btn-secondary">Ask About This Device</button>
+            </div>
+        </div>
+    </div>
+</div>
