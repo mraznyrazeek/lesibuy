@@ -1,11 +1,13 @@
-﻿using System.Threading.Tasks;
-using LesiBuy.Application.Dtos;
+﻿using LesiBuy.Application.Dtos;
 using LesiBuy.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace LesiBuy.API.Controllers
 {
+    
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]

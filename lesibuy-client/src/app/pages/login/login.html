@@ -1,0 +1,54 @@
+<div class="container auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <p class="auth-tag">Welcome back</p>
+      <h1>Sign In</h1>
+      <p class="auth-subtitle">
+        Log in to manage your orders and account details.
+      </p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Enter your email"
+          [class.invalid]="f['email'].invalid && f['email'].touched"
+        />
+        <small class="error" *ngIf="f['email'].invalid && f['email'].touched">
+          Please enter a valid email address.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Enter your password"
+          [class.invalid]="f['password'].invalid && f['password'].touched"
+        />
+        <small class="error" *ngIf="f['password'].invalid && f['password'].touched">
+          Password must be at least 6 characters.
+        </small>
+      </div>
+
+      <div class="error-box" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button class="btn auth-btn" type="submit" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Signing In...' : 'Sign In' }}
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Don’t have an account?</p>
+      <a routerLink="/register">Create Account</a>
+    </div>
+  </div>
+</div>

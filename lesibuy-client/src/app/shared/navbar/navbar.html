@@ -27,6 +27,18 @@
     <button type="button" class="nav-link" (click)="goToCategory('Audio')">Audio</button>
     <button type="button" class="nav-link orders-link" (click)="goToOrders()">Orders</button>
 
+    <ng-container *ngIf="!currentUser; else loggedInBlock">
+      <button type="button" class="nav-link auth-link" (click)="goToLogin()">Login</button>
+      <button type="button" class="auth-register-btn" (click)="goToRegister()">Register</button>
+    </ng-container>
+
+    <ng-template #loggedInBlock>
+      <div class="user-box">
+        <span class="user-greeting">Hi, {{ currentUser?.fullName }}</span>
+        <button type="button" class="logout-btn" (click)="logout()">Logout</button>
+      </div>
+    </ng-template>
+
     <button type="button" class="cart-btn" (click)="goToCart()">
       <img
         src="/images/app-icons/cart.png"

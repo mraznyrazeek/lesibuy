@@ -1,0 +1,87 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+
+export interface RegisterRequest {
+  fullName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  id: number;
+  fullName: string;
+  email: string;
+  token: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private apiUrl = '/api/auth';
+
+  private currentUserSubject = new BehaviorSubject<AuthResponse | null>(null);
+  currentUser$ = this.currentUserSubject.asObservable();
+
+  constructor(private http: HttpClient) {
+    const user = this.getUserFromStorage();
+    this.currentUserSubject.next(user);
+  }
+
+  register(data: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data);
+  }
+
+  login(data: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data);
+  }
+
+  setSession(user: AuthResponse): void {
+    if (this.isBrowser()) {
+      localStorage.setItem('lesibuy_user', JSON.stringify(user));
+      localStorage.setItem('lesibuy_token', user.token);
+    }
+
+    this.currentUserSubject.next(user);
+  }
+
+  logout(): void {
+    if (this.isBrowser()) {
+      localStorage.removeItem('lesibuy_user');
+      localStorage.removeItem('lesibuy_token');
+    }
+
+    this.currentUserSubject.next(null);
+  }
+
+  getToken(): string | null {
+    if (!this.isBrowser()) return null;
+    return localStorage.getItem('lesibuy_token');
+  }
+
+  getCurrentUser(): AuthResponse | null {
+    return this.currentUserSubject.value;
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
+
+  private getUserFromStorage(): AuthResponse | null {
+    if (!this.isBrowser()) return null;
+
+    const raw = localStorage.getItem('lesibuy_user');
+    return raw ? JSON.parse(raw) : null;
+  }
+
+  private isBrowser(): boolean {
+    return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+  }
+}
