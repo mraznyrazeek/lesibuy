@@ -1,64 +1,69 @@
 <div class="container">
-  <div class="orders-page-header">
-    <p class="orders-tag">Purchase history</p>
-    <h1 class="section-title">My Orders</h1>
-    <p class="orders-subtitle">
-      Track your recent purchases and review order details in one place.
-    </p>
+  <div class="orders-header">
+    <span class="orders-tag">Purchase history</span>
+    <h1>My Orders</h1>
+    <p>Track your recent purchases and review order details in one place.</p>
   </div>
 
-  <div class="orders-list" *ngIf="orders.length > 0; else noOrders">
-    <div class="order-card" *ngFor="let order of orders">
-      <div class="order-top">
-        <div class="order-top-left">
-          <div class="order-id-row">
-            <h2>Order #{{ order.id }}</h2>
-            <span class="order-badge">{{ order.paymentMethod }}</span>
-          </div>
-          <p class="order-date">{{ order.createdAt | date:'medium' }}</p>
-        </div>
-
-        <div class="order-total-box">
-          <span class="total-label">Total</span>
-          <span class="order-total">Rs. {{ order.totalAmount }}</span>
-        </div>
-      </div>
-
-      <div class="order-meta">
-        <div class="meta-chip">
-          <span class="meta-label">Customer</span>
-          <span class="meta-value">{{ order.fullName }}</span>
-        </div>
-
-        <div class="meta-chip">
-          <span class="meta-label">City</span>
-          <span class="meta-value">{{ order.city }}</span>
-        </div>
-
-        <div class="meta-chip">
-          <span class="meta-label">Items</span>
-          <span class="meta-value">{{ order.items.length }}</span>
-        </div>
-      </div>
-
-      <div class="order-items">
-        <div class="order-item" *ngFor="let item of order.items">
-          <div class="item-left">
-            <span class="item-name">{{ item.productName }}</span>
-            <span class="item-qty">x {{ item.quantity }}</span>
-          </div>
-          <span class="item-price">Rs. {{ item.subTotal }}</span>
-        </div>
-      </div>
-    </div>
+  <div class="loading-box" *ngIf="loading">
+    <p>Loading your orders...</p>
   </div>
 
-  <ng-template #noOrders>
+  <div class="error-box" *ngIf="!loading && errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="empty-orders" *ngIf="!loading && !errorMessage && orders.length === 0">
     <div class="empty-orders-card">
       <div class="empty-icon">🧾</div>
       <h2>No orders yet</h2>
       <p>Your placed orders will appear here.</p>
       <a routerLink="/" class="btn">Start Shopping</a>
     </div>
-  </ng-template>
+  </div>
+
+  <div class="orders-list" *ngIf="!loading && orders.length > 0">
+    <div class="order-card" *ngFor="let order of orders">
+      <div class="order-top">
+        <div>
+          <h2>Order #{{ order.id }}</h2>
+          <p class="order-date">{{ order.createdAt | date:'medium' }}</p>
+        </div>
+
+        <div class="order-total-box">
+          <span>Total</span>
+          <strong>Rs. {{ order.totalAmount }}</strong>
+        </div>
+      </div>
+
+      <div class="order-meta">
+        <div class="meta-box">
+          <span>CUSTOMER</span>
+          <strong>{{ order.fullName }}</strong>
+        </div>
+
+        <div class="meta-box">
+          <span>CITY</span>
+          <strong>{{ order.city }}</strong>
+        </div>
+
+        <div class="meta-box">
+          <span>ITEMS</span>
+          <strong>{{ order.items.length }}</strong>
+        </div>
+      </div>
+
+      <div class="order-divider"></div>
+
+      <div class="order-items">
+        <div class="order-item" *ngFor="let item of order.items">
+          <div>
+            <strong>{{ item.productName }}</strong>
+            <span> x {{ item.quantity }}</span>
+          </div>
+          <div class="item-price">Rs. {{ item.subTotal }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
