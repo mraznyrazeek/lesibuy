@@ -18,7 +18,7 @@ namespace LesiBuy.Application.Services
             _uow = uow;
         }
 
-        public async Task<Order> CreateOrderAsync(CreateOrderDto dto)
+        public async Task<Order> CreateOrderAsync(CreateOrderDto dto, int? userId = null)
         {
             var order = new Order
             {
@@ -29,7 +29,8 @@ namespace LesiBuy.Application.Services
                 City = dto.City,
                 PostalCode = dto.PostalCode,
                 PaymentMethod = dto.PaymentMethod,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UserId = userId
             };
 
             decimal total = 0;
@@ -67,6 +68,18 @@ namespace LesiBuy.Application.Services
         {
             var orders = await _uow.Repository<Order>()
                 .Query()
+                .Include(o => o.OrderItems)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+
+            return orders.Select(MapOrderToDto).ToList();
+        }
+
+        public async Task<IReadOnlyList<OrderDto>> GetOrdersByUserIdAsync(int userId)
+        {
+            var orders = await _uow.Repository<Order>()
+                .Query()
+                .Where(o => o.UserId == userId)
                 .Include(o => o.OrderItems)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();

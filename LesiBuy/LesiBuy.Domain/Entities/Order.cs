@@ -8,22 +8,18 @@ namespace LesiBuy.Domain.Entities
         public int Id { get; set; }
 
         public string FullName { get; set; } = null!;
-
         public string Email { get; set; } = null!;
-
         public string Phone { get; set; } = null!;
-
         public string Address { get; set; } = null!;
-
         public string City { get; set; } = null!;
-
         public string PostalCode { get; set; } = null!;
-
         public string PaymentMethod { get; set; } = null!;
 
         public decimal TotalAmount { get; set; }
+        public DateTime CreatedAt { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public int? UserId { get; set; }
+        public User? User { get; set; }
 
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
