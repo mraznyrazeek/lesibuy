@@ -1,13 +1,13 @@
-﻿using LesiBuy.Application.Dtos;
+﻿using System.Threading.Tasks;
+using LesiBuy.Application.Dtos;
 using LesiBuy.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace LesiBuy.API.Controllers
 {
-    
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
@@ -43,6 +43,7 @@ namespace LesiBuy.API.Controllers
             return Ok(order);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
