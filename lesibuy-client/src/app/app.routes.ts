@@ -19,4 +19,20 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'my-orders', component: MyOrdersComponent, canActivate: [authGuard] },
+  {
+    path: 'my-profile',
+    loadComponent: () =>
+      import('./pages/my-profile/my-profile').then(m => m.MyProfile)
+  },
+  {
+    path: 'change-password',
+    loadComponent: () =>
+      import('./pages/change-password/change-password').then(m => m.ChangePassword)
+  },
+
+  {
+    path: 'change-password',
+    loadComponent: () =>
+      import('./pages/change-password/change-password').then(m => m.ChangePassword)
+  }
 ];

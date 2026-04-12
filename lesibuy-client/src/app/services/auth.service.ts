@@ -21,6 +21,17 @@ export interface AuthResponse {
   token: string;
 }
 
+export interface UpdateProfileRequest {
+  fullName: string;
+  email: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -43,10 +54,30 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data);
   }
 
+  getMe(): Observable<AuthResponse> {
+    return this.http.get<AuthResponse>(`${this.apiUrl}/me`);
+  }
+
+  updateProfile(data: UpdateProfileRequest): Observable<AuthResponse> {
+    return this.http.put<AuthResponse>(`${this.apiUrl}/profile`, data);
+  }
+
+  changePassword(data: ChangePasswordRequest): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(`${this.apiUrl}/change-password`, data);
+  }
+
   setSession(user: AuthResponse): void {
     if (this.isBrowser()) {
       localStorage.setItem('lesibuy_user', JSON.stringify(user));
       localStorage.setItem('lesibuy_token', user.token);
+    }
+
+    this.currentUserSubject.next(user);
+  }
+
+  updateCurrentUser(user: AuthResponse): void {
+    if (this.isBrowser()) {
+      localStorage.setItem('lesibuy_user', JSON.stringify(user));
     }
 
     this.currentUserSubject.next(user);

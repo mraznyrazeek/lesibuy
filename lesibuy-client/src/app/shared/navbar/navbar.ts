@@ -1,19 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CartService, CartItem } from '../../services/cart';
 import { AuthService, AuthResponse } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
 export class Navbar implements OnInit {
   cartCount: number = 0;
   currentUser: AuthResponse | null = null;
+  isUserMenuOpen: boolean = false;
 
   constructor(
     private router: Router,
@@ -34,6 +35,26 @@ export class Navbar implements OnInit {
     });
   }
 
+  @HostListener('document:click')
+  closeMenuOnOutsideClick(): void {
+    if (this.isUserMenuOpen) {
+      this.isUserMenuOpen = false;
+    }
+  }
+
+  toggleUserMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
+  onMenuClick(event: MouseEvent): void {
+    event.stopPropagation();
+  }
+
+  closeUserMenu(): void {
+    this.isUserMenuOpen = false;
+  }
+
   goHome(): void {
     this.router.navigate(['/'], { queryParams: {} });
   }
@@ -49,7 +70,18 @@ export class Navbar implements OnInit {
   }
 
   goToOrders(): void {
+    this.closeUserMenu();
     this.router.navigate(['/my-orders']);
+  }
+
+  goToProfile(): void {
+    this.closeUserMenu();
+    this.router.navigate(['/my-profile']);
+  }
+
+  goToChangePassword(): void {
+    this.closeUserMenu();
+    this.router.navigate(['/change-password']);
   }
 
   goToLogin(): void {
@@ -61,6 +93,7 @@ export class Navbar implements OnInit {
   }
 
   logout(): void {
+    this.closeUserMenu();
     this.authService.logout();
     this.router.navigate(['/']);
   }

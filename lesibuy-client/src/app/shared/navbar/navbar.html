@@ -32,12 +32,36 @@
       <button type="button" class="auth-register-btn" (click)="goToRegister()">Register</button>
     </ng-container>
 
-    <ng-template #loggedInBlock>
-      <div class="user-box">
-        <span class="user-greeting">Hi, {{ currentUser?.fullName }}</span>
-        <button type="button" class="logout-btn" (click)="logout()">Logout</button>
-      </div>
-    </ng-template>
+   <ng-template #loggedInBlock>
+  <div class="user-menu-wrapper" (click)="onMenuClick($event)">
+    <button
+      type="button"
+      class="user-box user-menu-trigger"
+      (click)="toggleUserMenu($event)"
+    >
+      <span class="user-greeting">Hi, {{ currentUser?.fullName }}</span>
+      <span class="user-menu-arrow">▾</span>
+    </button>
+
+    <div class="user-dropdown" *ngIf="isUserMenuOpen">
+      <button type="button" class="dropdown-item" (click)="goToProfile()">
+        My Profile
+      </button>
+
+      <button type="button" class="dropdown-item" (click)="goToOrders()">
+        My Orders
+      </button>
+
+      <button type="button" class="dropdown-item" (click)="goToChangePassword()">
+        Change Password
+      </button>
+
+      <button type="button" class="dropdown-item logout-item" (click)="logout()">
+        Logout
+      </button>
+    </div>
+  </div>
+</ng-template>
 
     <button type="button" class="cart-btn" (click)="goToCart()">
       <img
