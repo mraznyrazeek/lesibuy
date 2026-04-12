@@ -1,0 +1,14 @@
+<div class="container" *ngIf="order">
+  <div class="success-card">
+    <div class="success-icon">✓</div>
+    <h1>Order Placed Successfully</h1>
+    <p>Thank you for shopping with LesiBuy.</p>
+    <p>Your Order ID: <strong>#{{ order.id }}</strong></p>
+    <p>Total Paid: <strong>Rs. {{ order.totalAmount }}</strong></p>
+
+    <div class="success-actions">
+      <button class="btn" (click)="goHome()">Continue Shopping</button>
+      <a routerLink="/my-orders" class="btn btn-secondary">View My Orders</a>
+    </div>
+  </div>
+</div>

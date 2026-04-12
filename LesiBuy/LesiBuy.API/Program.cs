@@ -1,11 +1,16 @@
 using AutoMapper;
-using LesiBuy.Application.Mapping;
+using LesiBuy.Application;
 using LesiBuy.Application.Services;
 using LesiBuy.Domain.Interfaces;
 //using LesiBuy.Domain.Interfaces.LesiBuy.Domain.Interfaces;
 using LesiBuy.Infrastructure.Data;
 using LesiBuy.Infrastructure.Repositories;
+using LesiBuy.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,17 +35,36 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Application services
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
-// AutoMapper
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddProfile<MappingProfile>();
-});
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddSwaggerGen();
 
 // Controllers & Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();     
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
+            )
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -49,6 +73,11 @@ app.UseRouting();
 app.UseCors("AllowAll");        
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
+
 
 if (app.Environment.IsDevelopment())
 {

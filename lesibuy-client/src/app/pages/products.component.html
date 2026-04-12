@@ -87,7 +87,7 @@
       (click)="selectCategory('Audio')">Audio</button>
   </div>
 
-    <div class="grid products-grid">
+  <div class="grid products-grid">
     <div class="card product-card" *ngFor="let product of filteredProducts">
       <div class="image-wrap">
         <img [src]="product.imageUrl || 'https://via.placeholder.com/250'" class="product-img" />
@@ -101,7 +101,10 @@
         <p class="desc">{{ product.description }}</p>
         <p class="category">{{ getCategoryName(product.categoryId) }}</p>
         <p class="price">Rs. {{ product.price }}</p>
-        <button class="btn" (click)="viewDetails(product.id)">View Details</button>
+        <div class="product-actions">
+          <button class="btn" (click)="viewDetails(product.id)">View Details</button>
+          <button class="btn btn-secondary" (click)="addToCart(product)">Add to Cart</button>
+        </div>
       </div>
     </div>
   </div>

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { CartService, CartItem } from '../../services/cart';
 
 @Component({
   selector: 'app-navbar',
@@ -8,29 +9,51 @@ import { Router } from '@angular/router';
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
-export class Navbar {
-  constructor(private router: Router) {}
+export class Navbar implements OnInit {
+  cartCount: number = 0;
+
+  constructor(
+    private router: Router,
+    private cartService: CartService
+  ) { }
+
+  ngOnInit(): void {
+    this.cartService.cartItems$.subscribe((items: CartItem[]) => {
+      this.cartCount = items.reduce(
+        (total: number, item: CartItem) => total + item.quantity,
+        0
+      );
+    });
+  }
+
+  goHome(): void {
+    this.router.navigate(['/'], { queryParams: {} });
+  }
 
   goToCategory(category: string): void {
-    if (category === 'All') {
-      this.router.navigate(['/']);
-      return;
-    }
-
     this.router.navigate(['/'], {
       queryParams: { category }
     });
   }
 
+  goToCart(): void {
+    this.router.navigate(['/cart']);
+  }
+
+  goToOrders(): void {
+    this.router.navigate(['/my-orders']);
+  }
+
   search(value: string): void {
-    const currentUrl = this.router.parseUrl(this.router.url);
-    const currentCategory = currentUrl.queryParams['category'] || '';
+    const trimmed = value.trim();
+
+    if (!trimmed) {
+      this.router.navigate(['/'], { queryParams: {} });
+      return;
+    }
 
     this.router.navigate(['/'], {
-      queryParams: {
-        ...(currentCategory ? { category: currentCategory } : {}),
-        ...(value.trim() ? { search: value.trim() } : {})
-      }
+      queryParams: { search: trimmed }
     });
   }
 }

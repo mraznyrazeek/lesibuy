@@ -1,14 +1,15 @@
-﻿using LesiBuy.Domain.Entities;
-//using LesiBuy.Domain.Interfaces.LesiBuy.Domain.Interfaces;
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using LesiBuy.Domain.Entities;
 
 namespace LesiBuy.Domain.Interfaces
 {
-    public interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork
     {
-        IRepository<Product> Products { get; } // “basket” just for Products
-        Task<int> CompleteAsync(); // “stamp and save” everything together
+        IRepository<Product> Products { get; }
+
+        IRepository<T> Repository<T>() where T : class;
+
+        Task<int> CompleteAsync();
     }
 }
 

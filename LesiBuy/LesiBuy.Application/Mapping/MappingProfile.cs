@@ -2,7 +2,7 @@
 using LesiBuy.Application.Dtos;
 using LesiBuy.Domain.Entities;
 
-namespace LesiBuy.Application.Mapping
+namespace LesiBuy.Application
 {
     public class MappingProfile : Profile
     {

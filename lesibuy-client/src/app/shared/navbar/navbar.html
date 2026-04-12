@@ -1,23 +1,40 @@
 <nav class="navbar">
-  <div class="nav-left">
-    <a class="logo" href="/">LesiBuy</a>
+  <div class="nav-left" (click)="goHome()">
+    <img
+      src="/images/app-icons/lesibuy-logo.png"
+      alt="LesiBuy"
+      class="brand-logo"
+    />
   </div>
 
   <div class="nav-center">
-    <input
-  type="text"
-  placeholder="Search Apple devices..."
-  class="search"
-  (input)="search($any($event.target).value)"
-/>
+    <div class="search-wrap">
+      <input
+        type="text"
+        placeholder="Search Apple devices..."
+        class="search"
+        (input)="search($any($event.target).value)"
+      />
+    </div>
   </div>
 
   <div class="nav-right">
-    <a href="/">Home</a>
-    <a href="/?category=iPhone">iPhone</a>
-    <a href="/?category=iPad">iPad</a>
-    <a href="/?category=MacBook">MacBook</a>
-    <a href="/?category=Apple%20Watch">Watch</a>
-    <a href="/?category=Audio">Audio</a>
+    <button type="button" class="nav-link" (click)="goHome()">Home</button>
+    <button type="button" class="nav-link" (click)="goToCategory('iPhone')">iPhone</button>
+    <button type="button" class="nav-link" (click)="goToCategory('iPad')">iPad</button>
+    <button type="button" class="nav-link" (click)="goToCategory('MacBook')">MacBook</button>
+    <button type="button" class="nav-link" (click)="goToCategory('Apple Watch')">Watch</button>
+    <button type="button" class="nav-link" (click)="goToCategory('Audio')">Audio</button>
+    <button type="button" class="nav-link orders-link" (click)="goToOrders()">Orders</button>
+
+    <button type="button" class="cart-btn" (click)="goToCart()">
+      <img
+        src="/images/app-icons/cart.png"
+        alt="Cart"
+        class="cart-icon"
+      />
+      <span class="cart-text">Cart</span>
+      <span class="cart-badge">{{ cartCount }}</span>
+    </button>
   </div>
 </nav>

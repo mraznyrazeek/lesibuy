@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProductService } from '../services/product.service';
 import { Product } from '../models/product.model';
+import { CartService } from '../services/cart';
 
 @Component({
   selector: 'app-products',
@@ -20,7 +21,8 @@ export class ProductsComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cartService: CartService
   ) {}
 
   ngOnInit(): void {
@@ -72,21 +74,20 @@ export class ProductsComponent implements OnInit {
   }
 
   selectCategory(category: string): void {
-    const currentSearch = this.route.snapshot.queryParamMap.get('search') || '';
-
     if (category === 'All') {
       this.router.navigate(['/'], {
-        queryParams: currentSearch ? { search: currentSearch } : {}
+        queryParams: {}
       });
       return;
     }
 
     this.router.navigate(['/'], {
-      queryParams: {
-        category,
-        ...(currentSearch ? { search: currentSearch } : {})
-      }
+      queryParams: { category }
     });
+  }
+
+  addToCart(product: Product): void {
+    this.cartService.addToCart(product);
   }
 
   viewDetails(id: number): void {

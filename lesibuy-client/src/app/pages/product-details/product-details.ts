@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
 
@@ -17,15 +17,23 @@ export class ProductDetailsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private productService: ProductService
   ) {}
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.route.paramMap.subscribe(params => {
+      const id = Number(params.get('id'));
+      console.log('Route ID:', id);
 
-    if (id) {
+      if (!id) {
+        console.error('Invalid product id');
+        return;
+      }
+
       this.productService.getProductById(id).subscribe({
         next: (data) => {
+          console.log('Product loaded:', data);
           this.product = data;
           this.parseSpecifications(data.specifications);
         },
@@ -33,7 +41,7 @@ export class ProductDetailsComponent implements OnInit {
           console.error('Error loading product details:', err);
         }
       });
-    }
+    });
   }
 
   parseSpecifications(specifications: string): void {
@@ -58,5 +66,9 @@ export class ProductDetailsComponent implements OnInit {
       case 5: return 'Audio';
       default: return 'Unknown';
     }
+  }
+
+  goHome(): void {
+    this.router.navigate(['/']);
   }
 }

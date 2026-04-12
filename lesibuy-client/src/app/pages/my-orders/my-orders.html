@@ -1,0 +1,64 @@
+<div class="container">
+  <div class="orders-page-header">
+    <p class="orders-tag">Purchase history</p>
+    <h1 class="section-title">My Orders</h1>
+    <p class="orders-subtitle">
+      Track your recent purchases and review order details in one place.
+    </p>
+  </div>
+
+  <div class="orders-list" *ngIf="orders.length > 0; else noOrders">
+    <div class="order-card" *ngFor="let order of orders">
+      <div class="order-top">
+        <div class="order-top-left">
+          <div class="order-id-row">
+            <h2>Order #{{ order.id }}</h2>
+            <span class="order-badge">{{ order.paymentMethod }}</span>
+          </div>
+          <p class="order-date">{{ order.createdAt | date:'medium' }}</p>
+        </div>
+
+        <div class="order-total-box">
+          <span class="total-label">Total</span>
+          <span class="order-total">Rs. {{ order.totalAmount }}</span>
+        </div>
+      </div>
+
+      <div class="order-meta">
+        <div class="meta-chip">
+          <span class="meta-label">Customer</span>
+          <span class="meta-value">{{ order.fullName }}</span>
+        </div>
+
+        <div class="meta-chip">
+          <span class="meta-label">City</span>
+          <span class="meta-value">{{ order.city }}</span>
+        </div>
+
+        <div class="meta-chip">
+          <span class="meta-label">Items</span>
+          <span class="meta-value">{{ order.items.length }}</span>
+        </div>
+      </div>
+
+      <div class="order-items">
+        <div class="order-item" *ngFor="let item of order.items">
+          <div class="item-left">
+            <span class="item-name">{{ item.productName }}</span>
+            <span class="item-qty">x {{ item.quantity }}</span>
+          </div>
+          <span class="item-price">Rs. {{ item.subTotal }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noOrders>
+    <div class="empty-orders-card">
+      <div class="empty-icon">🧾</div>
+      <h2>No orders yet</h2>
+      <p>Your placed orders will appear here.</p>
+      <a routerLink="/" class="btn">Start Shopping</a>
+    </div>
+  </ng-template>
+</div>
