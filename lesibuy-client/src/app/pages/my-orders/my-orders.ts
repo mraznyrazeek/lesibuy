@@ -52,7 +52,7 @@ export class MyOrdersComponent implements OnInit {
         next: (data: Order[]) => {
           this.orders = data;
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Failed to load orders:', err);
           this.errorMessage = err?.error?.message || 'Failed to load orders.';
         }

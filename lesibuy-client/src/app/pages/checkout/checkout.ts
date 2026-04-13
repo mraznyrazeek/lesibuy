@@ -84,7 +84,7 @@ export class CheckoutComponent implements OnInit {
         this.isSubmitting = false;
         this.router.navigate(['/order-success', response.id]);
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Order creation failed:', err);
         this.isSubmitting = false;
         alert('Failed to place order. Please try again.');

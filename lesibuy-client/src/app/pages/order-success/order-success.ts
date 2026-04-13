@@ -31,8 +31,8 @@ export class OrderSuccessComponent implements OnInit {
       next: (data) => {
         this.order = data;
       },
-      error: (err) => {
-        console.error(err);
+      error: (err: any) => {
+        console.error('Failed to load order:', err);
         this.router.navigate(['/']);
       }
     });

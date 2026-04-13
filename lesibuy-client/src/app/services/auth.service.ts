@@ -55,15 +55,18 @@ export class AuthService {
   }
 
   getMe(): Observable<AuthResponse> {
-    return this.http.get<AuthResponse>(`${this.apiUrl}/me`);
+    return this.http.get<AuthResponse>(this.withAccessToken(`${this.apiUrl}/me`));
   }
 
   updateProfile(data: UpdateProfileRequest): Observable<AuthResponse> {
-    return this.http.put<AuthResponse>(`${this.apiUrl}/profile`, data);
+    return this.http.put<AuthResponse>(this.withAccessToken(`${this.apiUrl}/profile`), data);
   }
 
   changePassword(data: ChangePasswordRequest): Observable<{ message: string }> {
-    return this.http.put<{ message: string }>(`${this.apiUrl}/change-password`, data);
+    return this.http.put<{ message: string }>(
+      this.withAccessToken(`${this.apiUrl}/change-password`),
+      data
+    );
   }
 
   setSession(user: AuthResponse): void {
@@ -104,6 +107,17 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
+
+  private withAccessToken(url: string): string {
+    const token = this.getToken();
+
+    if (!token) {
+      return url;
+    }
+
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}access_token=${encodeURIComponent(token)}`;
+    }
 
   private getUserFromStorage(): AuthResponse | null {
     if (!this.isBrowser()) return null;

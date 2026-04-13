@@ -14,12 +14,21 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // CORS
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAll", policy =>
+//        policy.AllowAnyOrigin()
+//              .AllowAnyHeader()
+//              .AllowAnyMethod());
+//});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowAnyMethod());
+              .AllowCredentials());
 });
 
 // DbContext
@@ -64,6 +73,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
+    options.IncludeErrorDetails = true;
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -81,28 +91,45 @@ builder.Services.AddAuthentication(options =>
     {
         OnMessageReceived = context =>
         {
-            Console.WriteLine("JWT raw header: " + context.Request.Headers["Authorization"]);
+            var authHeader = context.Request.Headers["Authorization"].ToString();
+            var accessToken = context.Request.Query["access_token"].ToString();
+
+            if (string.IsNullOrWhiteSpace(authHeader) && !string.IsNullOrWhiteSpace(accessToken))
+            {
+                context.Token = accessToken;
+                context.Response.Headers["X-Debug-Auth-Header"] = "TOKEN_FROM_QUERY";
+            }
+            else
+            {
+                context.Response.Headers["X-Debug-Auth-Header"] =
+                    string.IsNullOrWhiteSpace(authHeader) ? "NO_HEADER" : "HEADER_PRESENT";
+            }
+
             return Task.CompletedTask;
         },
         OnTokenValidated = context =>
         {
-            Console.WriteLine("JWT validated successfully");
-            foreach (var claim in context.Principal?.Claims ?? Enumerable.Empty<Claim>())
-            {
-                Console.WriteLine($"CLAIM => {claim.Type} = {claim.Value}");
-            }
+            context.Response.Headers["X-Debug-Auth"] = "TOKEN_VALIDATED";
+
+            var userIdClaim =
+                context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? context.Principal?.FindFirst("nameid")?.Value
+                ?? "NO_NAMEID";
+
+            context.Response.Headers["X-Debug-UserId"] = userIdClaim;
             return Task.CompletedTask;
         },
         OnAuthenticationFailed = context =>
         {
-            Console.WriteLine("JWT authentication failed: " + context.Exception.Message);
+            context.Response.Headers["X-Debug-Auth"] = "AUTH_FAILED";
+            context.Response.Headers["X-Debug-Auth-Error"] = context.Exception.Message;
             return Task.CompletedTask;
         },
         OnChallenge = context =>
         {
-            Console.WriteLine("JWT challenge triggered");
-            Console.WriteLine("Error: " + context.Error);
-            Console.WriteLine("Description: " + context.ErrorDescription);
+            context.Response.Headers["X-Debug-Challenge"] = "CHALLENGE_TRIGGERED";
+            context.Response.Headers["X-Debug-Challenge-Error"] = context.Error ?? "NO_ERROR";
+            context.Response.Headers["X-Debug-Challenge-Description"] = context.ErrorDescription ?? "NO_DESCRIPTION";
             return Task.CompletedTask;
         }
     };
