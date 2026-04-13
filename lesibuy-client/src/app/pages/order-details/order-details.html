@@ -1,0 +1,109 @@
+<section class="order-details-page">
+  <div class="order-details-container">
+    <div *ngIf="loading" class="orders-state">Loading order details...</div>
+
+    <div *ngIf="!loading && errorMessage" class="orders-state error">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!loading && order" class="order-details-card">
+      <div class="details-top">
+        <div class="details-head">
+          <h1>Order #{{ order.id }}</h1>
+          <p>{{ order.createdAt | date:'medium' }}</p>
+        </div>
+
+        <div class="details-top-right">
+          <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+            {{ order.status }}
+          </span>
+          <div class="details-total">Total Rs. {{ order.totalAmount }}</div>
+        </div>
+      </div>
+
+      <div class="details-grid">
+        <div class="meta-box">
+          <span class="meta-label">Customer</span>
+          <span class="meta-value">{{ order.fullName }}</span>
+        </div>
+
+        <div class="meta-box">
+          <span class="meta-label">City</span>
+          <span class="meta-value">{{ order.city }}</span>
+        </div>
+
+        <div class="meta-box">
+          <span class="meta-label">Items</span>
+          <span class="meta-value">{{ order.items.length }}</span>
+        </div>
+      </div>
+
+      <div class="details-items">
+        <div class="section-title-row">
+          <h3>Ordered Items</h3>
+        </div>
+
+        <div class="product-card" *ngFor="let item of order.items">
+          <div class="product-image-wrap">
+            <img
+              *ngIf="item.productImageUrl; else noImage"
+              [src]="item.productImageUrl"
+              [alt]="item.productName"
+              class="product-image"
+            />
+
+            <ng-template #noImage>
+              <div class="product-image placeholder-image">
+                No Image
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="product-main">
+            <div class="product-header">
+              <div>
+                <h4>{{ item.productName }}</h4>
+
+                <p class="product-description" *ngIf="item.productDescription; else noDescription">
+                  {{ item.productDescription }}
+                </p>
+
+                <ng-template #noDescription>
+                  <p class="product-description muted-text">
+                    Product details were not saved for this older order.
+                  </p>
+                </ng-template>
+              </div>
+
+              <div class="product-price-box">
+                <span class="price-label">Subtotal</span>
+                <span class="price-value">Rs. {{ item.subTotal }}</span>
+              </div>
+            </div>
+
+            <div class="product-tags">
+              <span class="tag" *ngIf="item.productCondition">Condition: {{ item.productCondition }}</span>
+              <span class="tag" *ngIf="item.sellerType">Seller: {{ item.sellerType }}</span>
+              <span class="tag">Qty: {{ item.quantity }}</span>
+              <span class="tag">Unit Price: Rs. {{ item.unitPrice }}</span>
+            </div>
+
+            <div
+              class="spec-grid"
+              *ngIf="item.specifications && parseSpecifications(item.specifications).length > 0"
+            >
+              <div class="spec-card" *ngFor="let spec of parseSpecifications(item.specifications)">
+                <span class="spec-card-label">{{ spec.key }}</span>
+                <span class="spec-card-value">{{ spec.value }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="details-actions">
+        <a routerLink="/my-orders" class="back-btn">← Back to Orders</a>
+      </div>
+    </div>
+  </div>
+</section>

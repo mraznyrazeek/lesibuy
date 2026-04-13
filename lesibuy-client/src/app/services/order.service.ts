@@ -7,6 +7,11 @@ export interface OrderItem {
   id?: number;
   productId?: number;
   productName: string;
+  productDescription?: string;
+  productImageUrl?: string;
+  productCondition?: string;
+  sellerType?: string;
+  specifications?: string;
   quantity: number;
   unitPrice: number;
   subTotal: number;
@@ -18,6 +23,7 @@ export interface Order {
   fullName: string;
   city: string;
   totalAmount: number;
+  status: string;
   items: OrderItem[];
 }
 
@@ -42,6 +48,7 @@ export interface CreateOrderResponse {
   fullName: string;
   city: string;
   totalAmount: number;
+  status: string;
   items: OrderItem[];
 }
 

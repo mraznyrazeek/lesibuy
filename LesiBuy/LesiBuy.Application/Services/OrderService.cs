@@ -28,9 +28,11 @@ namespace LesiBuy.Application.Services
                 Address = dto.Address,
                 City = dto.City,
                 PostalCode = dto.PostalCode,
-                PaymentMethod = dto.PaymentMethod,
                 CreatedAt = DateTime.UtcNow,
-                UserId = userId
+                TotalAmount = 0,
+                UserId = userId ?? 0,
+                Status = "Pending",
+                Items = new List<OrderItem>()
             };
 
             decimal total = 0;
@@ -44,10 +46,15 @@ namespace LesiBuy.Application.Services
 
                 var subTotal = product.Price * item.Quantity;
 
-                order.OrderItems.Add(new OrderItem
+                order.Items.Add(new OrderItem
                 {
                     ProductId = product.Id,
                     ProductName = product.Name,
+                    ProductDescription = product.Description,
+                    ProductImageUrl = product.ImageUrl,
+                    ProductCondition = product.Condition,
+                    SellerType = product.SellerType,
+                    Specifications = product.Specifications,
                     UnitPrice = product.Price,
                     Quantity = item.Quantity,
                     SubTotal = subTotal
@@ -68,7 +75,7 @@ namespace LesiBuy.Application.Services
         {
             var orders = await _uow.Repository<Order>()
                 .Query()
-                .Include(o => o.OrderItems)
+                .Include(o => o.Items)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
 
@@ -80,7 +87,7 @@ namespace LesiBuy.Application.Services
             var orders = await _uow.Repository<Order>()
                 .Query()
                 .Where(o => o.UserId == userId)
-                .Include(o => o.OrderItems)
+                .Include(o => o.Items)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
 
@@ -91,10 +98,11 @@ namespace LesiBuy.Application.Services
         {
             var order = await _uow.Repository<Order>()
                 .Query()
-                .Include(o => o.OrderItems)
+                .Include(o => o.Items)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
-            if (order == null) return null;
+            if (order == null)
+                return null;
 
             return MapOrderToDto(order);
         }
@@ -110,13 +118,18 @@ namespace LesiBuy.Application.Services
                 Address = order.Address,
                 City = order.City,
                 PostalCode = order.PostalCode,
-                PaymentMethod = order.PaymentMethod,
                 TotalAmount = order.TotalAmount,
                 CreatedAt = order.CreatedAt,
-                Items = order.OrderItems.Select(i => new OrderItemDto
+                Status = order.Status,
+                Items = order.Items.Select(i => new OrderItemDto
                 {
                     ProductId = i.ProductId,
                     ProductName = i.ProductName,
+                    ProductDescription = i.ProductDescription,
+                    ProductImageUrl = i.ProductImageUrl,
+                    ProductCondition = i.ProductCondition,
+                    SellerType = i.SellerType,
+                    Specifications = i.Specifications,
                     UnitPrice = i.UnitPrice,
                     Quantity = i.Quantity,
                     SubTotal = i.SubTotal

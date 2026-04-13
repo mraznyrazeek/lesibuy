@@ -1,9 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { finalize } from 'rxjs/operators';
+import { RouterModule } from '@angular/router';
 import { OrderService, Order } from '../../services/order.service';
-import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-my-orders',
@@ -14,48 +12,46 @@ import { AuthService } from '../../services/auth.service';
 })
 export class MyOrdersComponent implements OnInit {
   orders: Order[] = [];
-  loading = true;
+  loading = false;
   errorMessage = '';
 
-  constructor(
-    private orderService: OrderService,
-    private authService: AuthService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
+  constructor(private orderService: OrderService) {}
 
   ngOnInit(): void {
-    const user = this.authService.getCurrentUser();
-
-    if (!user) {
-      this.loading = false;
-      this.router.navigate(['/login']);
-      return;
-    }
-
     this.loadOrders();
   }
 
   loadOrders(): void {
     this.loading = true;
     this.errorMessage = '';
-    this.cdr.detectChanges();
 
-    this.orderService.getOrders()
-      .pipe(
-        finalize(() => {
-          this.loading = false;
-          this.cdr.detectChanges();
-        })
-      )
-      .subscribe({
-        next: (data: Order[]) => {
-          this.orders = data;
-        },
-        error: (err: any) => {
-          console.error('Failed to load orders:', err);
-          this.errorMessage = err?.error?.message || 'Failed to load orders.';
-        }
-      });
+    this.orderService.getOrders().subscribe({
+      next: (data) => {
+        this.orders = data;
+        this.loading = false;
+      },
+      error: (err: any) => {
+        console.error('Failed to load orders:', err);
+        this.errorMessage = 'Failed to load orders.';
+        this.loading = false;
+      }
+    });
+  }
+
+  getStatusClass(status: string): string {
+    switch ((status || '').toLowerCase()) {
+      case 'pending':
+        return 'status-pending';
+      case 'processing':
+        return 'status-processing';
+      case 'shipped':
+        return 'status-shipped';
+      case 'delivered':
+        return 'status-delivered';
+      case 'cancelled':
+        return 'status-cancelled';
+      default:
+        return 'status-default';
+    }
   }
 }
