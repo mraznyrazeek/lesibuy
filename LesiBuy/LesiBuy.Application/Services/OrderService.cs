@@ -20,14 +20,26 @@ namespace LesiBuy.Application.Services
 
         public async Task<OrderDto> CreateOrderAsync(CreateOrderDto dto, int? userId = null)
         {
+            var billingAddress = dto.BillingSameAsShipping ? dto.ShippingAddress : dto.BillingAddress;
+            var billingCity = dto.BillingSameAsShipping ? dto.ShippingCity : dto.BillingCity;
+            var billingPostalCode = dto.BillingSameAsShipping ? dto.ShippingPostalCode : dto.BillingPostalCode;
+
             var order = new Order
             {
                 FullName = dto.FullName,
                 Email = dto.Email,
                 Phone = dto.Phone,
-                Address = dto.Address,
-                City = dto.City,
-                PostalCode = dto.PostalCode,
+
+                ShippingAddress = dto.ShippingAddress,
+                ShippingCity = dto.ShippingCity,
+                ShippingPostalCode = dto.ShippingPostalCode,
+
+                BillingSameAsShipping = dto.BillingSameAsShipping,
+                BillingAddress = billingAddress,
+                BillingCity = billingCity,
+                BillingPostalCode = billingPostalCode,
+
+                PaymentMethod = dto.PaymentMethod,
                 CreatedAt = DateTime.UtcNow,
                 TotalAmount = 0,
                 UserId = userId ?? 0,
@@ -120,7 +132,6 @@ namespace LesiBuy.Application.Services
                 return false;
 
             order.Status = "Cancelled";
-
             await _uow.CompleteAsync();
 
             return true;
@@ -134,12 +145,21 @@ namespace LesiBuy.Application.Services
                 FullName = order.FullName,
                 Email = order.Email,
                 Phone = order.Phone,
-                Address = order.Address,
-                City = order.City,
-                PostalCode = order.PostalCode,
+
+                ShippingAddress = order.ShippingAddress,
+                ShippingCity = order.ShippingCity,
+                ShippingPostalCode = order.ShippingPostalCode,
+
+                BillingSameAsShipping = order.BillingSameAsShipping,
+                BillingAddress = order.BillingAddress,
+                BillingCity = order.BillingCity,
+                BillingPostalCode = order.BillingPostalCode,
+
+                PaymentMethod = order.PaymentMethod,
                 TotalAmount = order.TotalAmount,
                 CreatedAt = order.CreatedAt,
                 Status = order.Status,
+
                 Items = order.Items.Select(i => new OrderItemDto
                 {
                     ProductId = i.ProductId,

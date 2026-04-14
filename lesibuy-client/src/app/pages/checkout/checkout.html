@@ -1,137 +1,121 @@
-<div class="container" *ngIf="!orderPlaced; else successState">
+<div class="container checkout-page">
   <div class="checkout-header">
-    <div>
-      <p class="checkout-tag">Secure checkout</p>
-      <h1 class="section-title">Complete Your Order</h1>
-      <p class="checkout-subtitle">
-        Fill in your delivery details and review your order before placing it.
-      </p>
-    </div>
+    <h1>Complete Your Order</h1>
+    <p>Fill in your delivery details and review your order before placing it.</p>
   </div>
 
   <div class="checkout-layout">
     <div class="checkout-form-card">
       <h2>Shipping Details</h2>
 
-      <form [formGroup]="checkoutForm" novalidate>
+      <div class="error-box" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <form [formGroup]="checkoutForm">
+        <div class="form-group full-width">
+          <label>Full Name</label>
+          <input type="text" formControlName="fullName" placeholder="Enter your full name" />
+        </div>
+
         <div class="form-grid">
-          <div class="form-group full-width">
-            <label for="fullName">Full Name</label>
-            <input id="fullName" type="text" formControlName="fullName"
-              [class.invalid]="f['fullName'].invalid && f['fullName'].touched" placeholder="Enter your full name" />
-            <small class="error" *ngIf="f['fullName'].invalid && f['fullName'].touched">
-              Full name is required and must be at least 3 characters.
-            </small>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" formControlName="email" placeholder="Enter your email" />
           </div>
 
           <div class="form-group">
-            <label for="email">Email</label>
-            <input id="email" type="email" formControlName="email"
-              [class.invalid]="f['email'].invalid && f['email'].touched" placeholder="Enter your email" />
-            <small class="error" *ngIf="f['email'].invalid && f['email'].touched">
-              Please enter a valid email address.
-            </small>
+            <label>Phone</label>
+            <input type="text" formControlName="phone" placeholder="Enter your phone number" />
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Shipping Address</label>
+          <input type="text" formControlName="shippingAddress" placeholder="Street address / house number" />
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" formControlName="shippingCity" placeholder="Enter your city" />
           </div>
 
           <div class="form-group">
-            <label for="phone">Phone</label>
-            <input id="phone" type="text" formControlName="phone"
-              [class.invalid]="f['phone'].invalid && f['phone'].touched" placeholder="Enter your phone number" />
-            <small class="error" *ngIf="f['phone'].invalid && f['phone'].touched">
-              Please enter a valid phone number.
-            </small>
+            <label>Postal Code</label>
+            <input type="text" formControlName="shippingPostalCode" placeholder="Enter postal code" />
           </div>
+        </div>
 
-          <div class="form-group full-width">
-            <label for="address">Address</label>
-            <input id="address" type="text" formControlName="address"
-              [class.invalid]="f['address'].invalid && f['address'].touched"
-              placeholder="Street address / house number" />
-            <small class="error" *ngIf="f['address'].invalid && f['address'].touched">
-              Address is required.
-            </small>
-          </div>
+        <div class="checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="billingSameAsShipping" />
+            <span>Billing address same as shipping</span>
+          </label>
+        </div>
 
-          <div class="form-group">
-            <label for="city">City</label>
-            <input id="city" type="text" formControlName="city" [class.invalid]="f['city'].invalid && f['city'].touched"
-              placeholder="Enter your city" />
-            <small class="error" *ngIf="f['city'].invalid && f['city'].touched">
-              City is required.
-            </small>
-          </div>
-
-          <div class="form-group">
-            <label for="postalCode">Postal Code</label>
-            <input id="postalCode" type="text" formControlName="postalCode"
-              [class.invalid]="f['postalCode'].invalid && f['postalCode'].touched" placeholder="Enter postal code" />
-            <small class="error" *ngIf="f['postalCode'].invalid && f['postalCode'].touched">
-              Postal code is required.
-            </small>
-          </div>
+        <div class="billing-section" *ngIf="!checkoutForm.value.billingSameAsShipping">
+          <h3>Billing Address</h3>
 
           <div class="form-group full-width">
-            <label for="paymentMethod">Payment Method</label>
-            <select id="paymentMethod" formControlName="paymentMethod"
-              [class.invalid]="f['paymentMethod'].invalid && f['paymentMethod'].touched">
-              <option>Cash on Delivery</option>
-              <option>Bank Transfer</option>
-              <option>Card Payment</option>
-            </select>
+            <label>Billing Address</label>
+            <input type="text" formControlName="billingAddress" placeholder="Enter billing address" />
           </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Billing City</label>
+              <input type="text" formControlName="billingCity" placeholder="Enter billing city" />
+            </div>
+
+            <div class="form-group">
+              <label>Billing Postal Code</label>
+              <input type="text" formControlName="billingPostalCode" placeholder="Enter billing postal code" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Payment Method</label>
+          <select formControlName="paymentMethod">
+            <option value="Cash on Delivery">Cash on Delivery</option>
+          </select>
         </div>
       </form>
     </div>
 
-    <div class="checkout-summary-card">
+    <div class="summary-card">
       <h2>Order Summary</h2>
 
-      <div class="checkout-item" *ngFor="let item of cartItems">
-        <div class="checkout-item-left">
-          <img [src]="item.product.imageUrl" [alt]="item.product.name" class="checkout-item-image" />
+      <div class="summary-item" *ngFor="let item of cartItems">
+        <div class="summary-left">
+          <img [src]="item.product.imageUrl" [alt]="item.product.name" />
           <div>
-            <strong>{{ item.product.name }}</strong>
+            <h4>{{ item.product.name }}</h4>
             <p>Qty: {{ item.quantity }}</p>
           </div>
         </div>
-        <span>Rs. {{ item.product.price * item.quantity }}</span>
+        <div class="summary-price">Rs. {{ item.product.price * item.quantity }}</div>
       </div>
 
-      <div class="summary-divider"></div>
-
-      <div class="summary-row">
-        <span>Total Items</span>
-        <span>{{ getTotalQuantity() }}</span>
+      <div class="summary-totals">
+        <div class="summary-row">
+          <span>Total Items</span>
+          <span>{{ getTotalQuantity() }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Delivery</span>
+          <span>Free</span>
+        </div>
+        <div class="summary-row total-row">
+          <span>Total</span>
+          <span>Rs. {{ total }}</span>
+        </div>
       </div>
 
-      <div class="summary-row">
-        <span>Delivery</span>
-        <span>Free</span>
-      </div>
-
-      <div class="summary-row total-row">
-        <span>Total</span>
-        <span>Rs. {{ total }}</span>
-      </div>
-
-      <div class="error-box" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
-      <button class="btn place-order-btn" (click)="placeOrder()" [disabled]="isSubmitting || checkoutForm.invalid">
+      <button class="btn place-order-btn" (click)="placeOrder()" [disabled]="isSubmitting">
         {{ isSubmitting ? 'Placing Order...' : 'Place Order' }}
       </button>
     </div>
   </div>
 </div>
-
-<ng-template #successState>
-  <div class="container">
-    <div class="success-card">
-      <div class="success-icon">✓</div>
-      <h1>Order Placed Successfully</h1>
-      <p>Thank you for shopping with LesiBuy.</p>
-      <p *ngIf="placedOrderId">Your Order ID: <strong>#{{ placedOrderId }}</strong></p>
-      <button class="btn" (click)="goHome()">Continue Shopping</button>
-    </div>
-  </div>
-</ng-template>

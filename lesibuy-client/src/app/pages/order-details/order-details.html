@@ -1,132 +1,147 @@
-<section class="order-details-page">
-  <div class="order-details-container">
-    <div *ngIf="loading" class="orders-state">Loading order details...</div>
+<div class="container order-details-page">
+  <div *ngIf="loading" class="orders-state">
+    Loading order details...
+  </div>
 
-    <div *ngIf="!loading && errorMessage" class="orders-state error">
-      {{ errorMessage }}
+  <div *ngIf="!loading && errorMessage" class="orders-state error">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!loading && order" class="order-details-card">
+    <div class="details-top">
+      <div class="details-head">
+        <h1>Order #{{ order.id }}</h1>
+        <p>{{ order.createdAt | date:'medium' }}</p>
+      </div>
+
+      <div class="details-top-right">
+        <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+          {{ order.status }}
+        </span>
+        <div class="details-total">Total Rs. {{ order.totalAmount }}</div>
+      </div>
     </div>
 
-    <div *ngIf="!loading && order" class="order-details-card">
-      <div class="details-top">
-        <div class="details-head">
-          <h1>Order #{{ order.id }}</h1>
-          <p>{{ order.createdAt | date:'medium' }}</p>
-        </div>
-
-        <div class="details-top-right">
-          <span class="status-badge" [ngClass]="getStatusClass(order.status)">
-            {{ order.status }}
-          </span>
-          <div class="details-total">Total Rs. {{ order.totalAmount }}</div>
-        </div>
+    <div class="details-grid">
+      <div class="meta-box">
+        <span class="meta-label">Customer</span>
+        <span class="meta-value">{{ order.fullName }}</span>
       </div>
 
-      <div class="details-grid">
-        <div class="meta-box">
-          <span class="meta-label">Customer</span>
-          <span class="meta-value">{{ order.fullName }}</span>
-        </div>
-
-        <div class="meta-box">
-          <span class="meta-label">City</span>
-          <span class="meta-value">{{ order.city }}</span>
-        </div>
-
-        <div class="meta-box">
-          <span class="meta-label">Items</span>
-          <span class="meta-value">{{ order.items.length }}</span>
-        </div>
+      <div class="meta-box">
+        <span class="meta-label">Email</span>
+        <span class="meta-value">{{ order.email }}</span>
       </div>
 
-      <div class="details-actions top-actions" *ngIf="canCancelOrder()">
-        <button class="cancel-btn" (click)="openCancelModal()">
-          Cancel Order
-        </button>
+      <div class="meta-box">
+        <span class="meta-label">Phone</span>
+        <span class="meta-value">{{ order.phone || '-' }}</span>
       </div>
 
-      <div class="details-items">
-        <div class="section-title-row">
-          <h3>Ordered Items</h3>
-        </div>
+      <div class="meta-box">
+        <span class="meta-label">Shipping City</span>
+        <span class="meta-value">{{ order.shippingCity }}</span>
+      </div>
 
-        <div class="product-card" *ngFor="let item of order.items">
-          <div class="product-image-wrap">
-            <img
-              *ngIf="item.productImageUrl; else noImage"
-              [src]="item.productImageUrl"
-              [alt]="item.productName"
-              class="product-image"
-            />
+      <div class="meta-box">
+        <span class="meta-label">Payment Method</span>
+        <span class="meta-value">{{ order.paymentMethod }}</span>
+      </div>
 
-            <ng-template #noImage>
-              <div class="product-image placeholder-image">
-                No Image
-              </div>
-            </ng-template>
+      <div class="meta-box">
+        <span class="meta-label">Items</span>
+        <span class="meta-value">{{ order.items.length }}</span>
+      </div>
+    </div>
+
+    <div class="address-section">
+      <div class="address-card">
+        <h3>Shipping Address</h3>
+        <p>{{ order.shippingAddress }}</p>
+        <p>{{ order.shippingCity }}, {{ order.shippingPostalCode }}</p>
+      </div>
+
+      <div class="address-card">
+        <h3>Billing Address</h3>
+
+        <ng-container *ngIf="order.billingSameAsShipping; else billingDifferent">
+          <p>Same as shipping address</p>
+        </ng-container>
+
+        <ng-template #billingDifferent>
+          <p>{{ order.billingAddress || '-' }}</p>
+          <p>{{ order.billingCity || '-' }}, {{ order.billingPostalCode || '-' }}</p>
+        </ng-template>
+      </div>
+    </div>
+
+    <div class="order-actions" *ngIf="canCancelOrder()">
+      <button class="btn cancel-btn" (click)="cancelOrder()">
+        Cancel Order
+      </button>
+    </div>
+
+    <div class="action-row">
+      <button *ngIf="canDownloadInvoice()" class="btn" (click)="downloadInvoice()">
+        Download Invoice
+      </button>
+    </div>
+
+    <div class="items-section">
+      <h2>Ordered Items</h2>
+
+      <div class="details-item-card" *ngFor="let item of order.items">
+        <div class="item-left">
+          <div class="item-image-wrap" *ngIf="item.productImageUrl">
+            <img [src]="item.productImageUrl" [alt]="item.productName" class="item-image" />
           </div>
 
-          <div class="product-main">
-            <div class="product-header">
-              <div>
-                <h4>{{ item.productName }}</h4>
+          <div class="item-content">
+            <h3>{{ item.productName }}</h3>
 
-                <p class="product-description" *ngIf="item.productDescription; else noDescription">
-                  {{ item.productDescription }}
-                </p>
+            <p class="item-description" *ngIf="item.productDescription">
+              {{ item.productDescription }}
+            </p>
 
-                <ng-template #noDescription>
-                  <p class="product-description muted-text">
-                    Product details were not saved for this older order.
-                  </p>
-                </ng-template>
-              </div>
+            <div class="item-tags">
+              <span class="item-tag" *ngIf="item.productCondition">
+                Condition: {{ item.productCondition }}
+              </span>
 
-              <div class="product-price-box">
-                <span class="price-label">Subtotal</span>
-                <span class="price-value">Rs. {{ item.subTotal }}</span>
-              </div>
-            </div>
+              <span class="item-tag" *ngIf="item.sellerType">
+                Seller: {{ item.sellerType }}
+              </span>
 
-            <div class="product-tags">
-              <span class="tag" *ngIf="item.productCondition">Condition: {{ item.productCondition }}</span>
-              <span class="tag" *ngIf="item.sellerType">Seller: {{ item.sellerType }}</span>
-              <span class="tag">Qty: {{ item.quantity }}</span>
-              <span class="tag">Unit Price: Rs. {{ item.unitPrice }}</span>
+              <span class="item-tag">
+                Qty: {{ item.quantity }}
+              </span>
+
+              <span class="item-tag">
+                Unit Price: Rs. {{ item.unitPrice }}
+              </span>
             </div>
 
             <div
-              class="spec-grid"
+              class="specifications-grid"
               *ngIf="item.specifications && parseSpecifications(item.specifications).length > 0"
             >
-              <div class="spec-card" *ngFor="let spec of parseSpecifications(item.specifications)">
-                <span class="spec-card-label">{{ spec.key }}</span>
-                <span class="spec-card-value">{{ spec.value }}</span>
+              <div class="spec-chip" *ngFor="let spec of parseSpecifications(item.specifications)">
+                <span class="spec-chip-key">{{ spec.key }}</span>
+                <span class="spec-chip-value">{{ spec.value }}</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="details-actions">
-        <a routerLink="/my-orders" class="back-btn">← Back to Orders</a>
+        <div class="item-subtotal-box">
+          <span class="subtotal-label">Subtotal</span>
+          <span class="subtotal-value">Rs. {{ item.subTotal }}</span>
+        </div>
       </div>
     </div>
-  </div>
-</section>
 
-<div class="modal-overlay" *ngIf="showCancelModal" (click)="closeCancelModal()">
-  <div class="modal-box" (click)="$event.stopPropagation()">
-    <h3>Cancel Order</h3>
-    <p>Are you sure you want to cancel this order?</p>
-
-    <div class="modal-actions">
-      <button class="btn-secondary" (click)="closeCancelModal()" [disabled]="isCancelling">
-        Keep Order
-      </button>
-
-      <button class="btn-danger" (click)="confirmCancel()" [disabled]="isCancelling">
-        {{ isCancelling ? 'Cancelling...' : 'Yes, Cancel' }}
-      </button>
+    <div class="back-row">
+      <a routerLink="/my-orders" class="btn btn-secondary">Back to Orders</a>
     </div>
   </div>
 </div>

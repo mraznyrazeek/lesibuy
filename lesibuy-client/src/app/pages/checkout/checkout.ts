@@ -15,10 +15,9 @@ import { AuthService } from '../../services/auth.service';
 })
 export class CheckoutComponent implements OnInit {
   cartItems: CartItem[] = [];
-  total: number = 0;
+  total = 0;
   orderPlaced = false;
   isSubmitting = false;
-  placedOrderId: number | null = null;
   checkoutForm!: FormGroup;
   errorMessage = '';
 
@@ -35,9 +34,17 @@ export class CheckoutComponent implements OnInit {
       fullName: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s]{7,15}$/)]],
-      address: ['', [Validators.required, Validators.minLength(5)]],
-      city: ['', [Validators.required]],
-      postalCode: ['', [Validators.required, Validators.minLength(3)]],
+
+      shippingAddress: ['', [Validators.required, Validators.minLength(5)]],
+      shippingCity: ['', [Validators.required]],
+      shippingPostalCode: ['', [Validators.required, Validators.minLength(3)]],
+
+      billingSameAsShipping: [true],
+
+      billingAddress: [''],
+      billingCity: [''],
+      billingPostalCode: [''],
+
       paymentMethod: ['Cash on Delivery', Validators.required]
     });
 
@@ -51,6 +58,11 @@ export class CheckoutComponent implements OnInit {
     });
 
     this.loadProfileIntoCheckout();
+    this.handleBillingToggle();
+  }
+
+  get f() {
+    return this.checkoutForm.controls;
   }
 
   loadProfileIntoCheckout(): void {
@@ -60,9 +72,9 @@ export class CheckoutComponent implements OnInit {
           fullName: user.fullName || '',
           email: user.email || '',
           phone: user.phone || '',
-          address: user.address || '',
-          city: user.city || '',
-          postalCode: user.postalCode || ''
+          shippingAddress: user.address || '',
+          shippingCity: user.city || '',
+          shippingPostalCode: user.postalCode || ''
         });
       },
       error: (err) => {
@@ -71,8 +83,30 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
-  get f() {
-    return this.checkoutForm.controls;
+  handleBillingToggle(): void {
+    this.checkoutForm.get('billingSameAsShipping')?.valueChanges.subscribe((same) => {
+      const billingAddress = this.checkoutForm.get('billingAddress');
+      const billingCity = this.checkoutForm.get('billingCity');
+      const billingPostalCode = this.checkoutForm.get('billingPostalCode');
+
+      if (same) {
+        billingAddress?.clearValidators();
+        billingCity?.clearValidators();
+        billingPostalCode?.clearValidators();
+
+        billingAddress?.setValue('');
+        billingCity?.setValue('');
+        billingPostalCode?.setValue('');
+      } else {
+        billingAddress?.setValidators([Validators.required, Validators.minLength(5)]);
+        billingCity?.setValidators([Validators.required]);
+        billingPostalCode?.setValidators([Validators.required, Validators.minLength(3)]);
+      }
+
+      billingAddress?.updateValueAndValidity();
+      billingCity?.updateValueAndValidity();
+      billingPostalCode?.updateValueAndValidity();
+    });
   }
 
   placeOrder(): void {
@@ -85,9 +119,16 @@ export class CheckoutComponent implements OnInit {
       fullName: this.checkoutForm.value.fullName,
       email: this.checkoutForm.value.email,
       phone: this.checkoutForm.value.phone,
-      address: this.checkoutForm.value.address,
-      city: this.checkoutForm.value.city,
-      postalCode: this.checkoutForm.value.postalCode,
+
+      shippingAddress: this.checkoutForm.value.shippingAddress,
+      shippingCity: this.checkoutForm.value.shippingCity,
+      shippingPostalCode: this.checkoutForm.value.shippingPostalCode,
+
+      billingSameAsShipping: this.checkoutForm.value.billingSameAsShipping,
+      billingAddress: this.checkoutForm.value.billingAddress,
+      billingCity: this.checkoutForm.value.billingCity,
+      billingPostalCode: this.checkoutForm.value.billingPostalCode,
+
       paymentMethod: this.checkoutForm.value.paymentMethod,
       items: this.cartItems.map(item => ({
         productId: item.product.id,
@@ -106,7 +147,6 @@ export class CheckoutComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Order creation failed:', err);
-        console.error('Backend error body:', err?.error);
         this.isSubmitting = false;
         this.errorMessage = err?.error?.message || 'Failed to place order. Please try again.';
       }
@@ -115,9 +155,5 @@ export class CheckoutComponent implements OnInit {
 
   getTotalQuantity(): number {
     return this.cartItems.reduce((total, item) => total + item.quantity, 0);
-  }
-
-  goHome(): void {
-    this.router.navigate(['/']);
   }
 }

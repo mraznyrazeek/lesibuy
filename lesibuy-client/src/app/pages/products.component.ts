@@ -74,15 +74,22 @@ export class ProductsComponent implements OnInit {
   }
 
   selectCategory(category: string): void {
+    this.selectedCategory = category;
+
     if (category === 'All') {
       this.router.navigate(['/'], {
-        queryParams: {}
+        queryParams: this.searchTerm ? { search: this.searchTerm } : {},
+        fragment: 'featured-products'
       });
       return;
     }
 
     this.router.navigate(['/'], {
-      queryParams: { category }
+      queryParams: {
+        category,
+        ...(this.searchTerm ? { search: this.searchTerm } : {})
+      },
+      fragment: 'featured-products'
     });
   }
 

@@ -21,7 +21,19 @@ export interface Order {
   id: number;
   createdAt: string;
   fullName: string;
-  city: string;
+  email: string;
+  phone: string;
+
+  shippingAddress: string;
+  shippingCity: string;
+  shippingPostalCode: string;
+
+  billingSameAsShipping: boolean;
+  billingAddress?: string;
+  billingCity?: string;
+  billingPostalCode?: string;
+
+  paymentMethod: string;
   totalAmount: number;
   status: string;
   items: OrderItem[];
@@ -36,9 +48,17 @@ export interface CreateOrderRequest {
   fullName: string;
   email?: string;
   phone?: string;
-  address?: string;
-  city: string;
-  postalCode?: string;
+
+  shippingAddress: string;
+  shippingCity: string;
+  shippingPostalCode: string;
+
+  billingSameAsShipping: boolean;
+  billingAddress?: string;
+  billingCity?: string;
+  billingPostalCode?: string;
+
+  paymentMethod?: string;
   items: CreateOrderItemRequest[];
 }
 
@@ -46,13 +66,22 @@ export interface CreateOrderResponse {
   id: number;
   createdAt: string;
   fullName: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  city: string;
-  postalCode?: string;
-  paymentMethod?: string;
-  items: CreateOrderItemRequest[];
+  email: string;
+  phone: string;
+
+  shippingAddress: string;
+  shippingCity: string;
+  shippingPostalCode: string;
+
+  billingSameAsShipping: boolean;
+  billingAddress?: string;
+  billingCity?: string;
+  billingPostalCode?: string;
+
+  paymentMethod: string;
+  totalAmount: number;
+  status: string;
+  items: OrderItem[];
 }
 
 @Injectable({
@@ -64,7 +93,7 @@ export class OrderService {
   constructor(
     private http: HttpClient,
     private authService: AuthService
-  ) {}
+  ) { }
 
   getOrders(): Observable<Order[]> {
     return this.http.get<Order[]>(this.withAccessToken(this.apiUrl));

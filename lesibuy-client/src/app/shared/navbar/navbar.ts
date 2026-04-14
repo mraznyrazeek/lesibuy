@@ -12,9 +12,9 @@ import { AuthService, AuthResponse } from '../../services/auth.service';
   styleUrl: './navbar.css'
 })
 export class Navbar implements OnInit {
-  cartCount: number = 0;
+  cartCount = 0;
   currentUser: AuthResponse | null = null;
-  isUserMenuOpen: boolean = false;
+  isUserMenuOpen = false;
 
   constructor(
     private router: Router,
@@ -24,10 +24,7 @@ export class Navbar implements OnInit {
 
   ngOnInit(): void {
     this.cartService.cartItems$.subscribe((items: CartItem[]) => {
-      this.cartCount = items.reduce(
-        (total: number, item: CartItem) => total + item.quantity,
-        0
-      );
+      this.cartCount = items.reduce((total, item) => total + item.quantity, 0);
     });
 
     this.authService.currentUser$.subscribe((user: AuthResponse | null) => {
@@ -56,12 +53,16 @@ export class Navbar implements OnInit {
   }
 
   goHome(): void {
-    this.router.navigate(['/'], { queryParams: {} });
+    this.router.navigate(['/'], {
+      queryParams: {},
+      fragment: 'top'
+    });
   }
 
   goToCategory(category: string): void {
     this.router.navigate(['/'], {
-      queryParams: { category }
+      queryParams: { category },
+      fragment: 'featured-products'
     });
   }
 
@@ -102,12 +103,16 @@ export class Navbar implements OnInit {
     const trimmed = value.trim();
 
     if (!trimmed) {
-      this.router.navigate(['/'], { queryParams: {} });
+      this.router.navigate(['/'], {
+        queryParams: {},
+        fragment: 'top'
+      });
       return;
     }
 
     this.router.navigate(['/'], {
-      queryParams: { search: trimmed }
+      queryParams: { search: trimmed },
+      fragment: 'featured-products'
     });
   }
 }

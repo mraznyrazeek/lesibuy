@@ -30,7 +30,10 @@
     "@angular/router": "^20.1.0",
     "@angular/ssr": "^20.1.0",
     "express": "^5.1.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
     "rxjs": "~7.8.0",
+    "sweetalert2": "^11.26.24",
     "tslib": "^2.3.0",
     "zone.js": "^0.15.1"
   },
