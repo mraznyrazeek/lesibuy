@@ -121,6 +121,17 @@ input:focus {
   color: #8a6a00;
 }
 
+.info-box {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 @media (max-width: 640px) {
   .auth-card {
     padding: 24px;

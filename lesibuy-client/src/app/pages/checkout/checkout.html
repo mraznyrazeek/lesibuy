@@ -17,13 +17,8 @@
         <div class="form-grid">
           <div class="form-group full-width">
             <label for="fullName">Full Name</label>
-            <input
-              id="fullName"
-              type="text"
-              formControlName="fullName"
-              [class.invalid]="f['fullName'].invalid && f['fullName'].touched"
-              placeholder="Enter your full name"
-            />
+            <input id="fullName" type="text" formControlName="fullName"
+              [class.invalid]="f['fullName'].invalid && f['fullName'].touched" placeholder="Enter your full name" />
             <small class="error" *ngIf="f['fullName'].invalid && f['fullName'].touched">
               Full name is required and must be at least 3 characters.
             </small>
@@ -31,13 +26,8 @@
 
           <div class="form-group">
             <label for="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              formControlName="email"
-              [class.invalid]="f['email'].invalid && f['email'].touched"
-              placeholder="Enter your email"
-            />
+            <input id="email" type="email" formControlName="email"
+              [class.invalid]="f['email'].invalid && f['email'].touched" placeholder="Enter your email" />
             <small class="error" *ngIf="f['email'].invalid && f['email'].touched">
               Please enter a valid email address.
             </small>
@@ -45,13 +35,8 @@
 
           <div class="form-group">
             <label for="phone">Phone</label>
-            <input
-              id="phone"
-              type="text"
-              formControlName="phone"
-              [class.invalid]="f['phone'].invalid && f['phone'].touched"
-              placeholder="Enter your phone number"
-            />
+            <input id="phone" type="text" formControlName="phone"
+              [class.invalid]="f['phone'].invalid && f['phone'].touched" placeholder="Enter your phone number" />
             <small class="error" *ngIf="f['phone'].invalid && f['phone'].touched">
               Please enter a valid phone number.
             </small>
@@ -59,13 +44,9 @@
 
           <div class="form-group full-width">
             <label for="address">Address</label>
-            <input
-              id="address"
-              type="text"
-              formControlName="address"
+            <input id="address" type="text" formControlName="address"
               [class.invalid]="f['address'].invalid && f['address'].touched"
-              placeholder="Street address / house number"
-            />
+              placeholder="Street address / house number" />
             <small class="error" *ngIf="f['address'].invalid && f['address'].touched">
               Address is required.
             </small>
@@ -73,13 +54,8 @@
 
           <div class="form-group">
             <label for="city">City</label>
-            <input
-              id="city"
-              type="text"
-              formControlName="city"
-              [class.invalid]="f['city'].invalid && f['city'].touched"
-              placeholder="Enter your city"
-            />
+            <input id="city" type="text" formControlName="city" [class.invalid]="f['city'].invalid && f['city'].touched"
+              placeholder="Enter your city" />
             <small class="error" *ngIf="f['city'].invalid && f['city'].touched">
               City is required.
             </small>
@@ -87,13 +63,8 @@
 
           <div class="form-group">
             <label for="postalCode">Postal Code</label>
-            <input
-              id="postalCode"
-              type="text"
-              formControlName="postalCode"
-              [class.invalid]="f['postalCode'].invalid && f['postalCode'].touched"
-              placeholder="Enter postal code"
-            />
+            <input id="postalCode" type="text" formControlName="postalCode"
+              [class.invalid]="f['postalCode'].invalid && f['postalCode'].touched" placeholder="Enter postal code" />
             <small class="error" *ngIf="f['postalCode'].invalid && f['postalCode'].touched">
               Postal code is required.
             </small>
@@ -101,11 +72,8 @@
 
           <div class="form-group full-width">
             <label for="paymentMethod">Payment Method</label>
-            <select
-              id="paymentMethod"
-              formControlName="paymentMethod"
-              [class.invalid]="f['paymentMethod'].invalid && f['paymentMethod'].touched"
-            >
+            <select id="paymentMethod" formControlName="paymentMethod"
+              [class.invalid]="f['paymentMethod'].invalid && f['paymentMethod'].touched">
               <option>Cash on Delivery</option>
               <option>Bank Transfer</option>
               <option>Card Payment</option>
@@ -146,11 +114,10 @@
         <span>Rs. {{ total }}</span>
       </div>
 
-      <button
-        class="btn place-order-btn"
-        (click)="placeOrder()"
-        [disabled]="isSubmitting || checkoutForm.invalid"
-      >
+      <div class="error-box" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+      <button class="btn place-order-btn" (click)="placeOrder()" [disabled]="isSubmitting || checkoutForm.invalid">
         {{ isSubmitting ? 'Placing Order...' : 'Place Order' }}
       </button>
     </div>

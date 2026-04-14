@@ -1,35 +1,36 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { AuthService, AuthResponse } from '../../services/auth.service';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService, AuthResponse, UpdateProfileRequest } from '../../services/auth.service';
 
 @Component({
   selector: 'app-my-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './my-profile.html',
   styleUrl: './my-profile.css'
 })
 export class MyProfile implements OnInit {
+  profileForm!: FormGroup;
   currentUser: AuthResponse | null = null;
-  editMode = false;
+  isEditing = false;
   isSaving = false;
+  errorMessage = '';
+  successMessage = '';
 
-  formData = {
-    fullName: '',
-    email: ''
-  };
-
-  constructor(private authService: AuthService) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe((user: AuthResponse | null) => {
-      this.currentUser = user;
-
-      if (user) {
-        this.formData.fullName = user.fullName;
-        this.formData.email = user.email;
-      }
+    this.profileForm = this.fb.group({
+      fullName: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      phone: [''],
+      address: [''],
+      city: [''],
+      postalCode: ['']
     });
 
     this.loadProfile();
@@ -39,59 +40,74 @@ export class MyProfile implements OnInit {
     this.authService.getMe().subscribe({
       next: (user) => {
         this.currentUser = user;
-        this.authService.setSession(user);
-
-        this.formData.fullName = user.fullName;
-        this.formData.email = user.email;
+        this.profileForm.patchValue({
+          fullName: user.fullName || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          address: user.address || '',
+          city: user.city || '',
+          postalCode: user.postalCode || ''
+        });
       },
-      error: () => {
-        console.error('Failed to load profile');
+      error: (err) => {
+        console.error(err);
+        this.errorMessage = 'Failed to load profile.';
       }
     });
   }
 
   startEdit(): void {
-    if (!this.currentUser) return;
-
-    this.formData.fullName = this.currentUser.fullName;
-    this.formData.email = this.currentUser.email;
-    this.editMode = true;
+    this.isEditing = true;
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
   cancelEdit(): void {
-    if (!this.currentUser) return;
+    this.isEditing = false;
+    this.errorMessage = '';
+    this.successMessage = '';
 
-    this.formData.fullName = this.currentUser.fullName;
-    this.formData.email = this.currentUser.email;
-    this.editMode = false;
+    if (this.currentUser) {
+      this.profileForm.patchValue({
+        fullName: this.currentUser.fullName || '',
+        email: this.currentUser.email || '',
+        phone: this.currentUser.phone || '',
+        address: this.currentUser.address || '',
+        city: this.currentUser.city || '',
+        postalCode: this.currentUser.postalCode || ''
+      });
+    }
   }
 
   saveProfile(): void {
-    const trimmedFullName = this.formData.fullName.trim();
-    const trimmedEmail = this.formData.email.trim();
-
-    if (!trimmedFullName || !trimmedEmail) {
-      alert('Full Name and Email are required.');
+    if (this.profileForm.invalid) {
+      this.profileForm.markAllAsTouched();
       return;
     }
 
     this.isSaving = true;
+    this.errorMessage = '';
+    this.successMessage = '';
 
-    this.authService.updateProfile({
-      fullName: trimmedFullName,
-      email: trimmedEmail
-    }).subscribe({
+    const payload: UpdateProfileRequest = this.profileForm.value;
+
+    this.authService.updateProfile(payload).subscribe({
       next: (updatedUser) => {
-        this.authService.setSession(updatedUser);
         this.currentUser = updatedUser;
-        this.editMode = false;
+        this.authService.updateCurrentUser(updatedUser);
         this.isSaving = false;
-        alert('Profile updated successfully.');
+        this.isEditing = false;
+        this.successMessage = 'Profile updated successfully.';
       },
-      error: (error) => {
+      error: (err) => {
+        console.error(err);
         this.isSaving = false;
-        alert(error?.error?.message || 'Failed to update profile.');
+        this.errorMessage = err?.error?.message || 'Failed to update profile.';
       }
     });
+  }
+
+  get f() {
+    return this.profileForm.controls;
   }
 }

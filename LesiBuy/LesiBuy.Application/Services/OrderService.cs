@@ -18,7 +18,7 @@ namespace LesiBuy.Application.Services
             _uow = uow;
         }
 
-        public async Task<Order> CreateOrderAsync(CreateOrderDto dto, int? userId = null)
+        public async Task<OrderDto> CreateOrderAsync(CreateOrderDto dto, int? userId = null)
         {
             var order = new Order
             {
@@ -68,7 +68,7 @@ namespace LesiBuy.Application.Services
             await _uow.Repository<Order>().AddAsync(order);
             await _uow.CompleteAsync();
 
-            return order;
+            return MapOrderToDto(order);
         }
 
         public async Task<IReadOnlyList<OrderDto>> GetAllOrdersAsync()
@@ -105,6 +105,25 @@ namespace LesiBuy.Application.Services
                 return null;
 
             return MapOrderToDto(order);
+        }
+
+        public async Task<bool> CancelOrderAsync(int orderId, int userId)
+        {
+            var order = await _uow.Repository<Order>()
+                .Query()
+                .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
+
+            if (order == null)
+                return false;
+
+            if (!string.Equals(order.Status, "Pending", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            order.Status = "Cancelled";
+
+            await _uow.CompleteAsync();
+
+            return true;
         }
 
         private static OrderDto MapOrderToDto(Order order)

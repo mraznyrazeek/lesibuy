@@ -39,37 +39,107 @@
 
       <div class="form-group">
         <label for="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="Create a password"
-          [class.invalid]="f['password'].invalid && f['password'].touched"
-        />
+
+        <div class="password-input-wrap">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Create a password"
+            [class.invalid]="f['password'].invalid && f['password'].touched"
+          />
+          <button type="button" class="toggle-password-btn" (click)="togglePassword()">
+            {{ showPassword ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+
+        <div class="password-strength-box" *ngIf="passwordValue">
+          <div class="strength-header">
+            <span>Password Strength</span>
+            <span class="strength-text" [ngClass]="passwordStrengthClass">
+              {{ passwordStrength }}
+            </span>
+          </div>
+
+          <div class="strength-bar">
+            <div class="strength-fill" [ngClass]="passwordStrengthClass"></div>
+          </div>
+
+          <div class="password-rules">
+            <div class="rule" [class.valid]="passwordChecks.minLength">
+              <span class="rule-icon">{{ passwordChecks.minLength ? '✔' : '○' }}</span>
+              <span>At least 8 characters</span>
+            </div>
+
+            <div class="rule" [class.valid]="passwordChecks.uppercase">
+              <span class="rule-icon">{{ passwordChecks.uppercase ? '✔' : '○' }}</span>
+              <span>One uppercase letter</span>
+            </div>
+
+            <div class="rule" [class.valid]="passwordChecks.lowercase">
+              <span class="rule-icon">{{ passwordChecks.lowercase ? '✔' : '○' }}</span>
+              <span>One lowercase letter</span>
+            </div>
+
+            <div class="rule" [class.valid]="passwordChecks.number">
+              <span class="rule-icon">{{ passwordChecks.number ? '✔' : '○' }}</span>
+              <span>One number</span>
+            </div>
+
+            <div class="rule" [class.valid]="passwordChecks.special">
+              <span class="rule-icon">{{ passwordChecks.special ? '✔' : '○' }}</span>
+              <span>One special character</span>
+            </div>
+          </div>
+        </div>
+
         <small class="error" *ngIf="f['password'].invalid && f['password'].touched">
-          Password must be at least 6 characters.
+          Password must meet all required rules.
         </small>
       </div>
 
       <div class="form-group">
         <label for="confirmPassword">Confirm Password</label>
-        <input
-          id="confirmPassword"
-          type="password"
-          formControlName="confirmPassword"
-          placeholder="Confirm your password"
-          [class.invalid]="(f['confirmPassword'].invalid && f['confirmPassword'].touched) || (registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched)"
-        />
+
+        <div class="password-input-wrap">
+          <input
+            id="confirmPassword"
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            placeholder="Confirm your password"
+            [class.invalid]="
+              (f['confirmPassword'].invalid && f['confirmPassword'].touched) ||
+              (registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched)
+            "
+          />
+          <button type="button" class="toggle-password-btn" (click)="toggleConfirmPassword()">
+            {{ showConfirmPassword ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+
         <small class="error" *ngIf="f['confirmPassword'].invalid && f['confirmPassword'].touched">
           Confirm password is required.
         </small>
+
         <small class="error" *ngIf="registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched">
           Passwords do not match.
+        </small>
+
+        <small class="success-text" *ngIf="
+          f['confirmPassword'].touched &&
+          !registerForm.errors?.['passwordMismatch'] &&
+          f['confirmPassword'].value
+        ">
+          Passwords match.
         </small>
       </div>
 
       <div class="error-box" *ngIf="errorMessage">
         {{ errorMessage }}
+      </div>
+
+      <div class="success-box" *ngIf="successMessage">
+        {{ successMessage }}
       </div>
 
       <button class="btn auth-btn" type="submit" [disabled]="isSubmitting">

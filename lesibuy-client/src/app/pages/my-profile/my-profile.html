@@ -1,64 +1,96 @@
-<div class="profile-page">
+<div class="container profile-page">
   <div class="profile-card">
-    <h1>My Profile</h1>
+    <div class="profile-header">
+      <h1>My Profile</h1>
+      <p>Manage your personal and delivery information.</p>
+    </div>
 
-    <ng-container *ngIf="!editMode; else editBlock">
-      <div class="profile-row">
-        <span class="label">Full Name</span>
-        <span class="value">{{ currentUser?.fullName || '-' }}</span>
-      </div>
+    <div class="success-box" *ngIf="successMessage">
+      {{ successMessage }}
+    </div>
 
-      <div class="profile-row">
-        <span class="label">Email</span>
-        <span class="value">{{ currentUser?.email || '-' }}</span>
+    <div class="error-box" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="profileForm" *ngIf="isEditing; else profileView">
+      <div class="profile-grid">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" formControlName="fullName" />
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" formControlName="email" />
+        </div>
+
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="text" formControlName="phone" placeholder="Enter phone number" />
+        </div>
+
+        <div class="form-group full-width">
+          <label>Address</label>
+          <input type="text" formControlName="address" placeholder="Enter your address" />
+        </div>
+
+        <div class="form-group">
+          <label>City</label>
+          <input type="text" formControlName="city" placeholder="Enter your city" />
+        </div>
+
+        <div class="form-group">
+          <label>Postal Code</label>
+          <input type="text" formControlName="postalCode" placeholder="Enter postal code" />
+        </div>
       </div>
 
       <div class="profile-actions">
-        <button type="button" class="primary-btn" (click)="startEdit()">
-          Edit Profile
-        </button>
-      </div>
-    </ng-container>
-
-    <ng-template #editBlock>
-      <div class="form-group">
-        <label for="fullName">Full Name</label>
-        <input
-          id="fullName"
-          type="text"
-          [(ngModel)]="formData.fullName"
-          placeholder="Enter full name"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          [(ngModel)]="formData.email"
-          placeholder="Enter email"
-        />
-      </div>
-
-      <div class="profile-actions">
-        <button
-          type="button"
-          class="primary-btn"
-          (click)="saveProfile()"
-          [disabled]="isSaving"
-        >
+        <button type="button" class="btn" (click)="saveProfile()" [disabled]="isSaving">
           {{ isSaving ? 'Saving...' : 'Save Changes' }}
         </button>
-
-        <button
-          type="button"
-          class="secondary-btn"
-          (click)="cancelEdit()"
-          [disabled]="isSaving"
-        >
+        <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
           Cancel
         </button>
+      </div>
+    </form>
+
+    <ng-template #profileView>
+      <div class="profile-view-grid">
+        <div class="profile-row">
+          <span class="label">Full Name</span>
+          <span class="value">{{ currentUser?.fullName || '-' }}</span>
+        </div>
+
+        <div class="profile-row">
+          <span class="label">Email</span>
+          <span class="value">{{ currentUser?.email || '-' }}</span>
+        </div>
+
+        <div class="profile-row">
+          <span class="label">Phone</span>
+          <span class="value">{{ currentUser?.phone || '-' }}</span>
+        </div>
+
+        <div class="profile-row">
+          <span class="label">Address</span>
+          <span class="value">{{ currentUser?.address || '-' }}</span>
+        </div>
+
+        <div class="profile-row">
+          <span class="label">City</span>
+          <span class="value">{{ currentUser?.city || '-' }}</span>
+        </div>
+
+        <div class="profile-row">
+          <span class="label">Postal Code</span>
+          <span class="value">{{ currentUser?.postalCode || '-' }}</span>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button class="btn" (click)="startEdit()">Edit Profile</button>
       </div>
     </ng-template>
   </div>

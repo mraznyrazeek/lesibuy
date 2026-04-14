@@ -24,9 +24,26 @@
         </div>
       </div>
 
+      <div class="success-box" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+
       <div class="action-buttons">
-        <button class="btn">Buy Now</button>
-        <button class="btn btn-secondary">Ask About This Device</button>
+        <button
+          class="btn"
+          (click)="buyNow()"
+          [disabled]="!product.isAvailable"
+        >
+          Buy Now
+        </button>
+
+        <button
+          class="btn btn-secondary"
+          (click)="addToCart()"
+          [disabled]="!product.isAvailable"
+        >
+          Add to Cart
+        </button>
       </div>
     </div>
   </div>

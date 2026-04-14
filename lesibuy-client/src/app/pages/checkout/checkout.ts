@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { CartService, CartItem } from '../../services/cart';
 import { OrderService, CreateOrderResponse } from '../../services/order.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-checkout',
@@ -15,17 +16,19 @@ import { OrderService, CreateOrderResponse } from '../../services/order.service'
 export class CheckoutComponent implements OnInit {
   cartItems: CartItem[] = [];
   total: number = 0;
-  orderPlaced: boolean = false;
-  isSubmitting: boolean = false;
+  orderPlaced = false;
+  isSubmitting = false;
   placedOrderId: number | null = null;
   checkoutForm!: FormGroup;
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
     private cartService: CartService,
     private orderService: OrderService,
+    private authService: AuthService,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.checkoutForm = this.fb.group({
@@ -44,6 +47,26 @@ export class CheckoutComponent implements OnInit {
 
       if (items.length === 0 && !this.orderPlaced) {
         this.router.navigate(['/cart']);
+      }
+    });
+
+    this.loadProfileIntoCheckout();
+  }
+
+  loadProfileIntoCheckout(): void {
+    this.authService.getMe().subscribe({
+      next: (user) => {
+        this.checkoutForm.patchValue({
+          fullName: user.fullName || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          address: user.address || '',
+          city: user.city || '',
+          postalCode: user.postalCode || ''
+        });
+      },
+      error: (err) => {
+        console.error('Failed to load profile into checkout:', err);
       }
     });
   }
@@ -73,30 +96,28 @@ export class CheckoutComponent implements OnInit {
     };
 
     this.isSubmitting = true;
+    this.errorMessage = '';
 
     this.orderService.createOrder(payload).subscribe({
       next: (response: CreateOrderResponse) => {
-        // this.placedOrderId = response.id;
-        // this.orderPlaced = true;
-        // this.cartService.clearCart();
-        // this.isSubmitting = false;
         this.cartService.clearCart();
         this.isSubmitting = false;
         this.router.navigate(['/order-success', response.id]);
       },
       error: (err: any) => {
         console.error('Order creation failed:', err);
+        console.error('Backend error body:', err?.error);
         this.isSubmitting = false;
-        alert('Failed to place order. Please try again.');
+        this.errorMessage = err?.error?.message || 'Failed to place order. Please try again.';
       }
     });
   }
 
-  goHome(): void {
-    this.router.navigate(['/']);
-  }
-
   getTotalQuantity(): number {
     return this.cartItems.reduce((total, item) => total + item.quantity, 0);
+  }
+
+  goHome(): void {
+    this.router.navigate(['/']);
   }
 }

@@ -46,10 +46,13 @@ export interface CreateOrderResponse {
   id: number;
   createdAt: string;
   fullName: string;
+  email?: string;
+  phone?: string;
+  address?: string;
   city: string;
-  totalAmount: number;
-  status: string;
-  items: OrderItem[];
+  postalCode?: string;
+  paymentMethod?: string;
+  items: CreateOrderItemRequest[];
 }
 
 @Injectable({
@@ -77,6 +80,13 @@ export class OrderService {
 
   createOrder(payload: CreateOrderRequest): Observable<CreateOrderResponse> {
     return this.http.post<CreateOrderResponse>(this.withAccessToken(this.apiUrl), payload);
+  }
+
+  cancelOrder(id: number): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(
+      this.withAccessToken(`${this.apiUrl}/${id}/cancel`),
+      {}
+    );
   }
 
   private withAccessToken(url: string): string {

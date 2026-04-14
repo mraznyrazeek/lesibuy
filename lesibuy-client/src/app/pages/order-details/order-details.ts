@@ -14,6 +14,8 @@ export class OrderDetails implements OnInit {
   order?: Order;
   loading = false;
   errorMessage = '';
+  isCancelling = false;
+  showCancelModal = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -44,6 +46,41 @@ export class OrderDetails implements OnInit {
         console.error('Failed to load order details:', err);
         this.errorMessage = 'Failed to load order details.';
         this.loading = false;
+      }
+    });
+  }
+
+  canCancelOrder(): boolean {
+    return (this.order?.status || '').toLowerCase() === 'pending';
+  }
+
+  openCancelModal(): void {
+    if (!this.canCancelOrder()) return;
+    this.showCancelModal = true;
+  }
+
+  closeCancelModal(): void {
+    if (this.isCancelling) return;
+    this.showCancelModal = false;
+  }
+
+  confirmCancel(): void {
+    if (!this.order || !this.canCancelOrder()) return;
+
+    this.isCancelling = true;
+
+    this.orderService.cancelOrder(this.order.id).subscribe({
+      next: () => {
+        if (this.order) {
+          this.order.status = 'Cancelled';
+        }
+        this.isCancelling = false;
+        this.showCancelModal = false;
+      },
+      error: (err: any) => {
+        console.error('Failed to cancel order:', err);
+        alert(err?.error?.message || 'Failed to cancel order.');
+        this.isCancelling = false;
       }
     });
   }

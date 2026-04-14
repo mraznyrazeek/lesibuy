@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -11,19 +11,29 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   errorMessage: string = '';
+  infoMessage: string = '';
   isSubmitting: boolean = false;
+  returnUrl: string = '/';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.infoMessage = params['message'] || '';
+      this.returnUrl = params['returnUrl'] || '/';
     });
   }
 
@@ -44,7 +54,7 @@ export class LoginComponent {
       next: (response) => {
         this.authService.setSession(response);
         this.isSubmitting = false;
-        this.router.navigate(['/']);
+        this.router.navigateByUrl(this.returnUrl);
       },
       error: (err) => {
         console.error(err);

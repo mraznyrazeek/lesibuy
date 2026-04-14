@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
+import { CartService } from '../../services/cart';
 
 @Component({
   selector: 'app-product-details',
@@ -14,17 +15,18 @@ import { Product } from '../../models/product.model';
 export class ProductDetailsComponent implements OnInit {
   product: Product | null = null;
   specifications: { key: string; value: string }[] = [];
+  successMessage = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private productService: ProductService
+    private productService: ProductService,
+    private cartService: CartService
   ) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const id = Number(params.get('id'));
-      console.log('Route ID:', id);
 
       if (!id) {
         console.error('Invalid product id');
@@ -33,7 +35,6 @@ export class ProductDetailsComponent implements OnInit {
 
       this.productService.getProductById(id).subscribe({
         next: (data) => {
-          console.log('Product loaded:', data);
           this.product = data;
           this.parseSpecifications(data.specifications);
         },
@@ -48,13 +49,20 @@ export class ProductDetailsComponent implements OnInit {
     try {
       const parsed = JSON.parse(specifications);
       this.specifications = Object.keys(parsed).map(key => ({
-        key,
+        key: this.formatSpecKey(key),
         value: parsed[key]
       }));
     } catch (error) {
       console.error('Invalid specifications JSON', error);
       this.specifications = [];
     }
+  }
+
+  formatSpecKey(key: string): string {
+    return key
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, (char) => char.toUpperCase())
+      .trim();
   }
 
   getCategoryName(id: number): string {
@@ -66,6 +74,24 @@ export class ProductDetailsComponent implements OnInit {
       case 5: return 'Audio';
       default: return 'Unknown';
     }
+  }
+
+  addToCart(): void {
+    if (!this.product || !this.product.isAvailable) return;
+
+    this.cartService.addToCart(this.product);
+    this.successMessage = 'Product added to cart successfully.';
+
+    setTimeout(() => {
+      this.successMessage = '';
+    }, 2500);
+  }
+
+  buyNow(): void {
+    if (!this.product || !this.product.isAvailable) return;
+
+    this.cartService.addToCart(this.product);
+    this.router.navigate(['/checkout']);
   }
 
   goHome(): void {

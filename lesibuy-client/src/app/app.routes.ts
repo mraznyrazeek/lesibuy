@@ -13,32 +13,47 @@ export const routes: Routes = [
   { path: '', component: ProductsComponent },
   { path: 'products/:id', component: ProductDetailsComponent },
   { path: 'cart', component: CartComponent },
-  { path: 'checkout', component: CheckoutComponent },
-  { path: 'order-success/:id', component: OrderSuccessComponent },
-  { path: 'my-orders', component: MyOrdersComponent },
+
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+
+  { path: 'checkout', component: CheckoutComponent, canActivate: [authGuard] },
+  { path: 'order-success/:id', component: OrderSuccessComponent, canActivate: [authGuard] },
   { path: 'my-orders', component: MyOrdersComponent, canActivate: [authGuard] },
+
   {
     path: 'my-profile',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/my-profile/my-profile').then(m => m.MyProfile)
   },
   {
     path: 'change-password',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/change-password/change-password').then(m => m.ChangePassword)
   },
-
-  {
-    path: 'change-password',
-    loadComponent: () =>
-      import('./pages/change-password/change-password').then(m => m.ChangePassword)
-  },
-
   {
     path: 'orders/:id',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/order-details/order-details').then(m => m.OrderDetails)
-  }
+  },
+  {
+    path: 'contact-us',
+    loadComponent: () =>
+      import('./pages/contact-us/contact-us').then(m => m.ContactUsComponent)
+  },
+  {
+    path: 'privacy-policy',
+    loadComponent: () =>
+      import('./pages/privacy-policy/privacy-policy').then(m => m.PrivacyPolicyComponent)
+  },
+  {
+    path: 'terms-and-conditions',
+    loadComponent: () =>
+      import('./pages/terms-and-conditions/terms-and-conditions').then(m => m.TermsAndConditionsComponent)
+  },
+
+  { path: '**', redirectTo: '' }
 ];

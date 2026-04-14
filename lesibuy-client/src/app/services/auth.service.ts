@@ -18,12 +18,20 @@ export interface AuthResponse {
   id: number;
   fullName: string;
   email: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
   token: string;
 }
 
 export interface UpdateProfileRequest {
   fullName: string;
   email: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
 }
 
 export interface ChangePasswordRequest {
@@ -117,7 +125,7 @@ export class AuthService {
 
     const separator = url.includes('?') ? '&' : '?';
     return `${url}${separator}access_token=${encodeURIComponent(token)}`;
-    }
+  }
 
   private getUserFromStorage(): AuthResponse | null {
     if (!this.isBrowser()) return null;

@@ -187,6 +187,15 @@ select:focus {
   margin-bottom: 10px;
 }
 
+.error-box {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #fff1f2;
+  color: #be123c;
+  font-weight: 700;
+}
+
 @media (max-width: 992px) {
   .checkout-layout {
     grid-template-columns: 1fr;

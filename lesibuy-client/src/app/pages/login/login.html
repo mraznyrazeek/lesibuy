@@ -8,6 +8,10 @@
       </p>
     </div>
 
+    <div class="info-box" *ngIf="infoMessage">
+      {{ infoMessage }}
+    </div>
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
       <div class="form-group">
         <label for="email">Email</label>

@@ -81,12 +81,27 @@ input:focus {
   font-weight: 600;
 }
 
+.success-text {
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .error-box {
   margin-bottom: 18px;
   padding: 12px 14px;
   border-radius: 14px;
   background: #fff1f2;
   color: #be123c;
+  font-weight: 600;
+}
+
+.success-box {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #ecfdf3;
+  color: #166534;
   font-weight: 600;
 }
 
@@ -119,6 +134,134 @@ input:focus {
 
 .auth-footer a:hover {
   color: #8a6a00;
+}
+
+.password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrap input {
+  width: 100%;
+  padding-right: 90px;
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 10px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.toggle-password-btn:hover {
+  background: #f1f5f9;
+}
+
+.password-strength-box {
+  margin-top: 10px;
+  padding: 18px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.strength-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.strength-header span:first-child {
+  font-size: 14px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.strength-text {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.strength-bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.strength-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.strength-fill.strength-weak {
+  width: 33%;
+  background: #ef4444;
+}
+
+.strength-fill.strength-medium {
+  width: 66%;
+  background: #f59e0b;
+}
+
+.strength-fill.strength-strong {
+  width: 100%;
+  background: #22c55e;
+}
+
+.strength-text.strength-weak {
+  color: #dc2626;
+}
+
+.strength-text.strength-medium {
+  color: #d97706;
+}
+
+.strength-text.strength-strong {
+  color: #15803d;
+}
+
+.password-rules {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rule.valid {
+  color: #15803d;
+}
+
+.rule-icon {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+@media (max-width: 768px) {
+  .password-rules {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {

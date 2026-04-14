@@ -32,22 +32,20 @@ namespace LesiBuy.Application.Services
 
             var user = new User
             {
-                FullName = dto.FullName,
-                Email = dto.Email,
+                FullName = dto.FullName.Trim(),
+                Email = dto.Email.Trim(),
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                Phone = null,
+                Address = null,
+                City = null,
+                PostalCode = null
             };
 
             await _uow.Repository<User>().AddAsync(user);
             await _uow.CompleteAsync();
 
-            return new AuthResponseDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Token = _tokenService.CreateToken(user)
-            };
+            return MapToAuthResponse(user);
         }
 
         public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
@@ -64,13 +62,7 @@ namespace LesiBuy.Application.Services
             if (!validPassword)
                 throw new Exception("Invalid email or password.");
 
-            return new AuthResponseDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Token = _tokenService.CreateToken(user)
-            };
+            return MapToAuthResponse(user);
         }
 
         public async Task<AuthResponseDto> GetMeAsync(int userId)
@@ -82,13 +74,7 @@ namespace LesiBuy.Application.Services
             if (user == null)
                 throw new Exception("User not found.");
 
-            return new AuthResponseDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Token = _tokenService.CreateToken(user)
-            };
+            return MapToAuthResponse(user);
         }
 
         public async Task<AuthResponseDto> UpdateProfileAsync(int userId, UpdateProfileDto dto)
@@ -115,17 +101,15 @@ namespace LesiBuy.Application.Services
 
             user.FullName = dto.FullName.Trim();
             user.Email = dto.Email.Trim();
+            user.Phone = string.IsNullOrWhiteSpace(dto.Phone) ? null : dto.Phone.Trim();
+            user.Address = string.IsNullOrWhiteSpace(dto.Address) ? null : dto.Address.Trim();
+            user.City = string.IsNullOrWhiteSpace(dto.City) ? null : dto.City.Trim();
+            user.PostalCode = string.IsNullOrWhiteSpace(dto.PostalCode) ? null : dto.PostalCode.Trim();
 
             _uow.Repository<User>().Update(user);
             await _uow.CompleteAsync();
 
-            return new AuthResponseDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                Token = _tokenService.CreateToken(user)
-            };
+            return MapToAuthResponse(user);
         }
 
         public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
@@ -155,6 +139,21 @@ namespace LesiBuy.Application.Services
 
             _uow.Repository<User>().Update(user);
             await _uow.CompleteAsync();
+        }
+
+        private AuthResponseDto MapToAuthResponse(User user)
+        {
+            return new AuthResponseDto
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                Phone = user.Phone,
+                Address = user.Address,
+                City = user.City,
+                PostalCode = user.PostalCode,
+                Token = _tokenService.CreateToken(user)
+            };
         }
     }
 }

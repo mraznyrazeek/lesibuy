@@ -1,15 +1,15 @@
 <div class="container">
   <section class="hero">
     <div class="hero-content">
-      <p class="hero-tag">Trusted used & refurbished Apple devices</p>
-      <h1>Buy smarter with LesiBuy</h1>
+      <p class="hero-tag">Certified used & refurbished Apple devices</p>
+      <h1>Buy Apple devices with more confidence</h1>
       <p class="hero-text">
-        Discover quality iPhones, iPads, MacBooks, Apple Watches, and audio devices
-        at better prices with a cleaner, smarter shopping experience.
+        Explore quality iPhones, iPads, MacBooks, Apple Watches, and audio devices
+        at better value with a cleaner, more reliable shopping experience.
       </p>
 
       <div class="hero-actions">
-        <button class="btn">Shop Now</button>
+        <button class="btn" (click)="selectCategory('All')">Shop Collection</button>
         <button class="btn btn-secondary">Sell Your Device</button>
       </div>
 
@@ -24,12 +24,12 @@
 
     <div class="hero-visual">
       <div class="floating-card card small-card">
-        <p>Top pick</p>
-        <strong>Refurbished deals</strong>
+        <p>Featured range</p>
+        <strong>Professionally checked devices</strong>
       </div>
 
       <div class="hero-device card">
-        <img src="/images/Iphone/iPhone-13.jpg" alt="Featured iPhone" />
+        <img src="/images/Iphone/iPhone-13.jpg" alt="Featured Apple device" />
       </div>
 
       <div class="floating-card card price-card">
@@ -40,51 +40,88 @@
   </section>
 
   <section class="categories-section">
-    <div class="category-tile" (click)="selectCategory('iPhone')">
-      <div class="category-icon">📱</div>
-      <h3>iPhone</h3>
-      <p>Used and refurbished iPhones</p>
+    <div class="section-head">
+      <div>
+        <p class="section-kicker">Browse categories</p>
+        <h2 class="section-title">Shop by device type</h2>
+      </div>
+      <p class="section-note">
+        Carefully selected Apple categories for everyday work, study, and lifestyle.
+      </p>
     </div>
 
-    <div class="category-tile" (click)="selectCategory('iPad')">
-      <div class="category-icon">📲</div>
-      <h3>iPad</h3>
-      <p>Powerful tablets at better prices</p>
-    </div>
+    <div class="category-grid">
+      <div class="category-tile" (click)="selectCategory('iPhone')">
+        <div class="category-icon-wrap">
+          <span class="category-icon">📱</span>
+        </div>
+        <div class="category-content">
+          <h3>iPhone</h3>
+          <p>Used and refurbished iPhones with verified quality and value.</p>
+          <span class="category-link">Explore iPhone</span>
+        </div>
+      </div>
 
-    <div class="category-tile" (click)="selectCategory('MacBook')">
-      <div class="category-icon">💻</div>
-      <h3>MacBook</h3>
-      <p>MacBook Air and Pro devices</p>
-    </div>
+      <div class="category-tile" (click)="selectCategory('iPad')">
+        <div class="category-icon-wrap">
+          <span class="category-icon">📲</span>
+        </div>
+        <div class="category-content">
+          <h3>iPad</h3>
+          <p>Powerful tablets for study, business, drawing, and entertainment.</p>
+          <span class="category-link">Explore iPad</span>
+        </div>
+      </div>
 
-    <div class="category-tile" (click)="selectCategory('Apple Watch')">
-      <div class="category-icon">⌚</div>
-      <h3>Watch</h3>
-      <p>Smart and stylish Apple Watches</p>
-    </div>
+      <div class="category-tile" (click)="selectCategory('MacBook')">
+        <div class="category-icon-wrap">
+          <span class="category-icon">💻</span>
+        </div>
+        <div class="category-content">
+          <h3>MacBook</h3>
+          <p>MacBook Air and Pro devices designed for productivity and performance.</p>
+          <span class="category-link">Explore MacBook</span>
+        </div>
+      </div>
 
-    <div class="category-tile" (click)="selectCategory('Audio')">
-      <div class="category-icon">🎧</div>
-      <h3>Audio</h3>
-      <p>AirPods and Apple audio devices</p>
+      <div class="category-tile" (click)="selectCategory('Apple Watch')">
+        <div class="category-icon-wrap">
+          <span class="category-icon">⌚</span>
+        </div>
+        <div class="category-content">
+          <h3>Watch</h3>
+          <p>Smart Apple Watches with elegant design and useful daily features.</p>
+          <span class="category-link">Explore Watch</span>
+        </div>
+      </div>
+
+      <div class="category-tile" (click)="selectCategory('Audio')">
+        <div class="category-icon-wrap">
+          <span class="category-icon">🎧</span>
+        </div>
+        <div class="category-content">
+          <h3>Audio</h3>
+          <p>AirPods and Apple audio products for clear, premium listening.</p>
+          <span class="category-link">Explore Audio</span>
+        </div>
+      </div>
     </div>
   </section>
 
-  <h2 class="section-title">Featured Products</h2>
+  <div class="products-head">
+    <div>
+      <p class="section-kicker">Curated devices</p>
+      <h2 class="section-title">Featured Products</h2>
+    </div>
+  </div>
 
   <div class="filter-bar">
     <button class="filter-btn" [class.active]="selectedCategory === 'All'" (click)="selectCategory('All')">All</button>
-    <button class="filter-btn" [class.active]="selectedCategory === 'iPhone'"
-      (click)="selectCategory('iPhone')">iPhone</button>
-    <button class="filter-btn" [class.active]="selectedCategory === 'iPad'"
-      (click)="selectCategory('iPad')">iPad</button>
-    <button class="filter-btn" [class.active]="selectedCategory === 'MacBook'"
-      (click)="selectCategory('MacBook')">MacBook</button>
-    <button class="filter-btn" [class.active]="selectedCategory === 'Apple Watch'"
-      (click)="selectCategory('Apple Watch')">Watch</button>
-    <button class="filter-btn" [class.active]="selectedCategory === 'Audio'"
-      (click)="selectCategory('Audio')">Audio</button>
+    <button class="filter-btn" [class.active]="selectedCategory === 'iPhone'" (click)="selectCategory('iPhone')">iPhone</button>
+    <button class="filter-btn" [class.active]="selectedCategory === 'iPad'" (click)="selectCategory('iPad')">iPad</button>
+    <button class="filter-btn" [class.active]="selectedCategory === 'MacBook'" (click)="selectCategory('MacBook')">MacBook</button>
+    <button class="filter-btn" [class.active]="selectedCategory === 'Apple Watch'" (click)="selectCategory('Apple Watch')">Watch</button>
+    <button class="filter-btn" [class.active]="selectedCategory === 'Audio'" (click)="selectCategory('Audio')">Audio</button>
   </div>
 
   <div class="grid products-grid">
