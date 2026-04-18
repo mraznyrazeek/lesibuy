@@ -35,6 +35,7 @@ namespace LesiBuy.Application.Services
                 FullName = dto.FullName.Trim(),
                 Email = dto.Email.Trim(),
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+                Role = "Customer",
                 CreatedAt = DateTime.UtcNow,
                 Phone = null,
                 Address = null,
@@ -152,6 +153,7 @@ namespace LesiBuy.Application.Services
                 Address = user.Address,
                 City = user.City,
                 PostalCode = user.PostalCode,
+                Role = user.Role,
                 Token = _tokenService.CreateToken(user)
             };
         }
