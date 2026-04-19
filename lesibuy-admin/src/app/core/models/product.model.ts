@@ -5,10 +5,10 @@ export interface Product {
   price: number;
   stockQuantity: number;
   imageUrl?: string | null;
-  categoryId?: number | null;
+  categoryId: number;
   categoryName?: string | null;
-  isActive?: boolean;
   condition?: string | null;
   sellerType?: string | null;
   specifications?: string | null;
+  isAvailable?: boolean;
 }

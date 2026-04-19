@@ -3,6 +3,8 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../core/services/product.service';
 import { Product } from '../../core/models/product.model';
+import { CategoryService } from '../../core/services/category.service';
+import { Category } from '../../core/models/category.model';
 
 @Component({
   selector: 'app-products',
@@ -13,6 +15,7 @@ import { Product } from '../../core/models/product.model';
 })
 export class ProductsComponent implements OnInit {
   products: Product[] = [];
+  categories: Category[] = [];
   isLoading = false;
   errorMessage = '';
 
@@ -26,15 +29,20 @@ export class ProductsComponent implements OnInit {
     price: 0,
     stockQuantity: 0,
     imageUrl: '',
+    categoryId: 0,
     condition: '',
     sellerType: '',
     specifications: ''
   };
 
-  constructor(private productService: ProductService) { }
+  constructor(
+    private productService: ProductService,
+    private categoryService: CategoryService
+  ) {}
 
   ngOnInit(): void {
     this.loadProducts();
+    this.loadCategories();
   }
 
   loadProducts(): void {
@@ -54,6 +62,17 @@ export class ProductsComponent implements OnInit {
     });
   }
 
+  loadCategories(): void {
+    this.categoryService.getAll().subscribe({
+      next: (response) => {
+        this.categories = response;
+      },
+      error: (error) => {
+        console.error(error);
+      }
+    });
+  }
+
   openAddForm(): void {
     this.resetForm();
     this.isEditMode = false;
@@ -61,13 +80,14 @@ export class ProductsComponent implements OnInit {
     this.showForm = true;
   }
 
-  editProduct(product: any): void {
+  editProduct(product: Product): void {
     this.newProduct = {
       name: product.name ?? '',
       description: product.description ?? '',
       price: product.price ?? 0,
       stockQuantity: product.stockQuantity ?? 0,
       imageUrl: product.imageUrl ?? '',
+      categoryId: product.categoryId ?? 0,
       condition: product.condition ?? '',
       sellerType: product.sellerType ?? '',
       specifications: product.specifications ?? ''
@@ -86,6 +106,7 @@ export class ProductsComponent implements OnInit {
       price: Number(this.newProduct.price),
       stockQuantity: Number(this.newProduct.stockQuantity),
       imageUrl: this.newProduct.imageUrl,
+      categoryId: Number(this.newProduct.categoryId),
       condition: this.newProduct.condition,
       sellerType: this.newProduct.sellerType,
       specifications: this.newProduct.specifications
@@ -150,6 +171,7 @@ export class ProductsComponent implements OnInit {
       price: 0,
       stockQuantity: 0,
       imageUrl: '',
+      categoryId: 0,
       condition: '',
       sellerType: '',
       specifications: ''

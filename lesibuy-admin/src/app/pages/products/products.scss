@@ -178,3 +178,12 @@ input {
   min-height: 90px;
   resize: vertical;
 }
+
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  box-sizing: border-box;
+  background: #ffffff;
+}
