@@ -1,0 +1,37 @@
+.categories-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-card {
+  display: flex;
+  gap: 10px;
+}
+
+input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 10px 14px;
+  border: none;
+  background: #111827;
+  color: white;
+  border-radius: 6px;
+}
+
+.list-card {
+  background: white;
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.category-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}

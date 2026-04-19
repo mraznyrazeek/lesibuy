@@ -1,4 +1,6 @@
-﻿namespace LesiBuy.Application.Dtos
+﻿using System;
+
+namespace LesiBuy.Application.Dtos
 {
     public class ProductDto
     {
@@ -23,5 +25,7 @@
         public string SellerType { get; set; } = null!;
 
         public DateTime CreatedAt { get; set; }
+
+        public string? CategoryName { get; set; }
     }
 }

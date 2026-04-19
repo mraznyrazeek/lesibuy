@@ -1,0 +1,17 @@
+<div class="categories-page">
+  <div class="page-header">
+    <h1>Categories</h1>
+  </div>
+
+  <div class="form-card">
+    <input [(ngModel)]="newCategoryName" placeholder="Category name" />
+    <button (click)="addCategory()">Add</button>
+  </div>
+
+  <div class="list-card">
+    <div *ngFor="let category of categories" class="category-row">
+      <span>{{ category.name }}</span>
+      <button (click)="deleteCategory(category)">Delete</button>
+    </div>
+  </div>
+</div>

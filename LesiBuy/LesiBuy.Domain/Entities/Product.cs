@@ -25,6 +25,7 @@ namespace LesiBuy.Domain.Entities
         public string SellerType { get; set; } = "Admin";
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public Category? Category { get; set; }
     }
 }
-
