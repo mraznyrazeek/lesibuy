@@ -8,4 +8,7 @@ export interface Product {
   categoryId?: number | null;
   categoryName?: string | null;
   isActive?: boolean;
+  condition?: string | null;
+  sellerType?: string | null;
+  specifications?: string | null;
 }

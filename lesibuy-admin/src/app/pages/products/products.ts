@@ -22,8 +22,13 @@ export class ProductsComponent implements OnInit {
 
   newProduct = {
     name: '',
+    description: '',
     price: 0,
-    stockQuantity: 0
+    stockQuantity: 0,
+    imageUrl: '',
+    condition: '',
+    sellerType: '',
+    specifications: ''
   };
 
   constructor(private productService: ProductService) { }
@@ -56,11 +61,16 @@ export class ProductsComponent implements OnInit {
     this.showForm = true;
   }
 
-  editProduct(product: Product): void {
+  editProduct(product: any): void {
     this.newProduct = {
       name: product.name ?? '',
+      description: product.description ?? '',
       price: product.price ?? 0,
-      stockQuantity: product.stockQuantity ?? 0
+      stockQuantity: product.stockQuantity ?? 0,
+      imageUrl: product.imageUrl ?? '',
+      condition: product.condition ?? '',
+      sellerType: product.sellerType ?? '',
+      specifications: product.specifications ?? ''
     };
 
     this.isEditMode = true;
@@ -70,9 +80,15 @@ export class ProductsComponent implements OnInit {
 
   saveProduct(): void {
     const payload = {
+      id: this.isEditMode ? this.editingProductId ?? 0 : 0,
       name: this.newProduct.name,
+      description: this.newProduct.description,
       price: Number(this.newProduct.price),
-      stockQuantity: Number(this.newProduct.stockQuantity)
+      stockQuantity: Number(this.newProduct.stockQuantity),
+      imageUrl: this.newProduct.imageUrl,
+      condition: this.newProduct.condition,
+      sellerType: this.newProduct.sellerType,
+      specifications: this.newProduct.specifications
     };
 
     if (this.isEditMode && this.editingProductId !== null) {
@@ -130,8 +146,13 @@ export class ProductsComponent implements OnInit {
   resetForm(): void {
     this.newProduct = {
       name: '',
+      description: '',
       price: 0,
-      stockQuantity: 0
+      stockQuantity: 0,
+      imageUrl: '',
+      condition: '',
+      sellerType: '',
+      specifications: ''
     };
     this.isEditMode = false;
     this.editingProductId = null;

@@ -168,3 +168,13 @@ input {
 .form-actions .cancel {
   background: #6b7280;
 }
+
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  box-sizing: border-box;
+  min-height: 90px;
+  resize: vertical;
+}
