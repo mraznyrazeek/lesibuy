@@ -1,111 +1,664 @@
 <div class="products-page">
-  <div class="page-header">
-    <div>
+  <div class="topbar modern-topbar">
+    <div class="topbar-content">
+      <div class="topbar-label">Inventory</div>
       <h1>Products</h1>
-      <p>Manage all store products here.</p>
+      <p>Manage stock in a cleaner and more modern workspace.</p>
     </div>
 
-    <button class="add-btn" (click)="openAddForm()">+ Add Product</button>
+    <button class="primary-btn hero-add-btn" (click)="openAddForm()">
+      <span>＋</span> Add Product
+    </button>
   </div>
 
-  <div *ngIf="showForm" class="form-card">
-    <h2>{{ isEditMode ? 'Edit Product' : 'Add Product' }}</h2>
+  <div class="content-stack">
+    <!-- TOP FULL WIDTH FORM -->
+    <section class="panel panel-form top-form-panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-kicker">Create Product</div>
+        </div>
 
-    <div class="form-group">
-      <label>Name</label>
-      <input [(ngModel)]="newProduct.name" />
-    </div>
+        <div class="mini-badge">
+          {{ isEditMode ? 'Editing' : 'New' }}
+        </div>
+      </div>
 
-    <div class="form-group">
-      <label>Description</label>
-      <textarea [(ngModel)]="newProduct.description"></textarea>
-    </div>
+      <div *ngIf="validationErrors.length > 0" class="validation-box">
+        <strong>Please fix these:</strong>
+        <ul>
+          <li *ngFor="let error of validationErrors">{{ error }}</li>
+        </ul>
+      </div>
 
-    <div class="form-group">
-      <label>Price</label>
-      <input type="number" [(ngModel)]="newProduct.price" />
-    </div>
+      <div *ngIf="showForm; else emptyFormState" class="form-scroll">
+        <!-- Category -->
+        <div class="section-card">
+          <div class="section-title">
+            <h3>Category</h3>
+            <p>Select a device type first.</p>
+          </div>
 
-    <div class="form-group">
-      <label>Stock</label>
-      <input type="number" [(ngModel)]="newProduct.stockQuantity" />
-    </div>
+          <div class="form-grid two-cols">
+            <div class="form-group">
+              <label>Category</label>
+              <select [(ngModel)]="newProduct.categoryId" (ngModelChange)="onCategoryChange()">
+                <option [ngValue]="0">Select Category</option>
+                <option *ngFor="let category of categories" [ngValue]="category.id">
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
 
-    <div class="form-group">
-      <label>Image URL</label>
-      <input [(ngModel)]="newProduct.imageUrl" />
-    </div>
+            <div class="selected-card">
+              <span>Selected</span>
+              <strong>{{ selectedCategory?.name || 'None' }}</strong>
+            </div>
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label>Category</label>
-      <select [(ngModel)]="newProduct.categoryId">
-        <option [ngValue]="0">Select Category</option>
-        <option *ngFor="let category of categories" [ngValue]="category.id">
-          {{ category.name }}
-        </option>
-      </select>
-    </div>
+        <!-- iPhone -->
+        <div class="section-card" *ngIf="isCategorySelected() && isIphoneCategory()">
+          <div class="section-title">
+            <h3>{{ getDetailsSectionTitle() }}</h3>
+          </div>
 
-    <div class="form-group">
-      <label>Condition</label>
-      <input [(ngModel)]="newProduct.condition" placeholder="Used / Refurbished / New" />
-    </div>
+          <div class="form-grid three-cols">
+            <div class="form-group">
+              <label>Series</label>
+              <select [(ngModel)]="iphoneSpecs.series" (ngModelChange)="onIphoneSeriesChange()">
+                <option value="">Select Series</option>
+                <option *ngFor="let series of iphoneSeriesOptions" [value]="series">{{ series }}</option>
+              </select>
+            </div>
 
-    <div class="form-group">
-      <label>Seller Type</label>
-      <input [(ngModel)]="newProduct.sellerType" placeholder="Individual / Business" />
-    </div>
+            <div class="form-group">
+              <label>Model</label>
+              <select [(ngModel)]="iphoneSpecs.model" [disabled]="!iphoneSpecs.series" (ngModelChange)="onIphoneModelChange()">
+                <option value="">Select Model</option>
+                <option *ngFor="let model of iphoneModelOptions" [value]="model">{{ model }}</option>
+              </select>
+            </div>
 
-    <div class="form-group">
-      <label>Specifications</label>
-      <textarea [(ngModel)]="newProduct.specifications"></textarea>
-    </div>
+            <div class="form-group">
+              <label>Color</label>
+              <select [(ngModel)]="iphoneSpecs.color" [disabled]="!iphoneSpecs.model">
+                <option value="">Select Color</option>
+                <option *ngFor="let color of iphoneColorOptions" [value]="color">{{ color }}</option>
+              </select>
+            </div>
 
-    <div class="form-actions">
-      <button (click)="saveProduct()">
-        {{ isEditMode ? 'Update' : 'Save' }}
-      </button>
-      <button class="cancel" (click)="cancelForm()">Cancel</button>
-    </div>
-  </div>
+            <div class="form-group">
+              <label>Storage</label>
+              <select [(ngModel)]="iphoneSpecs.storage" [disabled]="!iphoneSpecs.model">
+                <option value="">Select Storage</option>
+                <option *ngFor="let storage of iphoneStorageOptions" [value]="storage">{{ storage }}</option>
+              </select>
+            </div>
 
-  <div class="table-card">
-    <div *ngIf="isLoading" class="state-message">Loading products...</div>
-    <div *ngIf="errorMessage" class="state-message error">{{ errorMessage }}</div>
+            <div class="form-group">
+              <label>Battery Health</label>
+              <input [(ngModel)]="iphoneSpecs.batteryHealth" placeholder="87%" />
+            </div>
 
-    <table *ngIf="!isLoading && !errorMessage">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Category</th>
-          <th>Price</th>
-          <th>Stock</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
+            <div class="form-group">
+              <label>SIM</label>
+              <select [(ngModel)]="iphoneSpecs.sim">
+                <option value="">Select SIM</option>
+                <option *ngFor="let sim of iphoneSimOptions" [value]="sim">{{ sim }}</option>
+              </select>
+            </div>
 
-      <tbody>
-        <tr *ngIf="products.length === 0">
-          <td colspan="6" class="empty-cell">No products available yet.</td>
-        </tr>
+            <div class="form-group">
+              <label>Box</label>
+              <select [(ngModel)]="iphoneSpecs.box">
+                <option value="">Select Box</option>
+                <option *ngFor="let option of yesNoOptions" [value]="option">{{ option }}</option>
+              </select>
+            </div>
 
-        <tr *ngFor="let product of products">
-          <td>{{ product.name }}</td>
-          <td>{{ product.categoryName || 'N/A' }}</td>
-          <td>{{ product.price | currency:'GBP':'symbol':'1.2-2' }}</td>
-          <td>{{ product.stockQuantity }}</td>
-          <td>
-            <span class="status-badge" [class.inactive]="product.isAvailable === false">
-              {{ product.isAvailable === false ? 'Inactive' : 'Active' }}
+            <div class="form-group">
+              <label>Accessories</label>
+              <input [(ngModel)]="iphoneSpecs.accessories" placeholder="Cable only" />
+            </div>
+
+            <div class="form-group">
+              <label>Condition</label>
+              <select [(ngModel)]="iphoneSpecs.condition">
+                <option value="">Select Condition</option>
+                <option *ngFor="let condition of conditionOptions" [value]="condition">{{ condition }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- MacBook -->
+        <div class="section-card" *ngIf="isCategorySelected() && isMacbookCategory()">
+          <div class="section-title">
+            <h3>{{ getDetailsSectionTitle() }}</h3>
+          </div>
+
+          <div class="form-grid three-cols">
+            <div class="form-group">
+              <label>Family</label>
+              <select [(ngModel)]="macbookSpecs.family" (ngModelChange)="onMacbookFamilyChange()">
+                <option value="">Select Family</option>
+                <option *ngFor="let family of macbookFamilyOptions" [value]="family">{{ family }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Model</label>
+              <select [(ngModel)]="macbookSpecs.model" [disabled]="!macbookSpecs.family" (ngModelChange)="onMacbookModelChange()">
+                <option value="">Select Model</option>
+                <option *ngFor="let model of macbookModelOptions" [value]="model">{{ model }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Processor</label>
+              <select [(ngModel)]="macbookSpecs.processor" [disabled]="!macbookSpecs.model">
+                <option value="">Select Processor</option>
+                <option *ngFor="let processor of macbookProcessorOptions" [value]="processor">{{ processor }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>RAM</label>
+              <select [(ngModel)]="macbookSpecs.ram" [disabled]="!macbookSpecs.model">
+                <option value="">Select RAM</option>
+                <option *ngFor="let ram of macbookRamOptions" [value]="ram">{{ ram }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Storage</label>
+              <select [(ngModel)]="macbookSpecs.storage" [disabled]="!macbookSpecs.model">
+                <option value="">Select Storage</option>
+                <option *ngFor="let storage of macbookStorageOptions" [value]="storage">{{ storage }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Color</label>
+              <select [(ngModel)]="macbookSpecs.color" [disabled]="!macbookSpecs.model">
+                <option value="">Select Color</option>
+                <option *ngFor="let color of macbookColorOptions" [value]="color">{{ color }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Screen</label>
+              <select [(ngModel)]="macbookSpecs.screen" [disabled]="!macbookSpecs.model">
+                <option value="">Select Screen</option>
+                <option *ngFor="let screen of macbookScreenOptions" [value]="screen">{{ screen }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Box</label>
+              <select [(ngModel)]="macbookSpecs.box">
+                <option value="">Select Box</option>
+                <option *ngFor="let option of yesNoOptions" [value]="option">{{ option }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Accessories</label>
+              <input [(ngModel)]="macbookSpecs.accessories" placeholder="With charger" />
+            </div>
+
+            <div class="form-group">
+              <label>Condition</label>
+              <select [(ngModel)]="macbookSpecs.condition">
+                <option value="">Select Condition</option>
+                <option *ngFor="let condition of conditionOptions" [value]="condition">{{ condition }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- iPad -->
+        <div class="section-card" *ngIf="isCategorySelected() && isIpadCategory()">
+          <div class="section-title">
+            <h3>{{ getDetailsSectionTitle() }}</h3>
+          </div>
+
+          <div class="form-grid three-cols">
+            <div class="form-group">
+              <label>Family</label>
+              <select [(ngModel)]="ipadSpecs.family" (ngModelChange)="onIpadFamilyChange()">
+                <option value="">Select Family</option>
+                <option *ngFor="let family of ipadFamilyOptions" [value]="family">{{ family }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Model</label>
+              <select [(ngModel)]="ipadSpecs.model" [disabled]="!ipadSpecs.family" (ngModelChange)="onIpadModelChange()">
+                <option value="">Select Model</option>
+                <option *ngFor="let model of ipadModelOptions" [value]="model">{{ model }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Storage</label>
+              <select [(ngModel)]="ipadSpecs.storage" [disabled]="!ipadSpecs.model">
+                <option value="">Select Storage</option>
+                <option *ngFor="let storage of ipadStorageOptions" [value]="storage">{{ storage }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Color</label>
+              <select [(ngModel)]="ipadSpecs.color" [disabled]="!ipadSpecs.model">
+                <option value="">Select Color</option>
+                <option *ngFor="let color of ipadColorOptions" [value]="color">{{ color }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Screen</label>
+              <select [(ngModel)]="ipadSpecs.screen" [disabled]="!ipadSpecs.model">
+                <option value="">Select Screen</option>
+                <option *ngFor="let screen of ipadScreenOptions" [value]="screen">{{ screen }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Connectivity</label>
+              <select [(ngModel)]="ipadSpecs.connectivity" [disabled]="!ipadSpecs.model">
+                <option value="">Select Connectivity</option>
+                <option *ngFor="let connectivity of ipadConnectivityOptions" [value]="connectivity">{{ connectivity }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Box</label>
+              <select [(ngModel)]="ipadSpecs.box">
+                <option value="">Select Box</option>
+                <option *ngFor="let option of yesNoOptions" [value]="option">{{ option }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Accessories</label>
+              <input [(ngModel)]="ipadSpecs.accessories" placeholder="Charger included" />
+            </div>
+
+            <div class="form-group">
+              <label>Condition</label>
+              <select [(ngModel)]="ipadSpecs.condition">
+                <option value="">Select Condition</option>
+                <option *ngFor="let condition of conditionOptions" [value]="condition">{{ condition }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- AirPods -->
+        <div class="section-card" *ngIf="isCategorySelected() && isAirpodsCategory()">
+          <div class="section-title">
+            <h3>{{ getDetailsSectionTitle() }}</h3>
+          </div>
+
+          <div class="form-grid three-cols">
+            <div class="form-group">
+              <label>Family</label>
+              <select [(ngModel)]="airpodsSpecs.family" (ngModelChange)="onAirpodsFamilyChange()">
+                <option value="">Select Family</option>
+                <option *ngFor="let family of airpodsFamilyOptions" [value]="family">{{ family }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Model</label>
+              <select [(ngModel)]="airpodsSpecs.model" [disabled]="!airpodsSpecs.family" (ngModelChange)="onAirpodsModelChange()">
+                <option value="">Select Model</option>
+                <option *ngFor="let model of airpodsModelOptions" [value]="model">{{ model }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Case Type</label>
+              <select [(ngModel)]="airpodsSpecs.caseType" [disabled]="!airpodsSpecs.model">
+                <option value="">Select Case Type</option>
+                <option *ngFor="let caseType of airpodsCaseTypeOptions" [value]="caseType">{{ caseType }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Noise Cancellation</label>
+              <select [(ngModel)]="airpodsSpecs.noiseCancellation" [disabled]="!airpodsSpecs.model">
+                <option value="">Select Noise Cancellation</option>
+                <option *ngFor="let noise of airpodsNoiseOptions" [value]="noise">{{ noise }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Color</label>
+              <select [(ngModel)]="airpodsSpecs.color" [disabled]="!airpodsSpecs.model">
+                <option value="">Select Color</option>
+                <option *ngFor="let color of airpodsColorOptions" [value]="color">{{ color }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Box</label>
+              <select [(ngModel)]="airpodsSpecs.box">
+                <option value="">Select Box</option>
+                <option *ngFor="let option of yesNoOptions" [value]="option">{{ option }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Accessories</label>
+              <input [(ngModel)]="airpodsSpecs.accessories" placeholder="Complete set" />
+            </div>
+
+            <div class="form-group">
+              <label>Condition</label>
+              <select [(ngModel)]="airpodsSpecs.condition">
+                <option value="">Select Condition</option>
+                <option *ngFor="let condition of conditionOptions" [value]="condition">{{ condition }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Watch -->
+        <div class="section-card" *ngIf="isCategorySelected() && isWatchCategory()">
+          <div class="section-title">
+            <h3>{{ getDetailsSectionTitle() }}</h3>
+          </div>
+
+          <div class="form-grid three-cols">
+            <div class="form-group">
+              <label>Family</label>
+              <select [(ngModel)]="watchSpecs.family" (ngModelChange)="onWatchFamilyChange()">
+                <option value="">Select Family</option>
+                <option *ngFor="let family of watchFamilyOptions" [value]="family">{{ family }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Model</label>
+              <select [(ngModel)]="watchSpecs.model" [disabled]="!watchSpecs.family" (ngModelChange)="onWatchModelChange()">
+                <option value="">Select Model</option>
+                <option *ngFor="let model of watchModelOptions" [value]="model">{{ model }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Size</label>
+              <select [(ngModel)]="watchSpecs.size" [disabled]="!watchSpecs.model">
+                <option value="">Select Size</option>
+                <option *ngFor="let size of watchSizeOptions" [value]="size">{{ size }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Color</label>
+              <select [(ngModel)]="watchSpecs.color" [disabled]="!watchSpecs.model">
+                <option value="">Select Color</option>
+                <option *ngFor="let color of watchColorOptions" [value]="color">{{ color }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Connectivity</label>
+              <select [(ngModel)]="watchSpecs.connectivity" [disabled]="!watchSpecs.model">
+                <option value="">Select Connectivity</option>
+                <option *ngFor="let connectivity of watchConnectivityOptions" [value]="connectivity">{{ connectivity }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Box</label>
+              <select [(ngModel)]="watchSpecs.box">
+                <option value="">Select Box</option>
+                <option *ngFor="let option of yesNoOptions" [value]="option">{{ option }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Accessories</label>
+              <input [(ngModel)]="watchSpecs.accessories" placeholder="Charger / straps included" />
+            </div>
+
+            <div class="form-group">
+              <label>Condition</label>
+              <select [(ngModel)]="watchSpecs.condition">
+                <option value="">Select Condition</option>
+                <option *ngFor="let condition of conditionOptions" [value]="condition">{{ condition }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Price -->
+        <div class="section-card" *ngIf="isCategorySelected()">
+          <div class="section-title row-space">
+            <div>
+              <h3>Price & Stock</h3>
+              <p>Available after selecting core details.</p>
+            </div>
+            <span class="status-chip" [class.ready]="canEnablePricingSection()">
+              {{ canEnablePricingSection() ? 'Ready' : 'Locked' }}
             </span>
-          </td>
-          <td>
-            <button class="action-btn" (click)="editProduct(product)">Edit</button>
-            <button class="action-btn delete" (click)="deleteProduct(product)">Delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </div>
+
+          <div *ngIf="!canEnablePricingSection()" class="hint-box">
+            {{ getPricingSectionMessage() }}
+          </div>
+
+          <div class="form-grid two-cols locked-box" [class.disabled]="!canEnablePricingSection()">
+            <div class="form-group">
+              <label>Price</label>
+              <input
+                type="number"
+                [(ngModel)]="newProduct.price"
+                [disabled]="!canEnablePricingSection()"
+                placeholder="Selling price"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Stock Quantity</label>
+              <input
+                type="number"
+                [(ngModel)]="newProduct.stockQuantity"
+                [disabled]="!canEnablePricingSection()"
+                placeholder="Available stock"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="section-card" *ngIf="isCategorySelected()">
+          <div class="section-title">
+            <h3>Description</h3>
+          </div>
+
+          <div class="form-group">
+            <label>Description</label>
+            <textarea [(ngModel)]="newProduct.description" placeholder="Write a short product description..."></textarea>
+          </div>
+        </div>
+
+        <!-- Images -->
+        <div class="section-card" *ngIf="isCategorySelected()">
+          <div class="section-title">
+            <h3>Images</h3>
+          </div>
+
+          <div class="upload-box">
+            <label class="upload-label">
+              <input
+                type="file"
+                multiple
+                accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                (change)="onImagesSelected($event)"
+              />
+              <div class="upload-inner">
+                <div class="upload-title">Upload product images</div>
+                <div class="upload-subtitle">JPG, JPEG, PNG</div>
+              </div>
+            </label>
+
+            <small *ngIf="imageError" class="error-text">{{ imageError }}</small>
+          </div>
+
+          <div class="file-chip-list" *ngIf="getImageNames().length > 0">
+            <div class="file-chip" *ngFor="let fileName of getImageNames(); let i = index">
+              <span>{{ fileName }}</span>
+              <button type="button" (click)="removeSelectedImage(i)">×</button>
+            </div>
+          </div>
+
+          <div class="preview-grid" *ngIf="imagePreviewUrls.length > 0">
+            <div class="preview-card" *ngFor="let preview of imagePreviewUrls; let i = index">
+              <img [src]="preview" [alt]="'Preview ' + (i + 1)" />
+              <button type="button" (click)="removeSelectedImage(i)">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="primary-btn" (click)="saveProduct()">
+            {{ isEditMode ? 'Update Product' : 'Save Product' }}
+          </button>
+          <button class="secondary-btn" (click)="cancelForm()">Cancel</button>
+        </div>
+      </div>
+
+      <ng-template #emptyFormState>
+        <div class="empty-form-state">
+          <p>Click <strong>Add Product</strong> to open the product form.</p>
+        </div>
+      </ng-template>
+    </section>
+
+    <!-- BOTTOM FULL WIDTH PRODUCT LIST -->
+    <section class="panel panel-list full-list-panel">
+      <div class="list-header-modern">
+        <div>
+          <div class="panel-kicker">Inventory List</div>
+          <h2>Products List</h2>
+          <p>Manage and update your product inventory.</p>
+        </div>
+      </div>
+
+      <div *ngIf="isLoading" class="table-state">Loading products...</div>
+      <div *ngIf="errorMessage" class="table-state error">{{ errorMessage }}</div>
+
+      <div *ngIf="!isLoading && !errorMessage" class="list-body modern-list-body">
+        <div class="table-scroll modern-table-scroll">
+          <table class="modern-product-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th class="actions-col">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngIf="paginatedProducts.length === 0">
+                <td colspan="6" class="empty-cell">No products found.</td>
+              </tr>
+
+              <tr *ngFor="let product of paginatedProducts">
+                <td class="product-cell">
+                  <div class="product-info">
+                    <div class="product-thumb">
+                      <span>{{ (product.name || 'P').charAt(0) }}</span>
+                    </div>
+
+                    <div class="product-text">
+                      <div class="product-name">{{ product.name }}</div>
+                      <div class="product-meta">{{ product.sellerType || 'Admin' }}</div>
+                    </div>
+                  </div>
+                </td>
+
+                <td>
+                  <span class="category-text">{{ product.categoryName || 'N/A' }}</span>
+                </td>
+
+                <td class="price-text">
+                  {{ product.price | currency:'GBP':'symbol':'1.2-2' }}
+                </td>
+
+                <td>
+                  <div class="stock-wrap">
+                    <span class="stock-number">{{ product.stockQuantity }}</span>
+                    <span
+                      class="stock-badge"
+                      [class.low]="product.stockQuantity <= 5"
+                      [class.good]="product.stockQuantity > 5"
+                    >
+                      {{ product.stockQuantity <= 5 ? 'Low stock' : 'In stock' }}
+                    </span>
+                  </div>
+                </td>
+
+                <td>
+                  <span class="status-pill modern-status-pill"
+                        [class.inactive]="product.isAvailable === false">
+                    <span class="dot"></span>
+                    {{ product.isAvailable === false ? 'Inactive' : 'Active' }}
+                  </span>
+                </td>
+
+                <td>
+                  <div class="table-actions modern-actions">
+                    <button class="table-btn modern-btn edit" (click)="editProduct(product)">
+                      Edit
+                    </button>
+                    <button class="table-btn modern-btn delete" (click)="deleteProduct(product)">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-footer-modern" *ngIf="products.length > 0">
+          <div class="footer-info">
+            Showing
+            {{ ((currentPage - 1) * pageSize) + 1 }}
+            to
+            {{ pageEnd }}
+            of
+            {{ products.length }}
+            products
+          </div>
+
+          <div class="pagination modern-pagination" *ngIf="products.length > pageSize">
+            <button (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
+
+            <button
+              *ngFor="let page of pageNumbers"
+              (click)="goToPage(page)"
+              [class.active]="currentPage === page">
+              {{ page }}
+            </button>
+
+            <button (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
+          </div>
+
+          <div class="page-size-chip">
+            {{ pageSize }} / page
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
