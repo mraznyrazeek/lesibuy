@@ -42,6 +42,28 @@ namespace LesiBuy.API.Controllers
             return Ok(_mapper.Map<CategoryDto>(created));
         }
 
+        [HttpPut("{id}")]
+        public async Task<ActionResult<CategoryDto>> UpdateCategory(int id, [FromBody] CategoryDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Name))
+            {
+                return BadRequest(new { message = "Category name is required." });
+            }
+
+            var existing = await _categoryService.GetCategoryByIdAsync(id);
+
+            if (existing == null)
+            {
+                return NotFound(new { message = "Category not found." });
+            }
+
+            existing.Name = dto.Name.Trim();
+
+            var updated = await _categoryService.UpdateCategoryAsync(existing);
+
+            return Ok(_mapper.Map<CategoryDto>(updated));
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {

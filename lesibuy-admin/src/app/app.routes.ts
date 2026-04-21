@@ -34,16 +34,16 @@ export const routes: Routes = [
           import('./pages/products/products').then(m => m.ProductsComponent)
       },
       {
+        path: 'categories',
+        loadComponent: () =>
+          import('./pages/categories/categories').then(m => m.CategoriesComponent)
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'
       }
     ]
-  },
-  {
-    path: 'categories',
-    loadComponent: () =>
-      import('./pages/categories/categories').then(m => m.CategoriesComponent)
   },
   {
     path: '**',

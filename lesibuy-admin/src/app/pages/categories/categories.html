@@ -1,17 +1,99 @@
 <div class="categories-page">
   <div class="page-header">
-    <h1>Categories</h1>
-  </div>
+    <div class="page-header-content">
+      <h1>Categories</h1>
+    </div>
 
-  <div class="form-card">
-    <input [(ngModel)]="newCategoryName" placeholder="Category name" />
-    <button (click)="addCategory()">Add</button>
-  </div>
-
-  <div class="list-card">
-    <div *ngFor="let category of categories" class="category-row">
-      <span>{{ category.name }}</span>
-      <button (click)="deleteCategory(category)">Delete</button>
+    <div class="header-badge">
+      {{ categories.length }} {{ categories.length === 1 ? 'Category' : 'Categories' }}
     </div>
   </div>
+
+  <section class="form-panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-kicker">Create Category</div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-wrap">
+        <input
+          [(ngModel)]="newCategoryName"
+          placeholder="Enter category name"
+          (keyup.enter)="addCategory()"
+        />
+      </div>
+
+      <button class="primary-btn" (click)="addCategory()" [disabled]="isSaving">
+        {{ isSaving ? 'Adding...' : 'Add Category' }}
+      </button>
+    </div>
+
+    <div *ngIf="formError" class="message error-message">
+      {{ formError }}
+    </div>
+  </section>
+
+  <section class="list-panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-kicker">Category List</div>
+        <h2>All Categories</h2>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="state-box">
+      Loading categories...
+    </div>
+
+    <div *ngIf="errorMessage" class="state-box error">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && categories.length === 0" class="empty-state">
+      <div class="empty-icon">📁</div>
+      <h3>No categories yet</h3>
+      <p>Add your first category to start organizing products.</p>
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && categories.length > 0" class="category-list">
+      <div *ngFor="let category of categories; let i = index" class="category-row">
+        <div class="category-left">
+          <div class="category-avatar">
+            {{ category.name.charAt(0) }}
+          </div>
+
+          <div class="category-info">
+            <ng-container *ngIf="editingId !== category.id; else editMode">
+              <div class="category-name">{{ category.name }}</div>
+              <div class="category-meta">Category #{{ i + 1 }}</div>
+            </ng-container>
+
+            <ng-template #editMode>
+              <input
+                [(ngModel)]="editCategoryName"
+                class="edit-input"
+                placeholder="Edit category name"
+              />
+            </ng-template>
+          </div>
+        </div>
+
+        <div class="category-actions">
+          <ng-container *ngIf="editingId !== category.id">
+            <button class="edit-btn" (click)="startEdit(category)">Edit</button>
+            <button class="danger-btn" (click)="deleteCategory(category)" [disabled]="deletingId === category.id">
+              {{ deletingId === category.id ? 'Deleting...' : 'Delete' }}
+            </button>
+          </ng-container>
+
+          <ng-container *ngIf="editingId === category.id">
+            <button class="save-btn" (click)="updateCategory(category)">Save</button>
+            <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>

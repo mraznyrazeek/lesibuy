@@ -3,7 +3,7 @@
     <div>
       <div class="page-kicker">Overview</div>
       <h1>Dashboard</h1>
-      <p>Track your inventory performance and manage products faster.</p>
+      <p>Track products, orders, and recent activity from one place.</p>
     </div>
 
     <div class="header-actions">
@@ -20,119 +20,128 @@
   </div>
 
   <ng-container *ngIf="!isLoading && !errorMessage">
-    <!-- Row 1 -->
+    <!-- KPI -->
     <div class="stats-grid">
       <div class="stat-card neutral">
         <div class="stat-top">
           <span class="stat-label">Total Products</span>
-          <span class="stat-icon">📦</span>
+          <span class="stat-icon-box neutral-icon">📦</span>
         </div>
         <div class="stat-value">{{ totalProducts }}</div>
-        <div class="stat-note">All inventory items</div>
+        <div class="stat-note">Listed products</div>
       </div>
 
       <div class="stat-card success">
         <div class="stat-top">
           <span class="stat-label">Active Products</span>
-          <span class="stat-icon">🟢</span>
+          <span class="stat-icon-box success-icon">●</span>
         </div>
         <div class="stat-value">{{ activeProducts }}</div>
-        <div class="stat-note">Visible and available</div>
+        <div class="stat-note">Ready to sell</div>
       </div>
 
-      <div class="stat-card danger">
+      <div class="stat-card primary-tone">
         <div class="stat-top">
-          <span class="stat-label">Inactive Products</span>
-          <span class="stat-icon">🔴</span>
+          <span class="stat-label">Total Orders</span>
+          <span class="stat-icon-box primary-icon">🧾</span>
         </div>
-        <div class="stat-value">{{ inactiveProducts }}</div>
-        <div class="stat-note">Currently disabled</div>
+        <div class="stat-value">{{ totalOrders }}</div>
+        <div class="stat-note">All received orders</div>
       </div>
 
       <div class="stat-card warning">
         <div class="stat-top">
-          <span class="stat-label">Low Stock Products</span>
-          <span class="stat-icon">⚠️</span>
+          <span class="stat-label">Pending Orders</span>
+          <span class="stat-icon-box warning-icon">⏳</span>
         </div>
-        <div class="stat-value">{{ lowStockProducts }}</div>
-        <div class="stat-note">Need attention soon</div>
+        <div class="stat-value">{{ pendingOrders }}</div>
+        <div class="stat-note">Need action</div>
       </div>
     </div>
 
-    <!-- Row 2 -->
-    <div class="dashboard-grid">
-      <!-- Recent Products -->
-      <section class="panel-card large-panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-kicker">Latest Activity</div>
-            <h2>Recent Products</h2>
-          </div>
-
-          <a routerLink="/products" class="panel-link-btn">View all</a>
-        </div>
-
-        <div *ngIf="recentProducts.length === 0" class="empty-state">
-          No recent products found.
-        </div>
-
-        <div class="recent-products-list" *ngIf="recentProducts.length > 0">
-          <div class="recent-product-item" *ngFor="let product of recentProducts">
-            <div class="product-avatar">
-              {{ (product.name || 'P').charAt(0) }}
-            </div>
-
-            <div class="product-main">
-              <div class="product-name">{{ product.name }}</div>
-              <div class="product-meta">
-                {{ product.categoryName || 'No category' }} • {{ product.condition || 'N/A' }}
-              </div>
-            </div>
-
-            <div class="product-side">
-              <div class="product-price">
-                {{ product.price | currency:'GBP':'symbol':'1.2-2' }}
-              </div>
-              <div
-                class="stock-badge"
-                [class.low]="(product.stockQuantity ?? 0) <= 5"
-                [class.good]="(product.stockQuantity ?? 0) > 5"
-              >
-                {{ getStockLabel(product.stockQuantity) }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Right Side -->
-      <div class="side-stack">
-        <section class="panel-card">
+    <!-- Main content -->
+    <div class="main-dashboard-layout">
+      <!-- LEFT COLUMN -->
+      <div class="left-column">
+        <section class="panel-card recent-orders-panel">
           <div class="panel-header">
             <div>
-              <div class="panel-kicker">Attention</div>
-              <h2>Low Stock Alerts</h2>
+              <div class="panel-kicker">Latest Orders</div>
+              <h2>Recent Orders</h2>
             </div>
           </div>
 
-          <div *ngIf="lowStockList.length === 0" class="empty-state">
-            Great — no low stock products right now.
+          <div *ngIf="recentOrders.length === 0" class="empty-state">
+            No recent orders found.
           </div>
 
-          <div class="alert-list" *ngIf="lowStockList.length > 0">
-            <div class="alert-item" *ngFor="let product of lowStockList">
-              <div class="alert-main">
-                <div class="alert-name">{{ product.name }}</div>
-                <div class="alert-meta">{{ product.categoryName || 'No category' }}</div>
+          <div class="recent-orders-list" *ngIf="recentOrders.length > 0">
+            <div class="recent-order-item" *ngFor="let order of recentOrders">
+              <div class="order-avatar">
+                {{ (order.fullName || 'C').charAt(0) }}
               </div>
 
-              <div class="alert-qty">
-                {{ product.stockQuantity ?? 0 }}
+              <div class="order-main">
+                <div class="order-name">{{ order.fullName }}</div>
+                <div class="order-meta">
+                  Order #{{ order.id }} • {{ getOrderItemsCount(order) }} item(s)
+                </div>
+              </div>
+
+              <div class="order-side">
+                <div class="order-amount">
+                  {{ order.totalAmount | currency:'GBP':'symbol':'1.2-2' }}
+                </div>
+                <div class="order-date">
+                  {{ order.createdAt | date:'dd MMM yyyy' }}
+                </div>
+                <div class="order-status-badge" [ngClass]="getStatusClass(order.status)">
+                  {{ order.status }}
+                </div>
               </div>
             </div>
           </div>
         </section>
 
+        <section class="panel-card recent-products-panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-kicker">Latest Products</div>
+              <h2>Recent Products</h2>
+            </div>
+
+            <a routerLink="/products" class="panel-link-btn">View all</a>
+          </div>
+
+          <div *ngIf="recentProducts.length === 0" class="empty-state">
+            No recent products found.
+          </div>
+
+          <div class="recent-products-list" *ngIf="recentProducts.length > 0">
+            <div class="recent-product-item" *ngFor="let product of recentProducts">
+              <div class="product-avatar">
+                {{ (product.name || 'P').charAt(0) }}
+              </div>
+
+              <div class="product-main">
+                <div class="product-name">{{ product.name }}</div>
+                <div class="product-meta">
+                  {{ product.categoryName || 'No category' }} • {{ product.condition || 'N/A' }}
+                </div>
+              </div>
+
+              <div class="product-side">
+                <div class="product-price">
+                  {{ product.price | currency:'GBP':'symbol':'1.2-2' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right-column">
         <section class="panel-card">
           <div class="panel-header">
             <div>
@@ -141,10 +150,69 @@
             </div>
           </div>
 
-          <div class="quick-actions">
-            <a routerLink="/products/new" class="quick-btn primary">+ Add Product</a>
-            <a routerLink="/products" class="quick-btn">Manage Products</a>
-            <a routerLink="/categories" class="quick-btn">Manage Categories</a>
+          <div class="quick-actions-grid">
+            <a routerLink="/products/new" class="quick-tile primary">
+              <span class="quick-tile-title">Add Product</span>
+              <span class="quick-tile-subtitle">Create new item</span>
+            </a>
+
+            <a routerLink="/products" class="quick-tile">
+              <span class="quick-tile-title">Products</span>
+              <span class="quick-tile-subtitle">Manage listings</span>
+            </a>
+
+            <a routerLink="/categories" class="quick-tile">
+              <span class="quick-tile-title">Categories</span>
+              <span class="quick-tile-subtitle">Organize products</span>
+            </a>
+
+            <a routerLink="/products" class="quick-tile">
+              <span class="quick-tile-title">Orders</span>
+              <span class="quick-tile-subtitle">Review orders</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-header">
+            <div>
+              <div class="panel-kicker">Orders</div>
+              <h2>Status Summary</h2>
+            </div>
+          </div>
+
+          <div class="status-summary-list">
+            <div class="status-summary-item">
+              <div class="summary-left">
+                <span class="summary-dot pending"></span>
+                <span>Pending</span>
+              </div>
+              <strong>{{ pendingCount }}</strong>
+            </div>
+
+            <div class="status-summary-item">
+              <div class="summary-left">
+                <span class="summary-dot processing"></span>
+                <span>Processing</span>
+              </div>
+              <strong>{{ processingCount }}</strong>
+            </div>
+
+            <div class="status-summary-item">
+              <div class="summary-left">
+                <span class="summary-dot completed"></span>
+                <span>Completed</span>
+              </div>
+              <strong>{{ completedCount }}</strong>
+            </div>
+
+            <div class="status-summary-item">
+              <div class="summary-left">
+                <span class="summary-dot cancelled"></span>
+                <span>Cancelled</span>
+              </div>
+              <strong>{{ cancelledCount }}</strong>
+            </div>
           </div>
         </section>
       </div>

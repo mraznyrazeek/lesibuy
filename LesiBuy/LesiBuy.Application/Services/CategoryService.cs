@@ -1,6 +1,5 @@
 ﻿using LesiBuy.Domain.Entities;
 using LesiBuy.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,16 +16,12 @@ namespace LesiBuy.Application.Services
 
         public async Task<IReadOnlyList<Category>> GetAllCategoriesAsync()
         {
-            return await _uow.Repository<Category>()
-                .Query()
-                .ToListAsync();
+            return await _uow.Repository<Category>().ListAllAsync();
         }
 
         public async Task<Category?> GetCategoryByIdAsync(int id)
         {
-            return await _uow.Repository<Category>()
-                .Query()
-                .FirstOrDefaultAsync(x => x.Id == id);
+            return await _uow.Repository<Category>().GetByIdAsync(id);
         }
 
         public async Task<Category> AddCategoryAsync(Category category)
@@ -36,13 +31,22 @@ namespace LesiBuy.Application.Services
             return category;
         }
 
+        public async Task<Category> UpdateCategoryAsync(Category category)
+        {
+            _uow.Repository<Category>().Update(category);
+            await _uow.CompleteAsync();
+            return category;
+        }
+
         public async Task DeleteCategoryAsync(int id)
         {
-            var category = await GetCategoryByIdAsync(id);
-            if (category == null) return;
+            var category = await _uow.Repository<Category>().GetByIdAsync(id);
 
-            _uow.Repository<Category>().Delete(category);
-            await _uow.CompleteAsync();
+            if (category != null)
+            {
+                _uow.Repository<Category>().Delete(category);
+                await _uow.CompleteAsync();
+            }
         }
     }
 }

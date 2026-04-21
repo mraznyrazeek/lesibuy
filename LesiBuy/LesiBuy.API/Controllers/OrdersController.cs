@@ -75,5 +75,13 @@ namespace LesiBuy.API.Controllers
 
             return Ok(new { message = "Order cancelled successfully." });
         }
+
+        [Authorize]
+        [HttpGet("admin/all")]
+        public async Task<IActionResult> GetAllOrdersForAdmin()
+        {
+            var orders = await _orderService.GetAllOrdersAsync();
+            return Ok(orders);
+        }
     }
 }

@@ -9,7 +9,7 @@ import { Category } from '../models/category.model';
 export class CategoryService {
   private readonly apiUrl = 'https://localhost:7225/api/categories';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(): Observable<Category[]> {
     return this.http.get<Category[]>(this.apiUrl);
@@ -17,6 +17,10 @@ export class CategoryService {
 
   create(category: any): Observable<any> {
     return this.http.post(this.apiUrl, category);
+  }
+
+  update(id: number, data: Partial<Category>) {
+    return this.http.put<Category>(`${this.apiUrl}/${id}`, data);
   }
 
   delete(id: number): Observable<any> {
