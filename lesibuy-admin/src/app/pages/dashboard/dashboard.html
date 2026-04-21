@@ -1,42 +1,153 @@
 <div class="dashboard">
   <div class="page-header">
-    <h1>Dashboard</h1>
-    <p>Welcome to LesiBuy Admin Panel.</p>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <h3>Total Products</h3>
-      <p>0</p>
+    <div>
+      <div class="page-kicker">Overview</div>
+      <h1>Dashboard</h1>
+      <p>Track your inventory performance and manage products faster.</p>
     </div>
 
-    <div class="stat-card">
-      <h3>Total Orders</h3>
-      <p>0</p>
-    </div>
-
-    <div class="stat-card">
-      <h3>Total Users</h3>
-      <p>0</p>
-    </div>
-
-    <div class="stat-card">
-      <h3>Total Revenue</h3>
-      <p>£0.00</p>
+    <div class="header-actions">
+      <a routerLink="/products/new" class="primary-action-btn">+ Add Product</a>
     </div>
   </div>
 
-  <div class="dashboard-section">
-    <div class="section-card">
-      <h2>Recent Orders</h2>
-      <p>No recent orders yet.</p>
-    </div>
+  <div *ngIf="isLoading" class="state-card">
+    Loading dashboard data...
+  </div>
 
-    <div class="section-card">
-      <h2>Quick Actions</h2>
-      <div class="quick-actions">
-        <a routerLink="/products" class="action-btn">Manage Products</a>
+  <div *ngIf="errorMessage" class="state-card error">
+    {{ errorMessage }}
+  </div>
+
+  <ng-container *ngIf="!isLoading && !errorMessage">
+    <!-- Row 1 -->
+    <div class="stats-grid">
+      <div class="stat-card neutral">
+        <div class="stat-top">
+          <span class="stat-label">Total Products</span>
+          <span class="stat-icon">📦</span>
+        </div>
+        <div class="stat-value">{{ totalProducts }}</div>
+        <div class="stat-note">All inventory items</div>
+      </div>
+
+      <div class="stat-card success">
+        <div class="stat-top">
+          <span class="stat-label">Active Products</span>
+          <span class="stat-icon">🟢</span>
+        </div>
+        <div class="stat-value">{{ activeProducts }}</div>
+        <div class="stat-note">Visible and available</div>
+      </div>
+
+      <div class="stat-card danger">
+        <div class="stat-top">
+          <span class="stat-label">Inactive Products</span>
+          <span class="stat-icon">🔴</span>
+        </div>
+        <div class="stat-value">{{ inactiveProducts }}</div>
+        <div class="stat-note">Currently disabled</div>
+      </div>
+
+      <div class="stat-card warning">
+        <div class="stat-top">
+          <span class="stat-label">Low Stock Products</span>
+          <span class="stat-icon">⚠️</span>
+        </div>
+        <div class="stat-value">{{ lowStockProducts }}</div>
+        <div class="stat-note">Need attention soon</div>
       </div>
     </div>
-  </div>
+
+    <!-- Row 2 -->
+    <div class="dashboard-grid">
+      <!-- Recent Products -->
+      <section class="panel-card large-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-kicker">Latest Activity</div>
+            <h2>Recent Products</h2>
+          </div>
+
+          <a routerLink="/products" class="panel-link-btn">View all</a>
+        </div>
+
+        <div *ngIf="recentProducts.length === 0" class="empty-state">
+          No recent products found.
+        </div>
+
+        <div class="recent-products-list" *ngIf="recentProducts.length > 0">
+          <div class="recent-product-item" *ngFor="let product of recentProducts">
+            <div class="product-avatar">
+              {{ (product.name || 'P').charAt(0) }}
+            </div>
+
+            <div class="product-main">
+              <div class="product-name">{{ product.name }}</div>
+              <div class="product-meta">
+                {{ product.categoryName || 'No category' }} • {{ product.condition || 'N/A' }}
+              </div>
+            </div>
+
+            <div class="product-side">
+              <div class="product-price">
+                {{ product.price | currency:'GBP':'symbol':'1.2-2' }}
+              </div>
+              <div
+                class="stock-badge"
+                [class.low]="(product.stockQuantity ?? 0) <= 5"
+                [class.good]="(product.stockQuantity ?? 0) > 5"
+              >
+                {{ getStockLabel(product.stockQuantity) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Side -->
+      <div class="side-stack">
+        <section class="panel-card">
+          <div class="panel-header">
+            <div>
+              <div class="panel-kicker">Attention</div>
+              <h2>Low Stock Alerts</h2>
+            </div>
+          </div>
+
+          <div *ngIf="lowStockList.length === 0" class="empty-state">
+            Great — no low stock products right now.
+          </div>
+
+          <div class="alert-list" *ngIf="lowStockList.length > 0">
+            <div class="alert-item" *ngFor="let product of lowStockList">
+              <div class="alert-main">
+                <div class="alert-name">{{ product.name }}</div>
+                <div class="alert-meta">{{ product.categoryName || 'No category' }}</div>
+              </div>
+
+              <div class="alert-qty">
+                {{ product.stockQuantity ?? 0 }}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-header">
+            <div>
+              <div class="panel-kicker">Shortcuts</div>
+              <h2>Quick Actions</h2>
+            </div>
+          </div>
+
+          <div class="quick-actions">
+            <a routerLink="/products/new" class="quick-btn primary">+ Add Product</a>
+            <a routerLink="/products" class="quick-btn">Manage Products</a>
+            <a routerLink="/categories" class="quick-btn">Manage Categories</a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </ng-container>
 </div>
