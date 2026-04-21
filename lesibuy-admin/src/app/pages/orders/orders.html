@@ -1,0 +1,106 @@
+<div class="orders-page">
+  <div class="page-header">
+    <div class="page-header-content">
+      <div class="page-kicker">Sales</div>
+      <h1>Orders</h1>
+      <p>Monitor customer orders and review their status from one place.</p>
+    </div>
+
+    <div class="header-badge">
+      {{ orders.length }} {{ orders.length === 1 ? 'Order' : 'Orders' }}
+    </div>
+  </div>
+
+  <section class="toolbar-panel">
+    <div class="toolbar-grid">
+      <div class="filter-group search-group">
+        <input
+          type="text"
+          placeholder="Search by customer, email, or order ID..."
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+
+      <div class="filter-group">
+        <select [(ngModel)]="selectedStatus">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="processing">Processing</option>
+          <option value="delivered">Delivered</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="list-panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-kicker">Order List</div>
+        <h2>All Orders</h2>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="state-box">
+      Loading orders...
+    </div>
+
+    <div *ngIf="errorMessage" class="state-box error">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && filteredOrders.length === 0" class="empty-state">
+      <div class="empty-icon">🧾</div>
+      <h3>No orders found</h3>
+      <p>Try adjusting your search or status filter.</p>
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && filteredOrders.length > 0" class="orders-list">
+      <div class="order-row" *ngFor="let order of filteredOrders">
+        <div class="order-left">
+          <div class="order-avatar">
+            {{ order.fullName.charAt(0) }}
+          </div>
+
+          <div class="order-info">
+            <div class="order-name">{{ order.fullName }}</div>
+            <div class="order-meta">
+              Order #{{ order.id }} • {{ order.email }}
+            </div>
+          </div>
+        </div>
+
+        <div class="order-center">
+          <div class="meta-block">
+            <span class="meta-label">Items</span>
+            <strong>{{ getItemCount(order) }}</strong>
+          </div>
+
+          <div class="meta-block">
+            <span class="meta-label">Payment</span>
+            <strong>{{ order.paymentMethod }}</strong>
+          </div>
+
+          <div class="meta-block">
+            <span class="meta-label">Date</span>
+            <strong>{{ order.createdAt | date:'dd MMM yyyy' }}</strong>
+          </div>
+
+          <div class="meta-block">
+            <span class="meta-label">Total</span>
+            <strong>{{ order.totalAmount | currency:'GBP':'symbol':'1.2-2' }}</strong>
+          </div>
+        </div>
+
+        <div class="order-right">
+          <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+            {{ order.status }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

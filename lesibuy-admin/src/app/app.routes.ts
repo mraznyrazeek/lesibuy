@@ -38,6 +38,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/categories/categories').then(m => m.CategoriesComponent)
       },
+
+      {
+        path: 'orders',
+        loadComponent: () =>
+          import('./pages/orders/orders').then(m => m.OrdersComponent)
+      },
       {
         path: '',
         redirectTo: 'dashboard',
