@@ -7,11 +7,15 @@ import { Order } from '../models/order.model';
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = 'https://localhost:7225/api/orders'; // change if your API port is different
+  private apiUrl = 'https://localhost:7225/api/orders'; // change if needed
 
   constructor(private http: HttpClient) {}
 
   getAllAdminOrders(): Observable<Order[]> {
     return this.http.get<Order[]>(`${this.apiUrl}/admin/all`);
+  }
+
+  updateOrderStatus(orderId: number, status: string): Observable<Order> {
+    return this.http.put<Order>(`${this.apiUrl}/admin/${orderId}/status`, { status });
   }
 }

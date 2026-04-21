@@ -60,6 +60,21 @@ namespace LesiBuy.API.Controllers
         }
 
         [Authorize]
+        [HttpPut("admin/{id}/status")]
+        public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Status))
+                return BadRequest(new { message = "Status is required." });
+
+            var updatedOrder = await _orderService.UpdateOrderStatusAsync(id, dto.Status);
+
+            if (updatedOrder == null)
+                return NotFound(new { message = "Order not found." });
+
+            return Ok(updatedOrder);
+        }
+
+        [Authorize]
         [HttpPut("{id}/cancel")]
         public async Task<IActionResult> CancelOrder(int id)
         {

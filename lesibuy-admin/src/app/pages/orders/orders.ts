@@ -20,6 +20,10 @@ export class OrdersComponent implements OnInit {
   searchTerm = '';
   selectedStatus = '';
 
+  selectedOrder: Order | null = null;
+  statusUpdateValue = '';
+  isUpdatingStatus = false;
+
   constructor(private orderService: OrderService) {}
 
   ngOnInit(): void {
@@ -75,12 +79,51 @@ export class OrdersComponent implements OnInit {
     if (normalized === 'pending') return 'pending';
     if (normalized === 'cancelled') return 'cancelled';
     if (normalized === 'completed' || normalized === 'delivered') return 'completed';
-    if (normalized === 'processing' || normalized === 'confirmed' || normalized === 'approved') return 'processing';
+    if (
+      normalized === 'processing' ||
+      normalized === 'confirmed' ||
+      normalized === 'approved'
+    ) return 'processing';
 
     return 'default';
   }
 
   getItemCount(order: Order): number {
     return order.items?.reduce((sum, item) => sum + (item.quantity ?? 0), 0) ?? 0;
+  }
+
+  openDetails(order: Order): void {
+    this.selectedOrder = order;
+    this.statusUpdateValue = order.status;
+  }
+
+  closeDetails(): void {
+    this.selectedOrder = null;
+    this.statusUpdateValue = '';
+    this.isUpdatingStatus = false;
+  }
+
+  updateStatus(): void {
+    if (!this.selectedOrder || !this.statusUpdateValue.trim()) return;
+
+    this.isUpdatingStatus = true;
+
+    this.orderService.updateOrderStatus(this.selectedOrder.id, this.statusUpdateValue).subscribe({
+      next: (updated) => {
+        const index = this.orders.findIndex(o => o.id === updated.id);
+        if (index !== -1) {
+          this.orders[index] = updated;
+        }
+
+        this.selectedOrder = updated;
+        this.statusUpdateValue = updated.status;
+        this.isUpdatingStatus = false;
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Failed to update order status.');
+        this.isUpdatingStatus = false;
+      }
+    });
   }
 }

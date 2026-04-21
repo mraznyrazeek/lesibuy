@@ -99,8 +99,85 @@
           <span class="status-badge" [ngClass]="getStatusClass(order.status)">
             {{ order.status }}
           </span>
+
+          <button class="view-btn" (click)="openDetails(order)">
+            View
+          </button>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- Details Modal -->
+  <div class="modal-backdrop" *ngIf="selectedOrder" (click)="closeDetails()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div class="panel-kicker">Order Details</div>
+          <h2>Order #{{ selectedOrder?.id }}</h2>
+        </div>
+
+        <button class="close-btn" (click)="closeDetails()">×</button>
+      </div>
+
+      <div class="modal-grid" *ngIf="selectedOrder">
+        <div class="detail-block">
+          <h3>Customer</h3>
+          <p><strong>Name:</strong> {{ selectedOrder.fullName }}</p>
+          <p><strong>Email:</strong> {{ selectedOrder.email }}</p>
+          <p><strong>Phone:</strong> {{ selectedOrder.phone }}</p>
+        </div>
+
+        <div class="detail-block">
+          <h3>Order Info</h3>
+          <p><strong>Payment:</strong> {{ selectedOrder.paymentMethod }}</p>
+          <p><strong>Date:</strong> {{ selectedOrder.createdAt | date:'dd MMM yyyy, HH:mm' }}</p>
+          <p><strong>Total:</strong> {{ selectedOrder.totalAmount | currency:'GBP':'symbol':'1.2-2' }}</p>
+        </div>
+
+        <div class="detail-block full-width">
+          <h3>Shipping Address</h3>
+          <p>{{ selectedOrder.shippingAddress }}</p>
+          <p>{{ selectedOrder.shippingCity }}, {{ selectedOrder.shippingPostalCode }}</p>
+        </div>
+
+        <div class="detail-block full-width">
+          <h3>Items</h3>
+          <div class="item-list">
+            <div class="item-row" *ngFor="let item of selectedOrder.items">
+              <div class="item-main">
+                <div class="item-name">{{ item.productName }}</div>
+                <div class="item-meta">
+                  Qty: {{ item.quantity }} • {{ item.productCondition || 'N/A' }}
+                </div>
+              </div>
+
+              <div class="item-price">
+                {{ item.subTotal | currency:'GBP':'symbol':'1.2-2' }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-block full-width">
+          <h3>Update Status</h3>
+          <div class="status-update-row">
+            <select [(ngModel)]="statusUpdateValue">
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Processing">Processing</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+
+            <button class="update-btn" (click)="updateStatus()" [disabled]="isUpdatingStatus">
+              {{ isUpdatingStatus ? 'Updating...' : 'Update Status' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

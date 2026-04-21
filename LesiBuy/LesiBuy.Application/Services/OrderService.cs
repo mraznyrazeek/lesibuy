@@ -119,6 +119,22 @@ namespace LesiBuy.Application.Services
             return MapOrderToDto(order);
         }
 
+        public async Task<OrderDto?> UpdateOrderStatusAsync(int orderId, string status)
+        {
+            var order = await _uow.Repository<Order>()
+                .Query()
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+                return null;
+
+            order.Status = status.Trim();
+            await _uow.CompleteAsync();
+
+            return MapOrderToDto(order);
+        }
+
         public async Task<bool> CancelOrderAsync(int orderId, int userId)
         {
             var order = await _uow.Repository<Order>()
