@@ -1,0 +1,189 @@
+<div class="products-page">
+  <div class="topbar modern-topbar">
+    <div class="topbar-content">
+      <div class="topbar-label">Inventory</div>
+      <h1>Products</h1>
+      <p>Manage stock in a cleaner and more modern workspace.</p>
+    </div>
+
+    <a class="primary-btn hero-add-btn" routerLink="/products/new">
+      <span>＋</span> Add Product
+    </a>
+  </div>
+
+  <section class="panel panel-list full-list-panel">
+    <!-- <div class="list-header-modern">
+      <div>
+        <div class="panel-kicker">Inventory List</div>
+        <h2>Products List</h2>
+        <p>Manage and update your product inventory.</p>
+      </div>
+    </div> -->
+
+
+    <div class="filter-bar">
+      <div class="filter-shell">
+        <div class="filter-grid">
+          <div class="filter-group search-group">
+            <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm"
+              (ngModelChange)="onFilterChange()" />
+          </div>
+
+          <div class="filter-group">
+            <select [(ngModel)]="selectedCategory" (ngModelChange)="onFilterChange()">
+              <option value="">All Categories</option>
+              <option *ngFor="let category of categories" [value]="category.name">
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <select [(ngModel)]="selectedCondition" (ngModelChange)="onFilterChange()">
+              <option value="">All Conditions</option>
+              <option value="New">New</option>
+              <option value="Used">Used</option>
+              <option value="Refurbished">Refurbished</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <select [(ngModel)]="selectedStatus" (ngModelChange)="onFilterChange()">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <select [(ngModel)]="selectedSort" (ngModelChange)="onFilterChange()">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="az">A - Z</option>
+              <option value="za">Z - A</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
+          </div>
+
+          <button class="reset-btn" (click)="resetFilters()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="table-state">Loading products...</div>
+    <div *ngIf="errorMessage" class="table-state error">{{ errorMessage }}</div>
+
+    <div *ngIf="!isLoading && !errorMessage" class="list-body modern-list-body">
+      <div class="table-scroll modern-table-scroll">
+        <table class="modern-product-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Category</th>
+              <th>Condition</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th class="actions-col">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngIf="paginatedProducts.length === 0">
+              <td colspan="7" class="empty-cell">No products found.</td>
+            </tr>
+
+            <tr *ngFor="let product of paginatedProducts">
+              <td class="product-cell">
+                <div class="product-info">
+                  <div class="product-thumb">
+                    <span>{{ (product.name || 'P').charAt(0) }}</span>
+                  </div>
+
+                  <div class="product-text">
+                    <div class="product-name">{{ product.name }}</div>
+                    <div class="product-meta">{{ product.sellerType || 'Admin' }}</div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <span class="category-text">{{ product.categoryName || 'N/A' }}</span>
+              </td>
+
+              <td>
+                <span class="condition-badge">{{ product.condition || 'N/A' }}</span>
+              </td>
+
+              <td class="price-text">
+                {{ product.price | currency:'GBP':'symbol':'1.2-2' }}
+              </td>
+
+              <td>
+                <div class="stock-wrap">
+                  <span class="stock-number">{{ product.stockQuantity }}</span>
+                  <span class="stock-badge" [class.low]="product.stockQuantity <= 5"
+                    [class.good]="product.stockQuantity > 5">
+                    {{ product.stockQuantity <= 5 ? 'Low stock' : 'In stock' }} </span>
+                </div>
+              </td>
+
+              <td class="status-cell">
+                <div class="status-inline-wrap">
+                  <span class="status-pill modern-status-pill" [class.inactive]="product.isAvailable === false">
+                    <span class="dot"></span>
+                    {{ product.isAvailable === false ? 'Inactive' : 'Active' }}
+                  </span>
+
+                  <button class="status-switch-btn" [class.off]="product.isAvailable === false"
+                    (click)="toggleStatus(product)">
+                    {{ product.isAvailable === false ? 'Activate' : 'Deactivate' }}
+                  </button>
+                </div>
+                </td>
+
+                <td class="actions-cell">
+                  <div class="table-actions modern-actions">
+                    <a class="table-btn modern-btn edit" [routerLink]="['/products/edit', product.id]">
+                      Edit
+                    </a>
+
+                    <button class="table-btn modern-btn delete" (click)="deleteProduct(product)">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer-modern" *ngIf="filteredProducts.length > 0">
+        <div class="footer-info">
+          Showing
+          {{ ((currentPage - 1) * pageSize) + 1 }}
+          to
+          {{ pageEnd }}
+          of
+          {{ filteredProducts.length }}
+          products
+        </div>
+
+        <div class="pagination modern-pagination" *ngIf="filteredProducts.length > pageSize">
+          <button (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
+
+          <button *ngFor="let page of pageNumbers" (click)="goToPage(page)" [class.active]="currentPage === page">
+            {{ page }}
+          </button>
+
+          <button (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
+        </div>
+
+        <div class="page-size-chip">
+          {{ pageSize }} / page
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

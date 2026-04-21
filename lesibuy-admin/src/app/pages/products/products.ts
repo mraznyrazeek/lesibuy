@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+
 import { ProductService } from '../../core/services/product.service';
 import { Product } from '../../core/models/product.model';
 import { CategoryService } from '../../core/services/category.service';
@@ -19,15 +21,12 @@ import {
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './products.html',
   styleUrls: ['./products.scss']
 })
 export class ProductsComponent implements OnInit {
-  products: Product[] = [];
   categories: Category[] = [];
-  isLoading = false;
-  errorMessage = '';
 
   showForm = false;
   isEditMode = false;
@@ -146,69 +145,16 @@ export class ProductsComponent implements OnInit {
     specifications: ''
   };
 
-  currentPage = 1;
-  pageSize = 10;
-
   constructor(
     private productService: ProductService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.loadProducts();
     this.loadCategories();
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.products.length / this.pageSize) || 1;
-  }
-
-  get paginatedProducts(): Product[] {
-    const start = (this.currentPage - 1) * this.pageSize;
-    return this.products.slice(start, start + this.pageSize);
-  }
-
-  get pageNumbers(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  get pageEnd(): number {
-    return Math.min(this.currentPage * this.pageSize, this.products.length);
-  }
-
-  goToPage(page: number): void {
-    if (page < 1 || page > this.totalPages) return;
-    this.currentPage = page;
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-    }
-  }
-
-  prevPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-    }
-  }
-
-  loadProducts(): void {
-    this.isLoading = true;
-    this.errorMessage = '';
-
-    this.productService.getAll().subscribe({
-      next: (response) => {
-        this.products = response;
-        this.currentPage = 1;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error(error);
-        this.errorMessage = 'Failed to load products.';
-        this.isLoading = false;
-      }
-    });
+    this.checkEditMode();
   }
 
   loadCategories(): void {
@@ -220,6 +166,112 @@ export class ProductsComponent implements OnInit {
         console.error(error);
       }
     });
+  }
+
+  checkEditMode(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+
+    if (idParam) {
+      const productId = Number(idParam);
+
+      if (!isNaN(productId) && productId > 0) {
+        this.loadProductForEdit(productId);
+        return;
+      }
+    }
+
+    this.openAddForm();
+  }
+
+  loadProductForEdit(productId: number): void {
+    this.productService.getById(productId).subscribe({
+      next: (product) => {
+        this.populateFormForEdit(product);
+      },
+      error: (error) => {
+        console.error('Failed to load product for edit:', error);
+        alert('Failed to load product details.');
+        this.router.navigate(['/products']);
+      }
+    });
+  }
+
+  populateFormForEdit(product: Product): void {
+    this.resetForm();
+
+    this.newProduct = {
+      name: product.name ?? '',
+      description: product.description ?? '',
+      price: product.price ?? 0,
+      stockQuantity: product.stockQuantity ?? 0,
+      imageUrl: product.imageUrl ?? '',
+      categoryId: product.categoryId ?? 0,
+      condition: product.condition ?? '',
+      sellerType: product.sellerType ?? 'Admin',
+      specifications: product.specifications ?? ''
+    };
+
+    try {
+      const parsed = product.specifications ? JSON.parse(product.specifications) : null;
+
+      if (this.isIphoneCategory() && parsed) {
+        this.iphoneSpecs = { ...this.iphoneSpecs, ...parsed };
+        this.onIphoneSeriesChange();
+        this.iphoneSpecs.model = parsed.model ?? '';
+        this.onIphoneModelChange();
+        this.iphoneSpecs.color = parsed.color ?? '';
+        this.iphoneSpecs.storage = parsed.storage ?? '';
+      }
+
+      if (this.isMacbookCategory() && parsed) {
+        this.macbookSpecs = { ...this.macbookSpecs, ...parsed };
+        this.onMacbookFamilyChange();
+        this.macbookSpecs.model = parsed.model ?? '';
+        this.onMacbookModelChange();
+        this.macbookSpecs.processor = parsed.processor ?? '';
+        this.macbookSpecs.ram = parsed.ram ?? '';
+        this.macbookSpecs.storage = parsed.storage ?? '';
+        this.macbookSpecs.color = parsed.color ?? '';
+        this.macbookSpecs.screen = parsed.screen ?? '';
+      }
+
+      if (this.isIpadCategory() && parsed) {
+        this.ipadSpecs = { ...this.ipadSpecs, ...parsed };
+        this.onIpadFamilyChange();
+        this.ipadSpecs.model = parsed.model ?? '';
+        this.onIpadModelChange();
+        this.ipadSpecs.storage = parsed.storage ?? '';
+        this.ipadSpecs.color = parsed.color ?? '';
+        this.ipadSpecs.screen = parsed.screen ?? '';
+        this.ipadSpecs.connectivity = parsed.connectivity ?? '';
+      }
+
+      if (this.isAirpodsCategory() && parsed) {
+        this.airpodsSpecs = { ...this.airpodsSpecs, ...parsed };
+        this.onAirpodsFamilyChange();
+        this.airpodsSpecs.model = parsed.model ?? '';
+        this.onAirpodsModelChange();
+        this.airpodsSpecs.caseType = parsed.caseType ?? '';
+        this.airpodsSpecs.noiseCancellation = parsed.noiseCancellation ?? '';
+        this.airpodsSpecs.color = parsed.color ?? '';
+      }
+
+      if (this.isWatchCategory() && parsed) {
+        this.watchSpecs = { ...this.watchSpecs, ...parsed };
+        this.onWatchFamilyChange();
+        this.watchSpecs.model = parsed.model ?? '';
+        this.onWatchModelChange();
+        this.watchSpecs.size = parsed.size ?? '';
+        this.watchSpecs.color = parsed.color ?? '';
+        this.watchSpecs.connectivity = parsed.connectivity ?? '';
+      }
+    } catch (error) {
+      console.error('Failed to parse specifications JSON', error);
+    }
+
+    this.isEditMode = true;
+    this.editingProductId = product.id;
+    this.showForm = true;
   }
 
   get selectedCategory(): Category | undefined {
@@ -658,9 +710,8 @@ export class ProductsComponent implements OnInit {
     if (this.isEditMode && this.editingProductId !== null) {
       this.productService.update(this.editingProductId, payload).subscribe({
         next: () => {
-          this.showForm = false;
-          this.loadProducts();
           this.resetForm();
+          this.router.navigate(['/products']);
         },
         error: (err) => {
           console.error('Update error:', err);
@@ -672,9 +723,8 @@ export class ProductsComponent implements OnInit {
 
     this.productService.create(payload).subscribe({
       next: () => {
-        this.showForm = false;
-        this.loadProducts();
         this.resetForm();
+        this.router.navigate(['/products']);
       },
       error: (err) => {
         console.error(err);
@@ -683,83 +733,16 @@ export class ProductsComponent implements OnInit {
     });
   }
 
-  deleteProduct(product: Product): void {
-    const confirmed = confirm(`Are you sure you want to delete "${product.name}"?`);
-    if (!confirmed) return;
-
-    this.productService.delete(product.id).subscribe({
-      next: () => this.loadProducts(),
-      error: (err) => {
-        console.error(err);
-        alert('Failed to delete product');
-      }
-    });
-  }
-
-  editProduct(product: Product): void {
-    this.resetForm();
-
-    this.newProduct = {
-      name: product.name ?? '',
-      description: product.description ?? '',
-      price: product.price ?? 0,
-      stockQuantity: product.stockQuantity ?? 0,
-      imageUrl: product.imageUrl ?? '',
-      categoryId: product.categoryId ?? 0,
-      condition: product.condition ?? '',
-      sellerType: product.sellerType ?? 'Admin',
-      specifications: product.specifications ?? ''
-    };
-
-    try {
-      const parsed = product.specifications ? JSON.parse(product.specifications) : null;
-
-      if (this.isIphoneCategory() && parsed) {
-        this.iphoneSpecs = { ...this.iphoneSpecs, ...parsed };
-        this.onIphoneSeriesChange();
-        if (this.iphoneSpecs.model) this.onIphoneModelChange();
-      }
-
-      if (this.isMacbookCategory() && parsed) {
-        this.macbookSpecs = { ...this.macbookSpecs, ...parsed };
-        this.onMacbookFamilyChange();
-        if (this.macbookSpecs.model) this.onMacbookModelChange();
-      }
-
-      if (this.isIpadCategory() && parsed) {
-        this.ipadSpecs = { ...this.ipadSpecs, ...parsed };
-        this.onIpadFamilyChange();
-        if (this.ipadSpecs.model) this.onIpadModelChange();
-      }
-
-      if (this.isAirpodsCategory() && parsed) {
-        this.airpodsSpecs = { ...this.airpodsSpecs, ...parsed };
-        this.onAirpodsFamilyChange();
-        if (this.airpodsSpecs.model) this.onAirpodsModelChange();
-      }
-
-      if (this.isWatchCategory() && parsed) {
-        this.watchSpecs = { ...this.watchSpecs, ...parsed };
-        this.onWatchFamilyChange();
-        if (this.watchSpecs.model) this.onWatchModelChange();
-      }
-    } catch (error) {
-      console.error('Failed to parse specifications JSON', error);
-    }
-
-    this.isEditMode = true;
-    this.editingProductId = product.id;
-    this.showForm = true;
-  }
-
   cancelForm(): void {
-    this.showForm = false;
     this.resetForm();
+    this.router.navigate(['/products']);
   }
 
   openAddForm(): void {
     this.resetForm();
     this.showForm = true;
+    this.isEditMode = false;
+    this.editingProductId = null;
   }
 
   resetAllSpecs(): void {
