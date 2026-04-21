@@ -7,7 +7,7 @@ import { Order } from '../models/order.model';
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = 'https://localhost:7225/api/orders'; // change if needed
+  private apiUrl = 'https://localhost:7225/api/orders'; // change port if needed
 
   constructor(private http: HttpClient) {}
 

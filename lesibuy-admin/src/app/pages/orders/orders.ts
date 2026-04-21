@@ -24,6 +24,9 @@ export class OrdersComponent implements OnInit {
   statusUpdateValue = '';
   isUpdatingStatus = false;
 
+  currentPage = 1;
+  pageSize = 15;
+
   constructor(private orderService: OrderService) {}
 
   ngOnInit(): void {
@@ -37,6 +40,7 @@ export class OrdersComponent implements OnInit {
     this.orderService.getAllAdminOrders().subscribe({
       next: (res) => {
         this.orders = res ?? [];
+        this.currentPage = 1;
         this.isLoading = false;
       },
       error: (err) => {
@@ -67,6 +71,48 @@ export class OrdersComponent implements OnInit {
     }
 
     return filtered;
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredOrders.length / this.pageSize) || 1;
+  }
+
+  get paginatedOrders(): Order[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredOrders.slice(start, start + this.pageSize);
+  }
+
+  get pageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  get pageEnd(): number {
+    return Math.min(this.currentPage * this.pageSize, this.filteredOrders.length);
+  }
+
+  onSearchChange(): void {
+    this.currentPage = 1;
+  }
+
+  onStatusChange(): void {
+    this.currentPage = 1;
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
   }
 
   normalizeStatus(status: string | null | undefined): string {

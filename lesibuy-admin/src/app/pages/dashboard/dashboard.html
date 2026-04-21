@@ -20,7 +20,6 @@
   </div>
 
   <ng-container *ngIf="!isLoading && !errorMessage">
-    <!-- KPI -->
     <div class="stats-grid">
       <div class="stat-card neutral">
         <div class="stat-top">
@@ -59,9 +58,7 @@
       </div>
     </div>
 
-    <!-- Main content -->
     <div class="main-dashboard-layout">
-      <!-- LEFT COLUMN -->
       <div class="left-column">
         <section class="panel-card recent-orders-panel">
           <div class="panel-header">
@@ -140,7 +137,6 @@
         </section>
       </div>
 
-      <!-- RIGHT COLUMN -->
       <div class="right-column">
         <section class="panel-card">
           <div class="panel-header">
@@ -188,6 +184,14 @@
                 <span>Pending</span>
               </div>
               <strong>{{ pendingCount }}</strong>
+            </div>
+
+            <div class="status-summary-item">
+              <div class="summary-left">
+                <span class="summary-dot approved"></span>
+                <span>Approved</span>
+              </div>
+              <strong>{{ approvedCount }}</strong>
             </div>
 
             <div class="status-summary-item">

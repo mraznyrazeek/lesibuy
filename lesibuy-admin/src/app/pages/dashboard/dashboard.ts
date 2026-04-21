@@ -31,9 +31,10 @@ export class DashboardComponent implements OnInit {
   recentOrders: Order[] = [];
 
   pendingCount = 0;
-  cancelledCount = 0;
-  completedCount = 0;
+  approvedCount = 0;
   processingCount = 0;
+  completedCount = 0;
+  cancelledCount = 0;
 
   constructor(
     private productService: ProductService,
@@ -60,10 +61,9 @@ export class DashboardComponent implements OnInit {
     this.productService.getAll().subscribe({
       next: (response) => {
         this.products = response ?? [];
-
         this.totalProducts = this.products.length;
         this.activeProducts = this.products.filter(p => p.isAvailable !== false).length;
-        this.recentProducts = [...this.products].slice(0, 5);
+        this.recentProducts = [...this.products].slice(0, 4);
 
         productsLoaded = true;
         finishLoading();
@@ -78,22 +78,36 @@ export class DashboardComponent implements OnInit {
     this.orderService.getAllAdminOrders().subscribe({
       next: (response) => {
         this.orders = response ?? [];
-
         this.totalOrders = this.orders.length;
-        this.pendingOrders = this.orders.filter(o => this.normalizeStatus(o.status) === 'pending').length;
+        this.pendingOrders = this.orders.filter(
+          o => this.normalizeStatus(o.status) === 'pending'
+        ).length;
 
-        this.pendingCount = this.orders.filter(o => this.normalizeStatus(o.status) === 'pending').length;
-        this.cancelledCount = this.orders.filter(o => this.normalizeStatus(o.status) === 'cancelled').length;
-        this.completedCount = this.orders.filter(o => {
-          const status = this.normalizeStatus(o.status);
-          return status === 'completed' || status === 'delivered';
-        }).length;
-        this.processingCount = this.orders.filter(o => {
-          const status = this.normalizeStatus(o.status);
-          return status === 'processing' || status === 'confirmed';
-        }).length;
+        this.pendingCount = this.orders.filter(
+          o => this.normalizeStatus(o.status) === 'pending'
+        ).length;
 
-        this.recentOrders = [...this.orders].slice(0, 5);
+        this.approvedCount = this.orders.filter(
+          o => this.normalizeStatus(o.status) === 'approved'
+        ).length;
+
+        this.processingCount = this.orders.filter(
+          o =>
+            this.normalizeStatus(o.status) === 'processing' ||
+            this.normalizeStatus(o.status) === 'confirmed'
+        ).length;
+
+        this.completedCount = this.orders.filter(
+          o =>
+            this.normalizeStatus(o.status) === 'completed' ||
+            this.normalizeStatus(o.status) === 'delivered'
+        ).length;
+
+        this.cancelledCount = this.orders.filter(
+          o => this.normalizeStatus(o.status) === 'cancelled'
+        ).length;
+
+        this.recentOrders = [...this.orders].slice(0, 4);
 
         ordersLoaded = true;
         finishLoading();
@@ -116,7 +130,11 @@ export class DashboardComponent implements OnInit {
     if (normalized === 'pending') return 'pending';
     if (normalized === 'cancelled') return 'cancelled';
     if (normalized === 'completed' || normalized === 'delivered') return 'completed';
-    if (normalized === 'processing' || normalized === 'confirmed') return 'processing';
+    if (
+      normalized === 'processing' ||
+      normalized === 'confirmed' ||
+      normalized === 'approved'
+    ) return 'processing';
 
     return 'default';
   }

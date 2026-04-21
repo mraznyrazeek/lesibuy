@@ -54,7 +54,7 @@
   white-space: nowrap;
 }
 
-/* Toolbar / Panel */
+/* Panels */
 .toolbar-panel,
 .list-panel {
   background: #ffffff;
@@ -97,6 +97,15 @@
   margin-bottom: 12px;
 }
 
+.panel-kicker {
+  font-size: 10px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
 .panel-header h2 {
   margin: 0;
   font-size: 18px;
@@ -104,7 +113,7 @@
   color: #0f172a;
 }
 
-/* State */
+/* States */
 .state-box {
   padding: 12px;
   border-radius: 10px;
@@ -130,6 +139,19 @@
 .empty-icon {
   font-size: 28px;
   margin-bottom: 8px;
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.empty-state p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 13px;
 }
 
 /* Orders list */
@@ -277,6 +299,56 @@
 
 .update-btn:disabled {
   opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Pagination */
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 14px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.footer-info {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination button {
+  min-width: 36px;
+  height: 36px;
+  border: 1px solid #dbe2ea;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #f8fafc;
+}
+
+.pagination button.active {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 

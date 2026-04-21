@@ -18,11 +18,12 @@
           type="text"
           placeholder="Search by customer, email, or order ID..."
           [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
         />
       </div>
 
       <div class="filter-group">
-        <select [(ngModel)]="selectedStatus">
+        <select [(ngModel)]="selectedStatus" (ngModelChange)="onStatusChange()">
           <option value="">All Status</option>
           <option value="pending">Pending</option>
           <option value="approved">Approved</option>
@@ -59,7 +60,7 @@
     </div>
 
     <div *ngIf="!isLoading && !errorMessage && filteredOrders.length > 0" class="orders-list">
-      <div class="order-row" *ngFor="let order of filteredOrders">
+      <div class="order-row" *ngFor="let order of paginatedOrders">
         <div class="order-left">
           <div class="order-avatar">
             {{ order.fullName.charAt(0) }}
@@ -106,15 +107,39 @@
         </div>
       </div>
     </div>
+
+    <div class="table-footer" *ngIf="!isLoading && !errorMessage && filteredOrders.length > 0">
+      <div class="footer-info">
+        Showing
+        {{ ((currentPage - 1) * pageSize) + 1 }}
+        to
+        {{ pageEnd }}
+        of
+        {{ filteredOrders.length }}
+        orders
+      </div>
+
+      <div class="pagination" *ngIf="filteredOrders.length > pageSize">
+        <button (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
+
+        <button
+          *ngFor="let page of pageNumbers"
+          (click)="goToPage(page)"
+          [class.active]="currentPage === page">
+          {{ page }}
+        </button>
+
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
+      </div>
+    </div>
   </section>
 
-  <!-- Details Modal -->
   <div class="modal-backdrop" *ngIf="selectedOrder" (click)="closeDetails()">
     <div class="modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div>
           <div class="panel-kicker">Order Details</div>
-          <h2>Order #{{ selectedOrder?.id }}</h2>
+          <h2>Order #{{ selectedOrder.id }}</h2>
         </div>
 
         <button class="close-btn" (click)="closeDetails()">×</button>
