@@ -1,9 +1,8 @@
 <div class="orders-page">
   <div class="page-header">
     <div class="page-header-content">
-      <div class="page-kicker">Sales</div>
+      <!-- <div class="page-kicker">Sales</div> -->
       <h1>Orders</h1>
-      <p>Monitor customer orders and review their status from one place.</p>
     </div>
 
     <div class="header-badge">
@@ -16,7 +15,7 @@
       <div class="filter-group search-group">
         <input
           type="text"
-          placeholder="Search by customer, email, or order ID..."
+          placeholder="Search by customer name or order ID..."
           [(ngModel)]="searchTerm"
           (ngModelChange)="onSearchChange()"
         />
@@ -27,10 +26,8 @@
           <option value="">All Status</option>
           <option value="pending">Pending</option>
           <option value="approved">Approved</option>
-          <option value="confirmed">Confirmed</option>
           <option value="processing">Processing</option>
           <option value="delivered">Delivered</option>
-          <option value="completed">Completed</option>
           <option value="cancelled">Cancelled</option>
         </select>
       </div>
@@ -63,7 +60,7 @@
       <div class="order-row" *ngFor="let order of paginatedOrders">
         <div class="order-left">
           <div class="order-avatar">
-            {{ order.fullName.charAt(0) }}
+            {{ getInitials(order.fullName) }}
           </div>
 
           <div class="order-info">
@@ -82,7 +79,7 @@
 
           <div class="meta-block">
             <span class="meta-label">Payment</span>
-            <strong>{{ order.paymentMethod }}</strong>
+            <strong>{{ order.paymentMethod || 'N/A' }}</strong>
           </div>
 
           <div class="meta-block">
@@ -137,36 +134,41 @@
   <div class="modal-backdrop" *ngIf="selectedOrder" (click)="closeDetails()">
     <div class="modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <div>
+        <div class="modal-title-wrap">
           <div class="panel-kicker">Order Details</div>
           <h2>Order #{{ selectedOrder.id }}</h2>
+          <p class="modal-subtitle">
+            Review customer details, items, payment summary, and update the order status.
+          </p>
         </div>
 
-        <button class="close-btn" (click)="closeDetails()">×</button>
+        <button class="close-btn" (click)="closeDetails()" aria-label="Close modal">
+          ×
+        </button>
       </div>
 
       <div class="modal-grid" *ngIf="selectedOrder">
-        <div class="detail-block">
+        <div class="detail-block glass-card">
           <h3>Customer</h3>
           <p><strong>Name:</strong> {{ selectedOrder.fullName }}</p>
           <p><strong>Email:</strong> {{ selectedOrder.email }}</p>
-          <p><strong>Phone:</strong> {{ selectedOrder.phone }}</p>
+          <p><strong>Phone:</strong> {{ selectedOrder.phone || 'N/A' }}</p>
         </div>
 
-        <div class="detail-block">
+        <div class="detail-block glass-card">
           <h3>Order Info</h3>
-          <p><strong>Payment:</strong> {{ selectedOrder.paymentMethod }}</p>
+          <p><strong>Payment:</strong> {{ selectedOrder.paymentMethod || 'N/A' }}</p>
           <p><strong>Date:</strong> {{ selectedOrder.createdAt | date:'dd MMM yyyy, HH:mm' }}</p>
           <p><strong>Total:</strong> {{ selectedOrder.totalAmount | currency:'GBP':'symbol':'1.2-2' }}</p>
         </div>
 
-        <div class="detail-block full-width">
+        <div class="detail-block full-width glass-card">
           <h3>Shipping Address</h3>
-          <p>{{ selectedOrder.shippingAddress }}</p>
-          <p>{{ selectedOrder.shippingCity }}, {{ selectedOrder.shippingPostalCode }}</p>
+          <p>{{ selectedOrder.shippingAddress || 'N/A' }}</p>
+          <p>{{ selectedOrder.shippingCity || 'N/A' }}, {{ selectedOrder.shippingPostalCode || 'N/A' }}</p>
         </div>
 
-        <div class="detail-block full-width">
+        <div class="detail-block full-width glass-card">
           <h3>Items</h3>
           <div class="item-list">
             <div class="item-row" *ngFor="let item of selectedOrder.items">
@@ -184,16 +186,14 @@
           </div>
         </div>
 
-        <div class="detail-block full-width">
+        <div class="detail-block full-width glass-card">
           <h3>Update Status</h3>
           <div class="status-update-row">
             <select [(ngModel)]="statusUpdateValue">
               <option value="Pending">Pending</option>
               <option value="Approved">Approved</option>
-              <option value="Confirmed">Confirmed</option>
               <option value="Processing">Processing</option>
               <option value="Delivered">Delivered</option>
-              <option value="Completed">Completed</option>
               <option value="Cancelled">Cancelled</option>
             </select>
 

@@ -58,9 +58,9 @@ export class OrdersComponent implements OnInit {
       const term = this.searchTerm.toLowerCase().trim();
 
       filtered = filtered.filter(order =>
-        order.fullName.toLowerCase().includes(term) ||
-        order.email.toLowerCase().includes(term) ||
-        order.id.toString().includes(term)
+        order.fullName?.toLowerCase().includes(term) ||
+        order.email?.toLowerCase().includes(term) ||
+        order.id?.toString().includes(term)
       );
     }
 
@@ -136,6 +136,17 @@ export class OrdersComponent implements OnInit {
 
   getItemCount(order: Order): number {
     return order.items?.reduce((sum, item) => sum + (item.quantity ?? 0), 0) ?? 0;
+  }
+
+  getInitials(name: string | null | undefined): string {
+    if (!name) return 'O';
+
+    const parts = name.trim().split(' ').filter(Boolean);
+    if (parts.length === 1) {
+      return parts[0].charAt(0).toUpperCase();
+    }
+
+    return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
   }
 
   openDetails(order: Order): void {

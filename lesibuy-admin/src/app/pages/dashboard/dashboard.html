@@ -3,7 +3,7 @@
     <div>
       <div class="page-kicker">Overview</div>
       <h1>Dashboard</h1>
-      <p>Track products, orders, and recent activity from one place.</p>
+      <p>Track products, orders, revenue, and recent activity from one place.</p>
     </div>
 
     <div class="header-actions">
@@ -57,6 +57,123 @@
         <div class="stat-note">Need action</div>
       </div>
     </div>
+
+    <section class="panel-card revenue-panel">
+  <div class="revenue-topbar">
+    <div>
+      <div class="panel-kicker">Revenue</div>
+      <h2>Revenue Overview</h2>
+      <p class="panel-subtext">Track your income performance across different periods.</p>
+    </div>
+
+    <div class="range-switcher modern-switcher">
+      <button
+        type="button"
+        [class.active]="revenueRange === 'weekly'"
+        (click)="setRevenueRange('weekly')">
+        Weekly
+      </button>
+
+      <button
+        type="button"
+        [class.active]="revenueRange === 'monthly'"
+        (click)="setRevenueRange('monthly')">
+        Monthly
+      </button>
+
+      <button
+        type="button"
+        [class.active]="revenueRange === 'yearly'"
+        (click)="setRevenueRange('yearly')">
+        Yearly
+      </button>
+    </div>
+  </div>
+
+  <div class="revenue-modern-layout">
+    <div class="revenue-summary-card">
+      <div class="summary-chip">{{ revenueRangeTitle }}</div>
+
+      <div class="summary-amount">
+        {{ revenueTotal | currency:'GBP':'symbol':'1.2-2' }}
+      </div>
+
+      <div class="summary-note">Total revenue for the selected period</div>
+
+      <div class="summary-stats">
+        <div class="summary-stat-box">
+          <span>Average</span>
+          <strong>{{ revenueAverage | currency:'GBP':'symbol':'1.2-2' }}</strong>
+        </div>
+
+        <!-- <div class="summary-stat-box">
+          <span>Growth</span>
+          <strong [ngClass]="{ 'trend-up': revenueTrend >= 0, 'trend-down': revenueTrend < 0 }">
+            {{ revenueTrend >= 0 ? '+' : '' }}{{ revenueTrend | number:'1.0-1' }}%
+          </strong>
+        </div> -->
+      </div>
+    </div>
+
+   <div class="revenue-chart-card">
+  <div class="chart-header-mini">
+    <div class="chart-legend">
+      <span class="legend-line"></span>
+      <span>Revenue trend</span>
+    </div>
+
+    <div class="chart-caption">
+      Peak: {{ maxRevenueValue | currency:'GBP':'symbol':'1.0-0' }}
+    </div>
+  </div>
+
+  <div class="chart-shell clean-line-chart">
+    <svg
+      class="revenue-chart modern-chart"
+      viewBox="0 0 100 220"
+      preserveAspectRatio="none"
+      aria-label="Revenue chart">
+
+      <defs>
+        <linearGradient id="revenueAreaGradientSoft" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="#2563eb" stop-opacity="0.16"></stop>
+          <stop offset="100%" stop-color="#2563eb" stop-opacity="0.015"></stop>
+        </linearGradient>
+
+        <linearGradient id="revenueLineGradientSoft" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%" stop-color="#7cb6ff"></stop>
+          <stop offset="50%" stop-color="#3b82f6"></stop>
+          <stop offset="100%" stop-color="#1d4ed8"></stop>
+        </linearGradient>
+      </defs>
+
+      <line x1="0" y1="220" x2="100" y2="220" class="axis-line"></line>
+      <line x1="0" y1="176" x2="100" y2="176" class="grid-line"></line>
+      <line x1="0" y1="132" x2="100" y2="132" class="grid-line"></line>
+      <line x1="0" y1="88" x2="100" y2="88" class="grid-line"></line>
+      <line x1="0" y1="44" x2="100" y2="44" class="grid-line"></line>
+      <line x1="0" y1="0" x2="100" y2="0" class="grid-line"></line>
+
+      <path [attr.d]="chartAreaPath" class="chart-area-soft"></path>
+      <path [attr.d]="chartSmoothPath" class="chart-line-clean"></path>
+
+      <ng-container *ngIf="chartDots.length > 0">
+        <circle
+          [attr.cx]="chartDots[chartDots.length - 1].cx"
+          [attr.cy]="chartDots[chartDots.length - 1].cy"
+          r="2.8"
+          class="chart-dot-last">
+        </circle>
+      </ng-container>
+    </svg>
+  </div>
+
+  <div class="chart-labels modern-labels">
+    <span *ngFor="let item of revenueChartData">{{ item.label }}</span>
+  </div>
+</div>
+  </div>
+</section>
 
     <div class="main-dashboard-layout">
       <div class="left-column">
