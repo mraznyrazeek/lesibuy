@@ -31,6 +31,10 @@ export class ProductsListComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
 
+  showDeleteModal = false;
+  productToDelete: Product | null = null;
+  isDeletingProduct = false;
+
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService
@@ -47,7 +51,7 @@ export class ProductsListComponent implements OnInit {
 
     this.productService.getAll().subscribe({
       next: (response) => {
-        this.products = response;
+        this.products = response ?? [];
         this.currentPage = 1;
         this.isLoading = false;
       },
@@ -62,7 +66,7 @@ export class ProductsListComponent implements OnInit {
   loadCategories(): void {
     this.categoryService.getAll().subscribe({
       next: (response) => {
-        this.categories = response;
+        this.categories = response ?? [];
       },
       error: (error) => {
         console.error(error);
@@ -172,14 +176,32 @@ export class ProductsListComponent implements OnInit {
     this.currentPage = 1;
   }
 
-  deleteProduct(product: Product): void {
-    const confirmed = confirm(`Are you sure you want to delete "${product.name}"?`);
-    if (!confirmed) return;
+  openDeleteModal(product: Product): void {
+    this.productToDelete = product;
+    this.showDeleteModal = true;
+  }
 
-    this.productService.delete(product.id).subscribe({
-      next: () => this.loadProducts(),
+  closeDeleteModal(): void {
+    if (this.isDeletingProduct) return;
+    this.showDeleteModal = false;
+    this.productToDelete = null;
+  }
+
+  confirmDeleteProduct(): void {
+    if (!this.productToDelete) return;
+
+    this.isDeletingProduct = true;
+
+    this.productService.delete(this.productToDelete.id).subscribe({
+      next: () => {
+        this.isDeletingProduct = false;
+        this.showDeleteModal = false;
+        this.productToDelete = null;
+        this.loadProducts();
+      },
       error: (err) => {
         console.error(err);
+        this.isDeletingProduct = false;
         alert('Failed to delete product');
       }
     });

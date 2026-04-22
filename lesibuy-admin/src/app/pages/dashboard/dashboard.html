@@ -26,7 +26,7 @@
           <span class="stat-label">Total Products</span>
           <span class="stat-icon-box neutral-icon">📦</span>
         </div>
-        <div class="stat-value">{{ totalProducts }}</div>
+        <div class="stat-value counting-number">{{ displayTotalProducts }}</div>
         <div class="stat-note">Listed products</div>
       </div>
 
@@ -35,7 +35,7 @@
           <span class="stat-label">Active Products</span>
           <span class="stat-icon-box success-icon">●</span>
         </div>
-        <div class="stat-value">{{ activeProducts }}</div>
+        <div class="stat-value counting-number">{{ displayActiveProducts }}</div>
         <div class="stat-note">Ready to sell</div>
       </div>
 
@@ -44,7 +44,7 @@
           <span class="stat-label">Total Orders</span>
           <span class="stat-icon-box primary-icon">🧾</span>
         </div>
-        <div class="stat-value">{{ totalOrders }}</div>
+        <div class="stat-value counting-number">{{ displayTotalOrders }}</div>
         <div class="stat-note">All received orders</div>
       </div>
 
@@ -53,127 +53,122 @@
           <span class="stat-label">Pending Orders</span>
           <span class="stat-icon-box warning-icon">⏳</span>
         </div>
-        <div class="stat-value">{{ pendingOrders }}</div>
+        <div class="stat-value counting-number">{{ displayPendingOrders }}</div>
         <div class="stat-note">Need action</div>
       </div>
     </div>
 
     <section class="panel-card revenue-panel">
-  <div class="revenue-topbar">
-    <div>
-      <div class="panel-kicker">Revenue</div>
-      <h2>Revenue Overview</h2>
-      <p class="panel-subtext">Track your income performance across different periods.</p>
-    </div>
-
-    <div class="range-switcher modern-switcher">
-      <button
-        type="button"
-        [class.active]="revenueRange === 'weekly'"
-        (click)="setRevenueRange('weekly')">
-        Weekly
-      </button>
-
-      <button
-        type="button"
-        [class.active]="revenueRange === 'monthly'"
-        (click)="setRevenueRange('monthly')">
-        Monthly
-      </button>
-
-      <button
-        type="button"
-        [class.active]="revenueRange === 'yearly'"
-        (click)="setRevenueRange('yearly')">
-        Yearly
-      </button>
-    </div>
-  </div>
-
-  <div class="revenue-modern-layout">
-    <div class="revenue-summary-card">
-      <div class="summary-chip">{{ revenueRangeTitle }}</div>
-
-      <div class="summary-amount">
-        {{ revenueTotal | currency:'GBP':'symbol':'1.2-2' }}
-      </div>
-
-      <div class="summary-note">Total revenue for the selected period</div>
-
-      <div class="summary-stats">
-        <div class="summary-stat-box">
-          <span>Average</span>
-          <strong>{{ revenueAverage | currency:'GBP':'symbol':'1.2-2' }}</strong>
+      <div class="revenue-topbar">
+        <div>
+          <div class="panel-kicker">Revenue</div>
+          <h2>Revenue Overview</h2>
+          <p class="panel-subtext">Track your income performance across different periods.</p>
         </div>
 
-        <!-- <div class="summary-stat-box">
-          <span>Growth</span>
-          <strong [ngClass]="{ 'trend-up': revenueTrend >= 0, 'trend-down': revenueTrend < 0 }">
-            {{ revenueTrend >= 0 ? '+' : '' }}{{ revenueTrend | number:'1.0-1' }}%
-          </strong>
-        </div> -->
+        <div class="range-switcher modern-switcher">
+          <button
+            type="button"
+            [class.active]="revenueRange === 'weekly'"
+            (click)="setRevenueRange('weekly')">
+            Weekly
+          </button>
+
+          <button
+            type="button"
+            [class.active]="revenueRange === 'monthly'"
+            (click)="setRevenueRange('monthly')">
+            Monthly
+          </button>
+
+          <button
+            type="button"
+            [class.active]="revenueRange === 'yearly'"
+            (click)="setRevenueRange('yearly')">
+            Yearly
+          </button>
+        </div>
       </div>
-    </div>
 
-   <div class="revenue-chart-card">
-  <div class="chart-header-mini">
-    <div class="chart-legend">
-      <span class="legend-line"></span>
-      <span>Revenue trend</span>
-    </div>
+      <div class="revenue-modern-layout">
+        <div class="revenue-summary-card">
+          <div class="summary-chip">{{ revenueRangeTitle }}</div>
 
-    <div class="chart-caption">
-      Peak: {{ maxRevenueValue | currency:'GBP':'symbol':'1.0-0' }}
-    </div>
-  </div>
+          <div class="summary-amount counting-number">
+            {{ displayRevenueTotal | currency:'GBP':'symbol':'1.2-2' }}
+          </div>
 
-  <div class="chart-shell clean-line-chart">
-    <svg
-      class="revenue-chart modern-chart"
-      viewBox="0 0 100 220"
-      preserveAspectRatio="none"
-      aria-label="Revenue chart">
+          <div class="summary-note">Total revenue for the selected period</div>
 
-      <defs>
-        <linearGradient id="revenueAreaGradientSoft" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="#2563eb" stop-opacity="0.16"></stop>
-          <stop offset="100%" stop-color="#2563eb" stop-opacity="0.015"></stop>
-        </linearGradient>
+          <div class="summary-stats">
+            <div class="summary-stat-box">
+              <span>Average</span>
+              <strong class="counting-number">
+                {{ displayRevenueAverage | currency:'GBP':'symbol':'1.2-2' }}
+              </strong>
+            </div>
+          </div>
+        </div>
 
-        <linearGradient id="revenueLineGradientSoft" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stop-color="#7cb6ff"></stop>
-          <stop offset="50%" stop-color="#3b82f6"></stop>
-          <stop offset="100%" stop-color="#1d4ed8"></stop>
-        </linearGradient>
-      </defs>
+        <div class="revenue-chart-card">
+          <div class="chart-header-mini">
+            <div class="chart-legend">
+              <span class="legend-line"></span>
+              <span>Revenue trend</span>
+            </div>
 
-      <line x1="0" y1="220" x2="100" y2="220" class="axis-line"></line>
-      <line x1="0" y1="176" x2="100" y2="176" class="grid-line"></line>
-      <line x1="0" y1="132" x2="100" y2="132" class="grid-line"></line>
-      <line x1="0" y1="88" x2="100" y2="88" class="grid-line"></line>
-      <line x1="0" y1="44" x2="100" y2="44" class="grid-line"></line>
-      <line x1="0" y1="0" x2="100" y2="0" class="grid-line"></line>
+            <div class="chart-caption counting-number">
+              Peak: {{ displayMaxRevenueValue | currency:'GBP':'symbol':'1.0-0' }}
+            </div>
+          </div>
 
-      <path [attr.d]="chartAreaPath" class="chart-area-soft"></path>
-      <path [attr.d]="chartSmoothPath" class="chart-line-clean"></path>
+          <div class="chart-shell clean-line-chart">
+            <svg
+              class="revenue-chart modern-chart"
+              viewBox="0 0 100 220"
+              preserveAspectRatio="none"
+              aria-label="Revenue chart">
 
-      <ng-container *ngIf="chartDots.length > 0">
-        <circle
-          [attr.cx]="chartDots[chartDots.length - 1].cx"
-          [attr.cy]="chartDots[chartDots.length - 1].cy"
-          r="2.8"
-          class="chart-dot-last">
-        </circle>
-      </ng-container>
-    </svg>
-  </div>
+              <defs>
+                <linearGradient id="revenueAreaGradientSoft" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#2563eb" stop-opacity="0.16"></stop>
+                  <stop offset="100%" stop-color="#2563eb" stop-opacity="0.015"></stop>
+                </linearGradient>
 
-  <div class="chart-labels modern-labels">
-    <span *ngFor="let item of revenueChartData">{{ item.label }}</span>
-  </div>
-</div>
-  </div>
-</section>
+                <linearGradient id="revenueLineGradientSoft" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stop-color="#7cb6ff"></stop>
+                  <stop offset="50%" stop-color="#3b82f6"></stop>
+                  <stop offset="100%" stop-color="#1d4ed8"></stop>
+                </linearGradient>
+              </defs>
+
+              <line x1="0" y1="220" x2="100" y2="220" class="axis-line"></line>
+              <line x1="0" y1="176" x2="100" y2="176" class="grid-line"></line>
+              <line x1="0" y1="132" x2="100" y2="132" class="grid-line"></line>
+              <line x1="0" y1="88" x2="100" y2="88" class="grid-line"></line>
+              <line x1="0" y1="44" x2="100" y2="44" class="grid-line"></line>
+              <line x1="0" y1="0" x2="100" y2="0" class="grid-line"></line>
+
+              <path [attr.d]="chartAreaPath" class="chart-area-soft"></path>
+              <path [attr.d]="chartSmoothPath" class="chart-line-clean"></path>
+
+              <ng-container *ngIf="chartDots.length > 0">
+                <circle
+                  [attr.cx]="chartDots[chartDots.length - 1].cx"
+                  [attr.cy]="chartDots[chartDots.length - 1].cy"
+                  r="2.8"
+                  class="chart-dot-last">
+                </circle>
+              </ng-container>
+            </svg>
+          </div>
+
+          <div class="chart-labels modern-labels">
+            <span *ngFor="let item of revenueChartData">{{ item.label }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <div class="main-dashboard-layout">
       <div class="left-column">
@@ -300,7 +295,7 @@
                 <span class="summary-dot pending"></span>
                 <span>Pending</span>
               </div>
-              <strong>{{ pendingCount }}</strong>
+              <strong class="counting-number">{{ displayPendingCount }}</strong>
             </div>
 
             <div class="status-summary-item">
@@ -308,7 +303,7 @@
                 <span class="summary-dot approved"></span>
                 <span>Approved</span>
               </div>
-              <strong>{{ approvedCount }}</strong>
+              <strong class="counting-number">{{ displayApprovedCount }}</strong>
             </div>
 
             <div class="status-summary-item">
@@ -316,7 +311,7 @@
                 <span class="summary-dot processing"></span>
                 <span>Processing</span>
               </div>
-              <strong>{{ processingCount }}</strong>
+              <strong class="counting-number">{{ displayProcessingCount }}</strong>
             </div>
 
             <div class="status-summary-item">
@@ -324,7 +319,7 @@
                 <span class="summary-dot completed"></span>
                 <span>Completed</span>
               </div>
-              <strong>{{ completedCount }}</strong>
+              <strong class="counting-number">{{ displayCompletedCount }}</strong>
             </div>
 
             <div class="status-summary-item">
@@ -332,7 +327,7 @@
                 <span class="summary-dot cancelled"></span>
                 <span>Cancelled</span>
               </div>
-              <strong>{{ cancelledCount }}</strong>
+              <strong class="counting-number">{{ displayCancelledCount }}</strong>
             </div>
           </div>
         </section>

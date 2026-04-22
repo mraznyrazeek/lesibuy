@@ -720,6 +720,19 @@
   font-size: 13px;
 }
 
+.counting-number {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  transition: transform 0.2s ease;
+}
+
+.stat-value.counting-number,
+.summary-amount.counting-number,
+.chart-caption.counting-number,
+.status-summary-item strong.counting-number {
+  will-change: contents;
+}
+
 /* Responsive */
 @media (max-width: 1280px) {
   .revenue-modern-layout {

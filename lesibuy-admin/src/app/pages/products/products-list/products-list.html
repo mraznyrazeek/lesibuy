@@ -1,7 +1,6 @@
 <div class="products-page">
   <div class="topbar modern-topbar">
     <div class="topbar-content">
-      <!-- <div class="topbar-label">Inventory</div> -->
       <h1>Products</h1>
     </div>
 
@@ -11,20 +10,14 @@
   </div>
 
   <section class="panel panel-list full-list-panel">
-    <!-- <div class="list-header-modern">
-      <div>
-        <div class="panel-kicker">Inventory List</div>
-        <h2>Products List</h2>
-        <p>Manage and update your product inventory.</p>
-      </div>
-    </div> -->
-
-
     <div class="filter-bar">
       <div class="filter-shell">
         <div class="filter-grid">
           <div class="filter-group search-group">
-            <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm"
+            <input
+              type="text"
+              placeholder="Search products..."
+              [(ngModel)]="searchTerm"
               (ngModelChange)="onFilterChange()" />
           </div>
 
@@ -122,9 +115,12 @@
               <td>
                 <div class="stock-wrap">
                   <span class="stock-number">{{ product.stockQuantity }}</span>
-                  <span class="stock-badge" [class.low]="product.stockQuantity <= 5"
+                  <span
+                    class="stock-badge"
+                    [class.low]="product.stockQuantity <= 5"
                     [class.good]="product.stockQuantity > 5">
-                    {{ product.stockQuantity <= 5 ? 'Low stock' : 'In stock' }} </span>
+                    {{ product.stockQuantity <= 5 ? 'Low stock' : 'In stock' }}
+                  </span>
                 </div>
               </td>
 
@@ -135,24 +131,26 @@
                     {{ product.isAvailable === false ? 'Inactive' : 'Active' }}
                   </span>
 
-                  <button class="status-switch-btn" [class.off]="product.isAvailable === false"
+                  <button
+                    class="status-switch-btn"
+                    [class.off]="product.isAvailable === false"
                     (click)="toggleStatus(product)">
                     {{ product.isAvailable === false ? 'Activate' : 'Deactivate' }}
                   </button>
                 </div>
-                </td>
+              </td>
 
-                <td class="actions-cell">
-                  <div class="table-actions modern-actions">
-                    <a class="table-btn modern-btn edit" [routerLink]="['/products/edit', product.id]">
-                      Edit
-                    </a>
+              <td class="actions-cell">
+                <div class="table-actions modern-actions">
+                  <a class="table-btn modern-btn edit" [routerLink]="['/products/edit', product.id]">
+                    Edit
+                  </a>
 
-                    <button class="table-btn modern-btn delete" (click)="deleteProduct(product)">
-                      Delete
-                    </button>
-                  </div>
-                </td>
+                  <button class="table-btn modern-btn delete" (click)="openDeleteModal(product)">
+                    Delete
+                  </button>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -172,7 +170,10 @@
         <div class="pagination modern-pagination" *ngIf="filteredProducts.length > pageSize">
           <button (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
 
-          <button *ngFor="let page of pageNumbers" (click)="goToPage(page)" [class.active]="currentPage === page">
+          <button
+            *ngFor="let page of pageNumbers"
+            (click)="goToPage(page)"
+            [class.active]="currentPage === page">
             {{ page }}
           </button>
 
@@ -185,4 +186,43 @@
       </div>
     </div>
   </section>
+
+  <!-- CUSTOM DELETE MODAL -->
+  <div class="custom-modal-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+    <div class="custom-modal-card delete-modal-card" (click)="$event.stopPropagation()">
+      <button class="modal-close-btn" (click)="closeDeleteModal()" [disabled]="isDeletingProduct">
+        ×
+      </button>
+
+      <div class="delete-modal-icon">
+        <span>!</span>
+      </div>
+
+      <div class="delete-modal-content">
+        <div class="delete-modal-kicker">Delete Product</div>
+        <h3>Are you sure?</h3>
+        <p>
+          You are about to delete
+          <strong>"{{ productToDelete?.name }}"</strong>.
+          This action cannot be undone.
+        </p>
+      </div>
+
+      <div class="delete-modal-actions">
+        <button
+          class="modal-btn secondary"
+          (click)="closeDeleteModal()"
+          [disabled]="isDeletingProduct">
+          Cancel
+        </button>
+
+        <button
+          class="modal-btn danger"
+          (click)="confirmDeleteProduct()"
+          [disabled]="isDeletingProduct">
+          {{ isDeletingProduct ? 'Deleting...' : 'Delete Product' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

@@ -47,10 +47,28 @@ export class DashboardComponent implements OnInit {
   chartWidth = 100;
   chartHeight = 220;
 
+  // Animated display values
+  displayTotalProducts = 0;
+  displayActiveProducts = 0;
+  displayTotalOrders = 0;
+  displayPendingOrders = 0;
+
+  displayPendingCount = 0;
+  displayApprovedCount = 0;
+  displayProcessingCount = 0;
+  displayCompletedCount = 0;
+  displayCancelledCount = 0;
+
+  displayRevenueTotal = 0;
+  displayRevenueAverage = 0;
+  displayMaxRevenueValue = 0;
+
+  private animationFrameIds: number[] = [];
+
   constructor(
     private productService: ProductService,
     private orderService: OrderService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -66,6 +84,7 @@ export class DashboardComponent implements OnInit {
     const finishLoading = () => {
       if (productsLoaded && ordersLoaded) {
         this.isLoading = false;
+        this.animateDashboardNumbers();
       }
     };
 
@@ -100,6 +119,7 @@ export class DashboardComponent implements OnInit {
         );
 
         this.totalOrders = this.orders.length;
+
         this.pendingOrders = this.orders.filter(
           o => this.normalizeStatus(o.status) === 'pending'
         ).length;
@@ -130,7 +150,7 @@ export class DashboardComponent implements OnInit {
 
         this.recentOrders = [...this.orders].slice(0, 4);
 
-        this.setRevenueRange('weekly');
+        this.setRevenueRange('weekly', false);
 
         ordersLoaded = true;
         finishLoading();
@@ -168,9 +188,13 @@ export class DashboardComponent implements OnInit {
     return order.items?.reduce((sum, item) => sum + (item.quantity ?? 0), 0) ?? 0;
   }
 
-  setRevenueRange(range: RevenueRange): void {
+  setRevenueRange(range: RevenueRange, animate = true): void {
     this.revenueRange = range;
     this.generateRevenueData();
+
+    if (animate && !this.isLoading) {
+      this.animateRevenueNumbers();
+    }
   }
 
   generateRevenueData(): void {
@@ -180,7 +204,7 @@ export class DashboardComponent implements OnInit {
       const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
       const data = labels.map(label => ({ label, value: 0 }));
 
-      const currentDay = now.getDay(); // Sun=0
+      const currentDay = now.getDay();
       const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
       const weekStart = new Date(now);
       weekStart.setHours(0, 0, 0, 0);
@@ -269,42 +293,6 @@ export class DashboardComponent implements OnInit {
     return max === 0 ? 1 : max;
   }
 
-  get chartPoints(): string {
-    if (!this.revenueChartData.length) return '';
-
-    const stepX =
-      this.revenueChartData.length > 1
-        ? this.chartWidth / (this.revenueChartData.length - 1)
-        : this.chartWidth;
-
-    return this.revenueChartData
-      .map((item, index) => {
-        const x = index * stepX;
-        const y = this.chartHeight - (item.value / this.maxRevenueValue) * this.chartHeight;
-        return `${x},${y}`;
-      })
-      .join(' ');
-  }
-
-  get chartAreaPoints(): string {
-    if (!this.revenueChartData.length) return '';
-
-    const stepX =
-      this.revenueChartData.length > 1
-        ? this.chartWidth / (this.revenueChartData.length - 1)
-        : this.chartWidth;
-
-    const linePoints = this.revenueChartData
-      .map((item, index) => {
-        const x = index * stepX;
-        const y = this.chartHeight - (item.value / this.maxRevenueValue) * this.chartHeight;
-        return `${x},${y}`;
-      })
-      .join(' ');
-
-    return `0,${this.chartHeight} ${linePoints} ${this.chartWidth},${this.chartHeight}`;
-  }
-
   get chartDots(): { cx: number; cy: number; value: number; label: string }[] {
     if (!this.revenueChartData.length) return [];
 
@@ -371,5 +359,71 @@ export class DashboardComponent implements OnInit {
     d += ' Z';
 
     return d;
+  }
+
+  private animateDashboardNumbers(): void {
+    this.cancelAnimations();
+
+    this.animateValue('displayTotalProducts', this.totalProducts, 1100, false);
+    this.animateValue('displayActiveProducts', this.activeProducts, 1150, false);
+    this.animateValue('displayTotalOrders', this.totalOrders, 1200, false);
+    this.animateValue('displayPendingOrders', this.pendingOrders, 1250, false);
+
+    this.animateValue('displayPendingCount', this.pendingCount, 1200, false);
+    this.animateValue('displayApprovedCount', this.approvedCount, 1200, false);
+    this.animateValue('displayProcessingCount', this.processingCount, 1200, false);
+    this.animateValue('displayCompletedCount', this.completedCount, 1200, false);
+    this.animateValue('displayCancelledCount', this.cancelledCount, 1200, false);
+
+    this.animateRevenueNumbers();
+  }
+
+  private animateRevenueNumbers(): void {
+    this.animateValue('displayRevenueTotal', this.revenueTotal, 1200, true);
+    this.animateValue('displayRevenueAverage', this.revenueAverage, 1200, true);
+    this.animateValue('displayMaxRevenueValue', this.maxRevenueValue, 1200, true);
+  }
+
+  private animateValue(
+    property: keyof DashboardComponent,
+    endValue: number,
+    duration = 1000,
+    isDecimal = false
+  ): void {
+    const startValue = 0;
+    const startTime = performance.now();
+
+    (this[property] as number) = 0;
+
+    const easeOutCubic = (t: number): number => 1 - Math.pow(1 - t, 3);
+
+    const updateFrame = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutCubic(progress);
+
+      const currentValue = startValue + (endValue - startValue) * easedProgress;
+
+      (this[property] as number) = isDecimal
+        ? Number(currentValue.toFixed(2))
+        : Math.round(currentValue);
+
+      if (progress < 1) {
+        const frameId = requestAnimationFrame(updateFrame);
+        this.animationFrameIds.push(frameId);
+      } else {
+        (this[property] as number) = isDecimal
+          ? Number(endValue.toFixed(2))
+          : Math.round(endValue);
+      }
+    };
+
+    const frameId = requestAnimationFrame(updateFrame);
+    this.animationFrameIds.push(frameId);
+  }
+
+  private cancelAnimations(): void {
+    this.animationFrameIds.forEach(id => cancelAnimationFrame(id));
+    this.animationFrameIds = [];
   }
 }
