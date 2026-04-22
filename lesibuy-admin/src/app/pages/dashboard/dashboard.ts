@@ -1,14 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-
 import { ProductService } from '../../core/services/product.service';
 import { OrderService } from '../../core/services/order.service';
-
 import { Product } from '../../core/models/product.model';
 import { Order } from '../../core/models/order.model';
 
 type RevenueRange = 'weekly' | 'monthly' | 'yearly';
+
+type RevenueChartItem = {
+  label: string;
+  value: number;
+};
+
+type ChartDot = {
+  cx: number;
+  cy: number;
+  value: number;
+  label: string;
+  index: number;
+};
 
 @Component({
   selector: 'app-dashboard',
@@ -23,12 +34,10 @@ export class DashboardComponent implements OnInit {
 
   isLoading = false;
   errorMessage = '';
-
   totalProducts = 0;
   activeProducts = 0;
   totalOrders = 0;
   pendingOrders = 0;
-
   recentProducts: Product[] = [];
   recentOrders: Order[] = [];
 
@@ -37,31 +46,32 @@ export class DashboardComponent implements OnInit {
   processingCount = 0;
   completedCount = 0;
   cancelledCount = 0;
-
   revenueRange: RevenueRange = 'weekly';
-  revenueChartData: { label: string; value: number }[] = [];
+  revenueChartData: RevenueChartItem[] = [];
   revenueTotal = 0;
   revenueAverage = 0;
   revenueTrend = 0;
-
   chartWidth = 100;
-  chartHeight = 220;
+  chartHeight = 100;
 
-  // Animated display values
+  private readonly chartLeftPadding = 8;
+  private readonly chartRightPadding = 4;
+  private readonly chartTopPadding = 18;
+  private readonly chartBottomPadding = 88;
+
   displayTotalProducts = 0;
   displayActiveProducts = 0;
   displayTotalOrders = 0;
   displayPendingOrders = 0;
-
   displayPendingCount = 0;
   displayApprovedCount = 0;
   displayProcessingCount = 0;
   displayCompletedCount = 0;
   displayCancelledCount = 0;
-
   displayRevenueTotal = 0;
   displayRevenueAverage = 0;
   displayMaxRevenueValue = 0;
+  activeRevenuePointIndex = 0;
 
   private animationFrameIds: number[] = [];
 
@@ -150,7 +160,7 @@ export class DashboardComponent implements OnInit {
 
         this.recentOrders = [...this.orders].slice(0, 4);
 
-        this.setRevenueRange('weekly', false);
+        this.setRevenueRange('monthly', false);
 
         ordersLoaded = true;
         finishLoading();
@@ -191,6 +201,7 @@ export class DashboardComponent implements OnInit {
   setRevenueRange(range: RevenueRange, animate = true): void {
     this.revenueRange = range;
     this.generateRevenueData();
+    this.setDefaultActivePoint();
 
     if (animate && !this.isLoading) {
       this.animateRevenueNumbers();
@@ -206,6 +217,7 @@ export class DashboardComponent implements OnInit {
 
       const currentDay = now.getDay();
       const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+
       const weekStart = new Date(now);
       weekStart.setHours(0, 0, 0, 0);
       weekStart.setDate(now.getDate() + mondayOffset);
@@ -241,6 +253,7 @@ export class DashboardComponent implements OnInit {
           if (orderDate >= monthStart && orderDate < nextMonthStart) {
             const day = orderDate.getDate();
             let index = 0;
+
             if (day >= 8 && day <= 14) index = 1;
             else if (day >= 15 && day <= 21) index = 2;
             else if (day >= 22) index = 3;
@@ -270,6 +283,7 @@ export class DashboardComponent implements OnInit {
     }
 
     this.revenueTotal = this.revenueChartData.reduce((sum, item) => sum + item.value, 0);
+
     this.revenueAverage = this.revenueChartData.length
       ? this.revenueTotal / this.revenueChartData.length
       : 0;
@@ -284,29 +298,35 @@ export class DashboardComponent implements OnInit {
 
     this.revenueTrend =
       firstHalf === 0
-        ? secondHalf > 0 ? 100 : 0
+        ? (secondHalf > 0 ? 100 : 0)
         : ((secondHalf - firstHalf) / firstHalf) * 100;
   }
 
-  get maxRevenueValue(): number {
-    const max = Math.max(...this.revenueChartData.map(item => item.value), 0);
-    return max === 0 ? 1 : max;
+  setActiveRevenuePoint(index: number): void {
+    if (!this.revenueChartData.length) {
+      this.activeRevenuePointIndex = 0;
+      return;
+    }
+
+    const safeIndex = Math.max(0, Math.min(index, this.revenueChartData.length - 1));
+    this.activeRevenuePointIndex = safeIndex;
   }
 
-  get chartDots(): { cx: number; cy: number; value: number; label: string }[] {
-    if (!this.revenueChartData.length) return [];
+  private setDefaultActivePoint(): void {
+    if (!this.revenueChartData.length) {
+      this.activeRevenuePointIndex = 0;
+      return;
+    }
 
-    const stepX =
-      this.revenueChartData.length > 1
-        ? this.chartWidth / (this.revenueChartData.length - 1)
-        : this.chartWidth;
+    let maxIndex = 0;
 
-    return this.revenueChartData.map((item, index) => ({
-      cx: index * stepX,
-      cy: this.chartHeight - (item.value / this.maxRevenueValue) * this.chartHeight,
-      value: item.value,
-      label: item.label
-    }));
+    for (let i = 1; i < this.revenueChartData.length; i++) {
+      if (this.revenueChartData[i].value >= this.revenueChartData[maxIndex].value) {
+        maxIndex = i;
+      }
+    }
+
+    this.activeRevenuePointIndex = maxIndex;
   }
 
   get revenueRangeTitle(): string {
@@ -315,35 +335,86 @@ export class DashboardComponent implements OnInit {
     return 'This Year';
   }
 
-  get chartCoordinates(): { x: number; y: number }[] {
+  get activeRevenuePoint(): ChartDot | null {
+    return this.chartDots[this.activeRevenuePointIndex] ?? null;
+  }
+
+  get activeRevenueData(): RevenueChartItem | null {
+    return this.revenueChartData[this.activeRevenuePointIndex] ?? null;
+  }
+
+  get maxRevenueValue(): number {
+    const max = Math.max(...this.revenueChartData.map(item => item.value), 0);
+    return max <= 0 ? 1 : max;
+  }
+
+  private getScaledY(value: number): number {
+    const drawableTop = this.chartTopPadding;
+    const drawableBottom = this.chartBottomPadding;
+    const drawableHeight = drawableBottom - drawableTop;
+    const max = this.maxRevenueValue;
+    const normalized = max > 0 ? value / max : 0;
+    const eased = Math.pow(normalized, 0.82);
+
+    return drawableBottom - eased * drawableHeight;
+  }
+
+  get chartDots(): ChartDot[] {
     if (!this.revenueChartData.length) return [];
 
-    const stepX =
-      this.revenueChartData.length > 1
-        ? this.chartWidth / (this.revenueChartData.length - 1)
-        : this.chartWidth;
+    const left = this.chartLeftPadding;
+    const right = this.chartWidth - this.chartRightPadding;
+    const usableWidth = right - left;
 
-    return this.revenueChartData.map((item, index) => ({
-      x: index * stepX,
-      y: this.chartHeight - (item.value / this.maxRevenueValue) * this.chartHeight
+    const count = this.revenueChartData.length;
+
+    return this.revenueChartData.map((item, index) => {
+      const cx =
+        count === 1
+          ? left + usableWidth / 2
+          : left + (usableWidth / (count - 1)) * index;
+
+      const cy = this.getScaledY(item.value);
+
+      return {
+        cx: Number(cx.toFixed(2)),
+        cy: Number(cy.toFixed(2)),
+        value: item.value,
+        label: item.label,
+        index
+      };
+    });
+  }
+
+  get chartCoordinates(): { x: number; y: number }[] {
+    return this.chartDots.map(dot => ({
+      x: dot.cx,
+      y: dot.cy
     }));
   }
 
   get chartSmoothPath(): string {
     const points = this.chartCoordinates;
     if (!points.length) return '';
-    if (points.length === 1) {
-      return `M ${points[0].x} ${points[0].y}`;
-    }
+    if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
 
     let d = `M ${points[0].x} ${points[0].y}`;
 
     for (let i = 0; i < points.length - 1; i++) {
-      const current = points[i];
-      const next = points[i + 1];
-      const controlX = (current.x + next.x) / 2;
+      const p0 = i === 0 ? points[i] : points[i - 1];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = i + 2 < points.length ? points[i + 2] : p2;
 
-      d += ` C ${controlX} ${current.y}, ${controlX} ${next.y}, ${next.x} ${next.y}`;
+      const tension = 0.18;
+
+      const cp1x = p1.x + (p2.x - p0.x) * tension;
+      const cp1y = p1.y + (p2.y - p0.y) * tension;
+
+      const cp2x = p2.x - (p3.x - p1.x) * tension;
+      const cp2y = p2.y - (p3.y - p1.y) * tension;
+
+      d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
     }
 
     return d;
@@ -353,12 +424,20 @@ export class DashboardComponent implements OnInit {
     const points = this.chartCoordinates;
     if (!points.length) return '';
 
+    const bottomY = this.chartBottomPadding;
     let d = this.chartSmoothPath;
-    d += ` L ${points[points.length - 1].x} ${this.chartHeight}`;
-    d += ` L ${points[0].x} ${this.chartHeight}`;
+
+    d += ` L ${points[points.length - 1].x} ${bottomY}`;
+    d += ` L ${points[0].x} ${bottomY}`;
     d += ' Z';
 
     return d;
+  }
+
+  get activeTooltipLeftPercent(): number {
+    const point = this.activeRevenuePoint;
+    if (!point) return 50;
+    return point.cx;
   }
 
   private animateDashboardNumbers(): void {
