@@ -125,26 +125,39 @@
   </div>
 
   <div class="grid products-grid">
-    <div class="card product-card" *ngFor="let product of filteredProducts">
-      <div class="image-wrap">
-        <img [src]="product.imageUrl || 'https://via.placeholder.com/250'" class="product-img" />
-        <div class="badge">
-          {{ product.condition }}
-        </div>
-      </div>
-
-      <div class="product-body">
-        <h3>{{ product.name }}</h3>
-        <p class="desc">{{ product.description }}</p>
-        <p class="category">{{ getCategoryName(product.categoryId) }}</p>
-        <p class="price">Rs. {{ product.price }}</p>
-        <div class="product-actions">
-          <button class="btn" (click)="viewDetails(product.id)">View Details</button>
-          <button class="btn btn-secondary" (click)="addToCart(product)">Add to Cart</button>
-        </div>
+  <div class="card product-card" *ngFor="let product of filteredProducts">
+    
+    <div class="image-wrap">
+      <img
+        [src]="getProductImage(product)"
+        [alt]="product.name"
+        class="product-img"
+        (error)="onImageError($event)"
+      />
+      
+      <div class="badge">
+        {{ product.condition }}
       </div>
     </div>
+
+    <div class="product-body">
+      <h3>{{ product.name }}</h3>
+      <p class="desc">{{ product.description }}</p>
+      <p class="category">{{ getCategoryName(product.categoryId) }}</p>
+      <p class="price">Rs. {{ product.price }}</p>
+
+      <div class="product-actions">
+        <button class="btn" (click)="viewDetails(product.id)">
+          View Details
+        </button>
+        <button class="btn btn-secondary" (click)="addToCart(product)">
+          Add to Cart
+        </button>
+      </div>
+    </div>
+
   </div>
+</div>
 
   <div class="no-results" *ngIf="filteredProducts.length === 0">
     No products match your search or selected category.

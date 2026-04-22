@@ -3,8 +3,8 @@ import { ProductsComponent } from './pages/products.component';
 import { ProductDetailsComponent } from './pages/product-details/product-details';
 import { CartComponent } from './pages/cart/cart';
 import { CheckoutComponent } from './pages/checkout/checkout';
-import { OrderSuccessComponent } from './pages/order-success/order-success';
-import { MyOrdersComponent } from './pages/my-orders/my-orders';
+import { ordersuccessComponent } from './pages/order-success/order-success';
+import { MyordersComponent } from './pages/my-orders/my-orders';
 import { LoginComponent } from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
 import { authGuard } from './guards/auth.guard';
@@ -18,8 +18,8 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
 
   { path: 'checkout', component: CheckoutComponent, canActivate: [authGuard] },
-  { path: 'order-success/:id', component: OrderSuccessComponent, canActivate: [authGuard] },
-  { path: 'my-orders', component: MyOrdersComponent, canActivate: [authGuard] },
+  { path: 'order-success/:id', component: ordersuccessComponent, canActivate: [authGuard] },
+  { path: 'my-orders', component: MyordersComponent, canActivate: [authGuard] },
 
   {
     path: 'my-profile',

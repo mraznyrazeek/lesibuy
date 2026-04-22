@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { OrderService, Order } from '../../services/order.service';
+import { orderservice, Order } from '../../services/order.service';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Swal from 'sweetalert2';
@@ -20,7 +20,7 @@ export class OrderDetails implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private orderService: OrderService
+    private orderservice: orderservice
   ) {}
 
   ngOnInit(): void {
@@ -38,7 +38,7 @@ export class OrderDetails implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
-    this.orderService.getOrderById(id).subscribe({
+    this.orderservice.getOrderById(id).subscribe({
       next: (data) => {
         this.order = data;
         this.loading = false;
@@ -70,6 +70,31 @@ export class OrderDetails implements OnInit {
     }
   }
 
+  getOrderItemImage(imageUrl?: string): string {
+  if (!imageUrl) {
+    return 'https://via.placeholder.com/120';
+  }
+
+  try {
+    const parsed = JSON.parse(imageUrl);
+    const firstImage = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+
+    if (firstImage) {
+      return `https://localhost:7225/uploads/${firstImage}`;
+    }
+
+    return 'https://via.placeholder.com/120';
+  } catch (error) {
+    console.error('Invalid productImageUrl:', imageUrl);
+    return 'https://via.placeholder.com/120';
+  }
+}
+
+onImageError(event: Event): void {
+  const img = event.target as HTMLImageElement;
+  img.src = 'https://via.placeholder.com/120';
+}
+
   canCancelOrder(): boolean {
     return (this.order?.status || '').toLowerCase() === 'pending';
   }
@@ -92,7 +117,7 @@ export class OrderDetails implements OnInit {
     }).then((result) => {
       if (!result.isConfirmed || !this.order) return;
 
-      this.orderService.cancelOrder(this.order.id).subscribe({
+      this.orderservice.cancelOrder(this.order.id).subscribe({
         next: () => {
           this.order!.status = 'Cancelled';
 

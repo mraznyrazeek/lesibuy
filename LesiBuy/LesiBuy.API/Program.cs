@@ -11,18 +11,11 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using LesiBuy.Application.Mapping;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // CORS
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowAll", policy =>
-//        policy.AllowAnyOrigin()
-//              .AllowAnyHeader()
-//              .AllowAnyMethod());
-//});
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -151,9 +144,28 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseRouting();
-app.UseCors("AllowAll");
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors("AllowAll");
+
+// Serve files from wwwroot if needed
+app.UseStaticFiles();
+
+// Serve files from uploads folder
+var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "uploads");
+
+if (!Directory.Exists(uploadsPath))
+{
+    Directory.CreateDirectory(uploadsPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads"
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

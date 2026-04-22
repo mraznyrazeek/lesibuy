@@ -59,7 +59,7 @@ export class RegisterComponent {
         password: ['', [Validators.required, strongPasswordValidator]],
         confirmPassword: ['', [Validators.required]]
       },
-      { validators: passwordMatchValidator }
+      { Validators: passwordMatchValidator }
     );
   }
 

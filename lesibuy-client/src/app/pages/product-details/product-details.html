@@ -1,7 +1,12 @@
 <div class="container" *ngIf="product; else loadingState">
   <div class="details-card">
+    
     <div class="details-image">
-      <img [src]="product.imageUrl || 'https://via.placeholder.com/300'" [alt]="product.name" />
+      <img
+        [src]="getProductImage()"
+        [alt]="product.name"
+        (error)="onImageError($event)"
+      />
     </div>
 
     <div class="details-info">
@@ -46,6 +51,7 @@
         </button>
       </div>
     </div>
+
   </div>
 </div>
 

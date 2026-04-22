@@ -70,7 +70,7 @@ export class Navbar implements OnInit {
     this.router.navigate(['/cart']);
   }
 
-  goToOrders(): void {
+  goToorders(): void {
     this.closeUserMenu();
     this.router.navigate(['/my-orders']);
   }

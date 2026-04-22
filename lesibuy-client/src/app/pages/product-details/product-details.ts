@@ -76,6 +76,31 @@ export class ProductDetailsComponent implements OnInit {
     }
   }
 
+  getProductImage(): string {
+  if (!this.product?.imageUrl) {
+    return 'https://via.placeholder.com/300';
+  }
+
+  try {
+    const parsed = JSON.parse(this.product.imageUrl);
+    const firstImage = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+
+    if (firstImage) {
+      return `https://localhost:7225/uploads/${firstImage}`;
+    }
+
+    return 'https://via.placeholder.com/300';
+  } catch (error) {
+    console.error('Invalid imageUrl:', this.product?.imageUrl);
+    return 'https://via.placeholder.com/300';
+  }
+}
+
+onImageError(event: Event): void {
+  const img = event.target as HTMLImageElement;
+  img.src = 'https://via.placeholder.com/300';
+}
+
   addToCart(): void {
     if (!this.product || !this.product.isAvailable) return;
 

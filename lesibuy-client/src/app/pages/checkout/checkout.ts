@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CartService, CartItem } from '../../services/cart';
-import { OrderService, CreateOrderResponse } from '../../services/order.service';
+import { orderservice, CreateOrderResponse } from '../../services/order.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -24,10 +24,10 @@ export class CheckoutComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private cartService: CartService,
-    private orderService: OrderService,
+    private orderservice: orderservice,
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.checkoutForm = this.fb.group({
@@ -139,7 +139,7 @@ export class CheckoutComponent implements OnInit {
     this.isSubmitting = true;
     this.errorMessage = '';
 
-    this.orderService.createOrder(payload).subscribe({
+    this.orderservice.createOrder(payload).subscribe({
       next: (response: CreateOrderResponse) => {
         this.cartService.clearCart();
         this.isSubmitting = false;
@@ -155,5 +155,30 @@ export class CheckoutComponent implements OnInit {
 
   getTotalQuantity(): number {
     return this.cartItems.reduce((total, item) => total + item.quantity, 0);
+  }
+
+  getCheckoutItemImage(imageUrl: string): string {
+    if (!imageUrl) {
+      return 'https://via.placeholder.com/80';
+    }
+
+    try {
+      const parsed = JSON.parse(imageUrl);
+      const firstImage = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+
+      if (firstImage) {
+        return `https://localhost:7225/uploads/${firstImage}`;
+      }
+
+      return 'https://via.placeholder.com/80';
+    } catch (error) {
+      console.error('Invalid imageUrl:', imageUrl);
+      return 'https://via.placeholder.com/80';
+    }
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'https://via.placeholder.com/80';
   }
 }

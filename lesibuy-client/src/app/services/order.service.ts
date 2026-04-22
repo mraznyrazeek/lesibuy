@@ -87,7 +87,7 @@ export interface CreateOrderResponse {
 @Injectable({
   providedIn: 'root'
 })
-export class OrderService {
+export class orderservice {
   private apiUrl = '/api/orders';
 
   constructor(
@@ -95,11 +95,11 @@ export class OrderService {
     private authService: AuthService
   ) { }
 
-  getOrders(): Observable<Order[]> {
+  getorders(): Observable<Order[]> {
     return this.http.get<Order[]>(this.withAccessToken(this.apiUrl));
   }
 
-  getMyOrders(): Observable<Order[]> {
+  getMyorders(): Observable<Order[]> {
     return this.http.get<Order[]>(this.withAccessToken(this.apiUrl));
   }
 

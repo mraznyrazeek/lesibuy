@@ -89,7 +89,8 @@
 
       <div class="summary-item" *ngFor="let item of cartItems">
         <div class="summary-left">
-          <img [src]="item.product.imageUrl" [alt]="item.product.name" />
+          <img [src]="getCheckoutItemImage(item.product.imageUrl)" [alt]="item.product.name"
+            (error)="onImageError($event)" />
           <div>
             <h4>{{ item.product.name }}</h4>
             <p>Qty: {{ item.quantity }}</p>

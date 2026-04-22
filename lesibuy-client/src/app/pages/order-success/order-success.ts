@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { OrderService, Order } from '../../services/order.service';
+import { orderservice, Order } from '../../services/order.service';
 
 @Component({
   selector: 'app-order-success',
@@ -10,13 +10,13 @@ import { OrderService, Order } from '../../services/order.service';
   templateUrl: './order-success.html',
   styleUrl: './order-success.css'
 })
-export class OrderSuccessComponent implements OnInit {
+export class ordersuccessComponent implements OnInit {
   order: Order | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private orderService: OrderService
+    private orderservice: orderservice
   ) {}
 
   ngOnInit(): void {
@@ -27,7 +27,7 @@ export class OrderSuccessComponent implements OnInit {
       return;
     }
 
-    this.orderService.getOrderById(id).subscribe({
+    this.orderservice.getOrderById(id).subscribe({
       next: (data) => {
         this.order = data;
       },

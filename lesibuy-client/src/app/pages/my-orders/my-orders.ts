@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { OrderService, Order } from '../../services/order.service';
+import { orderservice, Order } from '../../services/order.service';
 
 @Component({
   selector: 'app-my-orders',
@@ -10,22 +10,22 @@ import { OrderService, Order } from '../../services/order.service';
   templateUrl: './my-orders.html',
   styleUrl: './my-orders.css'
 })
-export class MyOrdersComponent implements OnInit {
+export class MyordersComponent implements OnInit {
   orders: Order[] = [];
   loading = false;
   errorMessage = '';
 
-  constructor(private orderService: OrderService) {}
+  constructor(private orderservice: orderservice) {}
 
   ngOnInit(): void {
-    this.loadOrders();
+    this.loadorders();
   }
 
-  loadOrders(): void {
+  loadorders(): void {
     this.loading = true;
     this.errorMessage = '';
 
-    this.orderService.getOrders().subscribe({
+    this.orderservice.getorders().subscribe({
       next: (data) => {
         this.orders = data;
         this.loading = false;

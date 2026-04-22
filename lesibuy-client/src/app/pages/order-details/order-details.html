@@ -92,8 +92,13 @@
 
       <div class="details-item-card" *ngFor="let item of order.items">
         <div class="item-left">
-          <div class="item-image-wrap" *ngIf="item.productImageUrl">
-            <img [src]="item.productImageUrl" [alt]="item.productName" class="item-image" />
+          <div class="item-image-wrap">
+            <img
+              [src]="getOrderItemImage(item.productImageUrl)"
+              [alt]="item.productName"
+              class="item-image"
+              (error)="onImageError($event)"
+            />
           </div>
 
           <div class="item-content">
@@ -141,7 +146,7 @@
     </div>
 
     <div class="back-row">
-      <a routerLink="/my-orders" class="btn btn-secondary">Back to Orders</a>
+      <a routerLink="/my-orders" class="btn btn-secondary">Back to orders</a>
     </div>
   </div>
 </div>

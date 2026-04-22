@@ -53,6 +53,31 @@ export class ProductsComponent implements OnInit {
     }
   }
 
+  getProductImage(product: Product): string {
+    if (!product.imageUrl) {
+      return 'https://via.placeholder.com/250';
+    }
+
+    try {
+      const parsed = JSON.parse(product.imageUrl);
+      const firstImage = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+
+      if (firstImage) {
+        return `https://localhost:7225/uploads/${firstImage}`;
+      }
+
+      return 'https://via.placeholder.com/250';
+    } catch (error) {
+      console.error('Invalid imageUrl:', product.imageUrl);
+      return 'https://via.placeholder.com/250';
+    }
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'https://via.placeholder.com/250';
+  }
+
   applyFilters(): void {
     this.filteredProducts = this.products.filter(product => {
       const matchesCategory =

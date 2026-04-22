@@ -17,7 +17,7 @@ export class CartComponent implements OnInit {
   constructor(
     private cartService: CartService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.cartService.cartItems$.subscribe((items: CartItem[]) => {
@@ -44,5 +44,30 @@ export class CartComponent implements OnInit {
 
   goToCheckout(): void {
     this.router.navigate(['/checkout']);
+  }
+
+  getCartItemImage(imageUrl: string): string {
+    if (!imageUrl) {
+      return 'https://via.placeholder.com/120';
+    }
+
+    try {
+      const parsed = JSON.parse(imageUrl);
+      const firstImage = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+
+      if (firstImage) {
+        return `https://localhost:7225/uploads/${firstImage}`;
+      }
+
+      return 'https://via.placeholder.com/120';
+    } catch (error) {
+      console.error('Invalid imageUrl:', imageUrl);
+      return 'https://via.placeholder.com/120';
+    }
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'https://via.placeholder.com/120';
   }
 }

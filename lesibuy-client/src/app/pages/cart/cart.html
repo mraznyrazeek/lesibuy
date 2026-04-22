@@ -6,8 +6,8 @@
       <h2>Your cart is empty</h2>
       <p>Add some products to continue shopping.</p>
       <a [routerLink]="['/']" [queryParams]="{}" class="btn">
-  Continue Shopping
-</a>
+        Continue Shopping
+      </a>
     </div>
   </div>
 
@@ -16,9 +16,10 @@
       <div class="cart-item" *ngFor="let item of cartItems">
         <div class="cart-item-image-wrap">
           <img
-            [src]="item.product.imageUrl || 'https://via.placeholder.com/120'"
+            [src]="getCartItemImage(item.product.imageUrl)"
             [alt]="item.product.name"
             class="cart-item-image"
+            (error)="onImageError($event)"
           />
         </div>
 
@@ -68,8 +69,12 @@
       </div>
 
       <div class="cart-summary-actions">
-        <button class="btn checkout-btn" (click)="goToCheckout()">Proceed to Checkout</button>
-        <button class="btn btn-secondary clear-btn" (click)="clearCart()">Clear Cart</button>
+        <button class="btn checkout-btn" (click)="goToCheckout()">
+          Proceed to Checkout
+        </button>
+        <button class="btn btn-secondary clear-btn" (click)="clearCart()">
+          Clear Cart
+        </button>
       </div>
     </div>
   </div>
