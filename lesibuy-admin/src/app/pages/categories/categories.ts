@@ -25,6 +25,11 @@ export class CategoriesComponent implements OnInit {
   errorMessage = '';
   formError = '';
 
+  /* custom delete modal */
+  showDeleteModal = false;
+  categoryToDelete: Category | null = null;
+  isDeletingCategory = false;
+
   constructor(private categoryService: CategoryService) {}
 
   ngOnInit(): void {
@@ -37,7 +42,7 @@ export class CategoriesComponent implements OnInit {
 
     this.categoryService.getAll().subscribe({
       next: (res) => {
-        this.categories = res;
+        this.categories = res ?? [];
         this.isLoading = false;
       },
       error: (err) => {
@@ -92,9 +97,12 @@ export class CategoriesComponent implements OnInit {
   cancelEdit(): void {
     this.editingId = null;
     this.editCategoryName = '';
+    this.formError = '';
   }
 
   updateCategory(category: Category): void {
+    this.formError = '';
+
     const name = this.editCategoryName.trim();
 
     if (!name) {
@@ -123,20 +131,42 @@ export class CategoriesComponent implements OnInit {
     });
   }
 
-  deleteCategory(category: Category): void {
-    if (!confirm(`Delete "${category.name}"?`)) return;
+  openDeleteModal(category: Category): void {
+    if (this.isDeletingCategory) return;
 
-    this.deletingId = category.id;
+    this.categoryToDelete = category;
+    this.showDeleteModal = true;
+    this.formError = '';
+  }
 
-    this.categoryService.delete(category.id).subscribe({
+  closeDeleteModal(): void {
+    if (this.isDeletingCategory) return;
+
+    this.showDeleteModal = false;
+    this.categoryToDelete = null;
+  }
+
+  confirmDeleteCategory(): void {
+    if (!this.categoryToDelete) return;
+
+    this.isDeletingCategory = true;
+    this.deletingId = this.categoryToDelete.id;
+
+    this.categoryService.delete(this.categoryToDelete.id).subscribe({
       next: () => {
+        this.isDeletingCategory = false;
         this.deletingId = null;
+        this.showDeleteModal = false;
+        this.categoryToDelete = null;
         this.loadCategories();
       },
       error: (err) => {
         console.error(err);
-        alert('Failed to delete category');
+        this.isDeletingCategory = false;
         this.deletingId = null;
+        this.showDeleteModal = false;
+        this.categoryToDelete = null;
+        this.formError = 'Failed to delete category.';
       }
     });
   }

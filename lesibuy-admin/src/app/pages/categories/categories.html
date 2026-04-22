@@ -82,8 +82,17 @@
 
         <div class="category-actions">
           <ng-container *ngIf="editingId !== category.id">
-            <button class="edit-btn" (click)="startEdit(category)">Edit</button>
-            <button class="danger-btn" (click)="deleteCategory(category)" [disabled]="deletingId === category.id">
+            <button
+              class="edit-btn"
+              (click)="startEdit(category)"
+              [disabled]="isDeletingCategory">
+              Edit
+            </button>
+
+            <button
+              class="danger-btn"
+              (click)="openDeleteModal(category)"
+              [disabled]="deletingId === category.id || isDeletingCategory">
               {{ deletingId === category.id ? 'Deleting...' : 'Delete' }}
             </button>
           </ng-container>
@@ -96,4 +105,46 @@
       </div>
     </div>
   </section>
+
+  <!-- CUSTOM DELETE MODAL -->
+  <div class="custom-modal-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+    <div class="custom-modal-card delete-modal-card" (click)="$event.stopPropagation()">
+      <button
+        class="modal-close-btn"
+        (click)="closeDeleteModal()"
+        [disabled]="isDeletingCategory">
+        ×
+      </button>
+
+      <div class="delete-modal-icon">
+        <span>!</span>
+      </div>
+
+      <div class="delete-modal-content">
+        <div class="delete-modal-kicker">Delete Category</div>
+        <h3>Are you sure?</h3>
+        <p>
+          You are about to delete
+          <strong>"{{ categoryToDelete?.name }}"</strong>.
+          This action cannot be undone.
+        </p>
+      </div>
+
+      <div class="delete-modal-actions">
+        <button
+          class="modal-btn secondary"
+          (click)="closeDeleteModal()"
+          [disabled]="isDeletingCategory">
+          Cancel
+        </button>
+
+        <button
+          class="modal-btn danger"
+          (click)="confirmDeleteCategory()"
+          [disabled]="isDeletingCategory">
+          {{ isDeletingCategory ? 'Deleting...' : 'Delete Category' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
