@@ -119,8 +119,13 @@ export class ProductsComponent implements OnInit {
   }
 
   addToCart(product: Product): void {
-    this.cartService.addToCart(product);
+  if (!product.isAvailable) {
+    alert('This product is currently unavailable.');
+    return;
   }
+
+  this.cartService.addToCart(product);
+}
 
   viewDetails(id: number): void {
     this.router.navigate(['/products', id]);

@@ -432,6 +432,39 @@
   font-weight: 700;
 }
 
+.unavailable-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  border: 1px solid #fecaca;
+}
+
+.stock-status {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.unavailable-text {
+  color: #dc2626;
+}
+
+.disabled-btn {
+  background: #e5e7eb !important;
+  color: #9ca3af !important;
+  border-color: #d1d5db !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
 @media (max-width: 1200px) {
   .category-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));

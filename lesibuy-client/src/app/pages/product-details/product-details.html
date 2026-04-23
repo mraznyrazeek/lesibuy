@@ -1,12 +1,8 @@
 <div class="container" *ngIf="product; else loadingState">
   <div class="details-card">
-    
+
     <div class="details-image">
-      <img
-        [src]="getProductImage()"
-        [alt]="product.name"
-        (error)="onImageError($event)"
-      />
+      <img [src]="getProductImage()" [alt]="product.name" (error)="onImageError($event)" />
     </div>
 
     <div class="details-info">
@@ -17,7 +13,12 @@
       <p class="price">Rs. {{ product.price }}</p>
 
       <div class="meta">
-        <p><strong>Availability:</strong> {{ product.isAvailable ? 'In Stock' : 'Out of Stock' }}</p>
+        <p class="availability-row">
+          <strong>Availability:</strong>
+          <span class="availability-badge" [class.out-of-stock]="!product.isAvailable">
+            {{ product.isAvailable ? 'In Stock' : 'Out of Stock' }}
+          </span>
+        </p>
         <p><strong>Seller:</strong> {{ product.sellerType }}</p>
       </div>
 
@@ -34,19 +35,11 @@
       </div>
 
       <div class="action-buttons">
-        <button
-          class="btn"
-          (click)="buyNow()"
-          [disabled]="!product.isAvailable"
-        >
+        <button class="btn" (click)="buyNow()" [disabled]="!product.isAvailable">
           Buy Now
         </button>
 
-        <button
-          class="btn btn-secondary"
-          (click)="addToCart()"
-          [disabled]="!product.isAvailable"
-        >
+        <button class="btn btn-secondary" (click)="addToCart()" [disabled]="!product.isAvailable">
           Add to Cart
         </button>
       </div>

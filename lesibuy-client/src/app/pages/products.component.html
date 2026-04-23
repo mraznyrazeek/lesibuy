@@ -134,9 +134,13 @@
         class="product-img"
         (error)="onImageError($event)"
       />
-      
+
       <div class="badge">
         {{ product.condition }}
+      </div>
+
+      <div class="unavailable-badge" *ngIf="!product.isAvailable">
+        Unavailable
       </div>
     </div>
 
@@ -146,12 +150,22 @@
       <p class="category">{{ getCategoryName(product.categoryId) }}</p>
       <p class="price">Rs. {{ product.price }}</p>
 
+      <p class="stock-status" [class.unavailable-text]="!product.isAvailable">
+        {{ product.isAvailable ? 'Available' : 'Unavailable' }}
+      </p>
+
       <div class="product-actions">
         <button class="btn" (click)="viewDetails(product.id)">
           View Details
         </button>
-        <button class="btn btn-secondary" (click)="addToCart(product)">
-          Add to Cart
+
+        <button
+          class="btn btn-secondary"
+          [disabled]="!product.isAvailable"
+          [class.disabled-btn]="!product.isAvailable"
+          (click)="addToCart(product)"
+        >
+          {{ product.isAvailable ? 'Add to Cart' : 'Unavailable' }}
         </button>
       </div>
     </div>
