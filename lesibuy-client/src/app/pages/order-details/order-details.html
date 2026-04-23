@@ -10,6 +10,7 @@
   <div *ngIf="!loading && order" class="order-details-card">
     <div class="details-top">
       <div class="details-head">
+        <a routerLink="/my-orders" class="back-link">← Back to Orders</a>
         <h1>Order #{{ order.id }}</h1>
         <p>{{ order.createdAt | date:'medium' }}</p>
       </div>
@@ -18,62 +19,31 @@
         <span class="status-badge" [ngClass]="getStatusClass(order.status)">
           {{ order.status }}
         </span>
-        <div class="details-total">Total Rs. {{ order.totalAmount }}</div>
+
+        <div class="amount-block">
+          <span class="amount-label">Total Amount</span>
+          <div class="details-total">Rs. {{ order.totalAmount }}</div>
+        </div>
       </div>
     </div>
 
-    <div class="tracking-section" *ngIf="(order.status || '').toLowerCase() !== 'cancelled'">
-      <div class="tracking-header">
+    <div class="tracking-card" *ngIf="(order.status || '').toLowerCase() !== 'cancelled'">
+      <div class="tracking-card-head">
         <h3>Order Tracking</h3>
-        <span class="tracking-current-status" [ngClass]="getStatusClass(order.status)">
+        <span class="mini-status" [ngClass]="getStatusClass(order.status)">
           {{ order.status }}
         </span>
       </div>
 
-      <div class="tracking-line">
-        <div class="tracking-line-base"></div>
-        <div
-          class="tracking-line-fill"
-          [style.width.%]="getTrackingProgress()"
-        ></div>
+      <div class="tracking-steps">
+        <div class="tracking-bar"></div>
+        <div class="tracking-bar-fill" [style.width.%]="getTrackingProgress()"></div>
 
-        <div class="tracking-step" [class.active]="isStepActive('pending')">
-          <div class="tracking-icon"><span>✓</span></div>
-          <div class="tracking-text">
-            <strong>Pending</strong>
-            <span>Order placed</span>
-          </div>
-        </div>
-
-        <div class="tracking-step" [class.active]="isStepActive('approved')">
-          <div class="tracking-icon"><span>✓</span></div>
-          <div class="tracking-text">
-            <strong>Approved</strong>
-            <span>Confirmed</span>
-          </div>
-        </div>
-
-        <div class="tracking-step" [class.active]="isStepActive('processing')">
-          <div class="tracking-icon"><span>✓</span></div>
-          <div class="tracking-text">
-            <strong>Processing</strong>
-            <span>Preparing</span>
-          </div>
-        </div>
-
-        <div class="tracking-step" [class.active]="isStepActive('shipped')">
-          <div class="tracking-icon"><span>✓</span></div>
-          <div class="tracking-text">
-            <strong>Shipped</strong>
-            <span>On the way</span>
-          </div>
-        </div>
-
-        <div class="tracking-step" [class.active]="isStepActive('delivered')">
-          <div class="tracking-icon"><span>✓</span></div>
-          <div class="tracking-text">
-            <strong>Delivered</strong>
-            <span>Completed</span>
+        <div class="tracking-step" *ngFor="let step of trackingSteps" [class.active]="isStepActive(step.key)">
+          <div class="tracking-dot">✓</div>
+          <div class="tracking-copy">
+            <strong>{{ step.title }}</strong>
+            <span>{{ step.subtitle }}</span>
           </div>
         </div>
       </div>
@@ -84,47 +54,46 @@
       <p>This order has been cancelled.</p>
     </div>
 
-    <div class="details-grid">
-      <div class="meta-box">
-        <span class="meta-label">Customer</span>
-        <span class="meta-value">{{ order.fullName }}</span>
+    <div class="details-info-strip">
+      <div class="info-strip-item">
+        <span class="info-strip-label">Customer</span>
+        <span class="info-strip-value">{{ order.fullName }}</span>
       </div>
 
-      <div class="meta-box">
-        <span class="meta-label">Email</span>
-        <span class="meta-value">{{ order.email }}</span>
+      <div class="info-strip-item">
+        <span class="info-strip-label">Email</span>
+        <span class="info-strip-value">{{ order.email }}</span>
       </div>
 
-      <div class="meta-box">
-        <span class="meta-label">Phone</span>
-        <span class="meta-value">{{ order.phone || '-' }}</span>
+      <div class="info-strip-item">
+        <span class="info-strip-label">Phone</span>
+        <span class="info-strip-value">{{ order.phone || '-' }}</span>
       </div>
 
-      <div class="meta-box">
-        <span class="meta-label">Shipping City</span>
-        <span class="meta-value">{{ order.shippingCity }}</span>
+      <div class="info-strip-item">
+        <span class="info-strip-label">Payment Method</span>
+        <span class="info-strip-value">{{ order.paymentMethod }}</span>
       </div>
 
-      <div class="meta-box">
-        <span class="meta-label">Payment Method</span>
-        <span class="meta-value">{{ order.paymentMethod }}</span>
-      </div>
-
-      <div class="meta-box">
-        <span class="meta-label">Items</span>
-        <span class="meta-value">{{ order.items.length }}</span>
+      <div class="info-strip-item">
+        <span class="info-strip-label">Items</span>
+        <span class="info-strip-value">{{ order.items.length }} Item(s)</span>
       </div>
     </div>
 
-    <div class="address-section">
-      <div class="address-card">
-        <h3>Shipping Address</h3>
+    <div class="address-grid">
+      <div class="info-panel">
+        <div class="panel-head">
+          <h3>Shipping Address</h3>
+        </div>
         <p>{{ order.shippingAddress }}</p>
         <p>{{ order.shippingCity }}, {{ order.shippingPostalCode }}</p>
       </div>
 
-      <div class="address-card">
-        <h3>Billing Address</h3>
+      <div class="info-panel">
+        <div class="panel-head">
+          <h3>Billing Address</h3>
+        </div>
 
         <ng-container *ngIf="order.billingSameAsShipping; else billingDifferent">
           <p>Same as shipping address</p>
@@ -137,78 +106,73 @@
       </div>
     </div>
 
-    <div class="order-actions" *ngIf="canCancelOrder()">
-      <button class="btn cancel-btn" (click)="cancelOrder()">
+    <div class="action-strip">
+      <button *ngIf="canCancelOrder()" class="btn cancel-btn" (click)="cancelOrder()">
         Cancel Order
       </button>
-    </div>
 
-    <div class="action-row">
-      <button *ngIf="canDownloadInvoice()" class="btn" (click)="downloadInvoice()">
-        Download Order Invoice
+      <button *ngIf="canDownloadInvoice()" class="btn invoice-btn" (click)="downloadInvoice()">
+        Download Invoice
       </button>
     </div>
 
     <div class="items-section">
       <h2>Ordered Items</h2>
 
-      <div class="details-item-card" *ngFor="let item of order.items">
-        <div class="item-left">
-          <div class="item-image-wrap">
-            <img
-              [src]="getOrderItemImage(item.productImageUrl)"
-              [alt]="item.productName"
-              class="item-image"
-              (error)="onImageError($event)"
-            />
+      <div class="ordered-item" *ngFor="let item of order.items">
+        <div class="ordered-item-left">
+          <div class="ordered-item-image-wrap">
+            <img [src]="getOrderItemImage(item.productImageUrl)" [alt]="item.productName" class="ordered-item-image"
+              (error)="onImageError($event)" />
           </div>
 
-          <div class="item-content">
+          <div class="ordered-item-content">
             <h3>{{ item.productName }}</h3>
 
-            <p class="item-description" *ngIf="item.productDescription">
+            <p class="ordered-item-description" *ngIf="item.productDescription">
               {{ item.productDescription }}
             </p>
 
-            <div class="item-tags">
-              <span class="item-tag" *ngIf="item.productCondition">
-                Condition: {{ item.productCondition }}
+            <div class="tag-row">
+              <span class="item-pill" *ngIf="item.productCondition">
+                {{ item.productCondition }}
               </span>
 
-              <span class="item-tag" *ngIf="item.sellerType">
+              <span class="item-pill" *ngIf="item.sellerType">
                 Seller: {{ item.sellerType }}
               </span>
 
-              <span class="item-tag">
+              <span class="item-pill">
                 Qty: {{ item.quantity }}
               </span>
 
-              <span class="item-tag">
+              <span class="item-pill">
                 Unit Price: Rs. {{ item.unitPrice }}
               </span>
             </div>
 
-            <div
-              class="specifications-grid"
-              *ngIf="item.specifications && parseSpecifications(item.specifications).length > 0"
-            >
-              <div class="spec-chip" *ngFor="let spec of parseSpecifications(item.specifications)">
-                <span class="spec-chip-key">{{ spec.key }}</span>
-                <span class="spec-chip-value">{{ spec.value }}</span>
+            <div class="spec-grid" *ngIf="item.specifications && parseSpecifications(item.specifications).length > 0">
+              <div class="spec-box" *ngFor="let spec of parseSpecifications(item.specifications)">
+                <span class="spec-box-key">{{ spec.key }}</span>
+                <span class="spec-box-value">{{ spec.value }}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="item-subtotal-box">
+        <div class="subtotal-card">
           <span class="subtotal-label">Subtotal</span>
           <span class="subtotal-value">Rs. {{ item.subTotal }}</span>
         </div>
       </div>
     </div>
 
-    <div class="back-row">
-      <a routerLink="/my-orders" class="btn btn-secondary">Back to orders</a>
+    <div class="delivery-message" *ngIf="(order.status || '').toLowerCase() === 'delivered'">
+      <div class="delivery-message-icon">✓</div>
+      <div>
+        <strong>This order has been delivered successfully.</strong>
+        <p>Thank you for shopping with LesiBuy.</p>
+      </div>
     </div>
   </div>
 </div>

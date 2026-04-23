@@ -18,10 +18,18 @@ export class OrderDetails implements OnInit {
   loading = false;
   errorMessage = '';
 
+  readonly trackingSteps = [
+    { key: 'pending', title: 'Pending', subtitle: 'Order placed' },
+    { key: 'approved', title: 'Approved', subtitle: 'Confirmed' },
+    { key: 'processing', title: 'Processing', subtitle: 'Preparing' },
+    { key: 'shipped', title: 'Shipped', subtitle: 'On the way' },
+    { key: 'delivered', title: 'Delivered', subtitle: 'Completed' }
+  ];
+
   constructor(
     private route: ActivatedRoute,
     private orderservice: orderservice
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -71,39 +79,69 @@ export class OrderDetails implements OnInit {
   }
 
   getOrderItemImage(imageUrl?: string): string {
-  if (!imageUrl) {
-    return 'https://via.placeholder.com/120';
-  }
-
-  try {
-    const parsed = JSON.parse(imageUrl);
-    const firstImage = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
-
-    if (firstImage) {
-      return `https://localhost:7225/uploads/${firstImage}`;
+    if (!imageUrl) {
+      return 'https://via.placeholder.com/120';
     }
 
-    return 'https://via.placeholder.com/120';
-  } catch (error) {
-    console.error('Invalid productImageUrl:', imageUrl);
-    return 'https://via.placeholder.com/120';
-  }
-}
+    try {
+      const parsed = JSON.parse(imageUrl);
+      const firstImage = Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
 
-onImageError(event: Event): void {
-  const img = event.target as HTMLImageElement;
-  img.src = 'https://via.placeholder.com/120';
-}
+      if (firstImage) {
+        return `https://localhost:7225/uploads/${firstImage}`;
+      }
+
+      return 'https://via.placeholder.com/120';
+    } catch (error) {
+      console.error('Invalid productImageUrl:', imageUrl);
+      return 'https://via.placeholder.com/120';
+    }
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'https://via.placeholder.com/120';
+  }
 
   canCancelOrder(): boolean {
     return (this.order?.status || '').toLowerCase() === 'pending';
   }
 
-  //Invoice can be downloaded only if order is approved, processing, shipped or delivered
   canDownloadInvoice(): boolean {
-  const status = (this.order?.status || '').toLowerCase();
-  return ['approved', 'processing', 'shipped', 'delivered'].includes(status);
-}
+    const status = (this.order?.status || '').toLowerCase();
+    return ['approved', 'processing', 'shipped', 'delivered'].includes(status);
+  }
+
+  isStepActive(step: string): boolean {
+    const statusOrder = ['pending', 'approved', 'processing', 'shipped', 'delivered'];
+    const currentStatus = (this.order?.status || '').toLowerCase();
+
+    if (currentStatus === 'cancelled') return false;
+
+    const currentIndex = statusOrder.indexOf(currentStatus);
+    const stepIndex = statusOrder.indexOf(step.toLowerCase());
+
+    return currentIndex >= stepIndex && currentIndex !== -1;
+  }
+
+  getTrackingProgress(): number {
+    const currentStatus = (this.order?.status || '').toLowerCase();
+
+    switch (currentStatus) {
+      case 'pending':
+        return 0;
+      case 'approved':
+        return 25;
+      case 'processing':
+        return 50;
+      case 'shipped':
+        return 75;
+      case 'delivered':
+        return 100;
+      default:
+        return 0;
+    }
+  }
 
   cancelOrder(): void {
     if (!this.order) return;
@@ -190,40 +228,6 @@ onImageError(event: Event): void {
     doc.text(lines, x, y);
     return y + lines.length * lineHeight;
   }
-
-  isStepActive(step: string): boolean {
-  const statusOrder = ['pending', 'approved', 'processing', 'shipped', 'delivered'];
-  const currentStatus = (this.order?.status || '').toLowerCase();
-
-  const currentIndex = statusOrder.indexOf(currentStatus);
-  const stepIndex = statusOrder.indexOf(step.toLowerCase());
-
-  if (currentStatus === 'cancelled') {
-    return false;
-  }
-
-  return currentIndex >= stepIndex && currentIndex !== -1;
-}
-
-// order status
-getTrackingProgress(): number {
-  const currentStatus = (this.order?.status || '').toLowerCase();
-
-  switch (currentStatus) {
-    case 'pending':
-      return 0;
-    case 'approved':
-      return 25;
-    case 'processing':
-      return 50;
-    case 'shipped':
-      return 75;
-    case 'delivered':
-      return 100;
-    default:
-      return 0;
-  }
-}
 
   downloadInvoice(): void {
     if (!this.order || !this.canDownloadInvoice()) {
