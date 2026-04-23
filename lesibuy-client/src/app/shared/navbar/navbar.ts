@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { CartService, CartItem } from '../../services/cart';
@@ -19,7 +19,8 @@ export class Navbar implements OnInit {
   constructor(
     private router: Router,
     private cartService: CartService,
-    private authService: AuthService
+    private authService: AuthService,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -32,9 +33,13 @@ export class Navbar implements OnInit {
     });
   }
 
-  @HostListener('document:click')
-  closeMenuOnOutsideClick(): void {
-    if (this.isUserMenuOpen) {
+  @HostListener('document:click', ['$event'])
+  closeMenuOnOutsideClick(event: MouseEvent): void {
+    const clickedInside = this.elementRef.nativeElement
+      .querySelector('.user-menu-wrapper')
+      ?.contains(event.target);
+
+    if (!clickedInside) {
       this.isUserMenuOpen = false;
     }
   }
@@ -44,15 +49,12 @@ export class Navbar implements OnInit {
     this.isUserMenuOpen = !this.isUserMenuOpen;
   }
 
-  onMenuClick(event: MouseEvent): void {
-    event.stopPropagation();
-  }
-
   closeUserMenu(): void {
     this.isUserMenuOpen = false;
   }
 
   goHome(): void {
+    this.closeUserMenu();
     this.router.navigate(['/'], {
       queryParams: {},
       fragment: 'top'
@@ -60,6 +62,7 @@ export class Navbar implements OnInit {
   }
 
   goToCategory(category: string): void {
+    this.closeUserMenu();
     this.router.navigate(['/'], {
       queryParams: { category },
       fragment: 'featured-products'
@@ -67,6 +70,7 @@ export class Navbar implements OnInit {
   }
 
   goToCart(): void {
+    this.closeUserMenu();
     this.router.navigate(['/cart']);
   }
 
@@ -80,7 +84,8 @@ export class Navbar implements OnInit {
     this.router.navigate(['/my-profile']);
   }
 
-  goToChangePassword(): void {
+  goToChangePassword(event?: MouseEvent): void {
+    event?.stopPropagation();
     this.closeUserMenu();
     this.router.navigate(['/change-password']);
   }

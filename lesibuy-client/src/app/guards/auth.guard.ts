@@ -10,12 +10,10 @@ export const authGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  router.navigate(['/login'], {
+  return router.createUrlTree(['/login'], {
     queryParams: {
-      message: 'Please log in first to view your orders.',
+      message: 'Please log in first to continue.',
       returnUrl: state.url
     }
   });
-
-  return false;
 };
