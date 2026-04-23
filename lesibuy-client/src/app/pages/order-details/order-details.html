@@ -22,6 +22,68 @@
       </div>
     </div>
 
+    <div class="tracking-section" *ngIf="(order.status || '').toLowerCase() !== 'cancelled'">
+      <div class="tracking-header">
+        <h3>Order Tracking</h3>
+        <span class="tracking-current-status" [ngClass]="getStatusClass(order.status)">
+          {{ order.status }}
+        </span>
+      </div>
+
+      <div class="tracking-line">
+        <div class="tracking-line-base"></div>
+        <div
+          class="tracking-line-fill"
+          [style.width.%]="getTrackingProgress()"
+        ></div>
+
+        <div class="tracking-step" [class.active]="isStepActive('pending')">
+          <div class="tracking-icon"><span>✓</span></div>
+          <div class="tracking-text">
+            <strong>Pending</strong>
+            <span>Order placed</span>
+          </div>
+        </div>
+
+        <div class="tracking-step" [class.active]="isStepActive('approved')">
+          <div class="tracking-icon"><span>✓</span></div>
+          <div class="tracking-text">
+            <strong>Approved</strong>
+            <span>Confirmed</span>
+          </div>
+        </div>
+
+        <div class="tracking-step" [class.active]="isStepActive('processing')">
+          <div class="tracking-icon"><span>✓</span></div>
+          <div class="tracking-text">
+            <strong>Processing</strong>
+            <span>Preparing</span>
+          </div>
+        </div>
+
+        <div class="tracking-step" [class.active]="isStepActive('shipped')">
+          <div class="tracking-icon"><span>✓</span></div>
+          <div class="tracking-text">
+            <strong>Shipped</strong>
+            <span>On the way</span>
+          </div>
+        </div>
+
+        <div class="tracking-step" [class.active]="isStepActive('delivered')">
+          <div class="tracking-icon"><span>✓</span></div>
+          <div class="tracking-text">
+            <strong>Delivered</strong>
+            <span>Completed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cancelled-state" *ngIf="(order.status || '').toLowerCase() === 'cancelled'">
+      <div class="cancelled-badge">Cancelled</div>
+      <p>This order has been cancelled.</p>
+    </div>
+
     <div class="details-grid">
       <div class="meta-box">
         <span class="meta-label">Customer</span>
@@ -83,7 +145,7 @@
 
     <div class="action-row">
       <button *ngIf="canDownloadInvoice()" class="btn" (click)="downloadInvoice()">
-        Download Invoice
+        Download Order Invoice
       </button>
     </div>
 

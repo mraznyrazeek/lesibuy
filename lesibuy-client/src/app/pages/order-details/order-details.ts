@@ -99,9 +99,11 @@ onImageError(event: Event): void {
     return (this.order?.status || '').toLowerCase() === 'pending';
   }
 
+  //Invoice can be downloaded only if order is approved, processing, shipped or delivered
   canDownloadInvoice(): boolean {
-    return (this.order?.status || '').toLowerCase() === 'approved';
-  }
+  const status = (this.order?.status || '').toLowerCase();
+  return ['approved', 'processing', 'shipped', 'delivered'].includes(status);
+}
 
   cancelOrder(): void {
     if (!this.order) return;
@@ -188,6 +190,40 @@ onImageError(event: Event): void {
     doc.text(lines, x, y);
     return y + lines.length * lineHeight;
   }
+
+  isStepActive(step: string): boolean {
+  const statusOrder = ['pending', 'approved', 'processing', 'shipped', 'delivered'];
+  const currentStatus = (this.order?.status || '').toLowerCase();
+
+  const currentIndex = statusOrder.indexOf(currentStatus);
+  const stepIndex = statusOrder.indexOf(step.toLowerCase());
+
+  if (currentStatus === 'cancelled') {
+    return false;
+  }
+
+  return currentIndex >= stepIndex && currentIndex !== -1;
+}
+
+// order status
+getTrackingProgress(): number {
+  const currentStatus = (this.order?.status || '').toLowerCase();
+
+  switch (currentStatus) {
+    case 'pending':
+      return 0;
+    case 'approved':
+      return 25;
+    case 'processing':
+      return 50;
+    case 'shipped':
+      return 75;
+    case 'delivered':
+      return 100;
+    default:
+      return 0;
+  }
+}
 
   downloadInvoice(): void {
     if (!this.order || !this.canDownloadInvoice()) {
