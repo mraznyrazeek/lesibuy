@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { CartService, CartItem } from '../../services/cart';
 import { AuthService, AuthResponse } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-navbar',
@@ -17,11 +18,12 @@ export class Navbar implements OnInit {
   isUserMenuOpen = false;
 
   constructor(
-    private router: Router,
-    private cartService: CartService,
-    private authService: AuthService,
-    private elementRef: ElementRef
-  ) {}
+  private router: Router,
+  private cartService: CartService,
+  private authService: AuthService,
+  private notificationService: NotificationService,
+  private elementRef: ElementRef
+) {}
 
   ngOnInit(): void {
     this.cartService.cartItems$.subscribe((items: CartItem[]) => {
@@ -99,10 +101,11 @@ export class Navbar implements OnInit {
   }
 
   logout(): void {
-    this.closeUserMenu();
-    this.authService.logout();
-    this.router.navigate(['/']);
-  }
+  this.closeUserMenu();
+  this.notificationService.stopConnection();
+  this.authService.logout();
+  this.router.navigate(['/']);
+}
 
   search(value: string): void {
     const trimmed = value.trim();
