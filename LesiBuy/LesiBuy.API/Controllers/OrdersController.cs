@@ -4,6 +4,8 @@ using LesiBuy.Application.Dtos;
 using LesiBuy.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using LesiBuy.API.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace LesiBuy.API.Controllers
 {
@@ -12,10 +14,14 @@ namespace LesiBuy.API.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public OrdersController(IOrderService orderService)
+        public OrdersController(
+            IOrderService orderService,
+            IHubContext<NotificationHub> hubContext)
         {
             _orderService = orderService;
+            _hubContext = hubContext;
         }
 
         [Authorize]
@@ -70,6 +76,17 @@ namespace LesiBuy.API.Controllers
 
             if (updatedOrder == null)
                 return NotFound(new { message = "Order not found." });
+
+            await _hubContext.Clients
+                .Group($"user-{updatedOrder.UserId}")
+                .SendAsync("OrderStatusUpdated", new
+                {
+                    orderId = updatedOrder.Id,
+                    status = updatedOrder.Status,
+                    title = "Order status updated",
+                    message = $"Your order #{updatedOrder.Id} is now {updatedOrder.Status}.",
+                    createdAt = DateTime.UtcNow
+                });
 
             return Ok(updatedOrder);
         }

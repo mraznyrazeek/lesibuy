@@ -7,6 +7,7 @@ using LesiBuy.Domain.Entities;
 using LesiBuy.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace LesiBuy.Application.Services
 {
     public class OrderService : IOrderService
@@ -29,16 +30,13 @@ namespace LesiBuy.Application.Services
                 FullName = dto.FullName,
                 Email = dto.Email,
                 Phone = dto.Phone,
-
                 ShippingAddress = dto.ShippingAddress,
                 ShippingCity = dto.ShippingCity,
                 ShippingPostalCode = dto.ShippingPostalCode,
-
                 BillingSameAsShipping = dto.BillingSameAsShipping,
                 BillingAddress = billingAddress,
                 BillingCity = billingCity,
                 BillingPostalCode = billingPostalCode,
-
                 PaymentMethod = dto.PaymentMethod,
                 CreatedAt = DateTime.UtcNow,
                 TotalAmount = 0,
@@ -129,10 +127,25 @@ namespace LesiBuy.Application.Services
             if (order == null)
                 return null;
 
-            order.Status = status.Trim();
+            var cleanStatus = status.Trim();
+            order.Status = cleanStatus;
+
+            var notification = new Notification
+            {
+                UserId = order.UserId,
+                OrderId = order.Id,
+                Title = "Order status updated",
+                Message = $"Your order #{order.Id} is now {cleanStatus}.",
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _uow.Repository<Notification>().AddAsync(notification);
             await _uow.CompleteAsync();
 
-            return MapOrderToDto(order);
+            var orderDto = MapOrderToDto(order);
+
+            return orderDto;
         }
 
         public async Task<bool> CancelOrderAsync(int orderId, int userId)
@@ -161,6 +174,8 @@ namespace LesiBuy.Application.Services
                 FullName = order.FullName,
                 Email = order.Email,
                 Phone = order.Phone,
+
+                UserId = order.UserId,
 
                 ShippingAddress = order.ShippingAddress,
                 ShippingCity = order.ShippingCity,

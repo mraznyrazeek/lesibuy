@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Text;
 using LesiBuy.Application.Mapping;
 using Microsoft.Extensions.FileProviders;
+using LesiBuy.API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +22,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
         policy.WithOrigins(
                 "http://localhost:4200",
-                "http://localhost:58422"
+                "http://localhost:63767"
               )
               .AllowAnyMethod()
               .AllowAnyHeader()
@@ -45,12 +46,17 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+// AutoMapper
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<MappingProfile>();
+});
 
 // Controllers + Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 // JWT Auth
 var jwtKey = builder.Configuration["Jwt:Key"];
@@ -182,5 +188,7 @@ app.MapGet("/weatherforecast", () =>
         Summary = new[] { "Freezing", "Bracing", "Chilly", "Cool" }[i % 4]
     })
 ).WithName("GetWeatherForecast");
+
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.Run();

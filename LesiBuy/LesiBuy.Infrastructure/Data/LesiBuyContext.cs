@@ -14,6 +14,7 @@ namespace LesiBuy.Infrastructure.Data
         public DbSet<OrderItem> OrderItems { get; set; } = null!;
         public DbSet<Category> Categories { get; set; }
         public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Notification> Notifications { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
