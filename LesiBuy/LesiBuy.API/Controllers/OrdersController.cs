@@ -81,6 +81,8 @@ namespace LesiBuy.API.Controllers
                 .Group($"user-{updatedOrder.UserId}")
                 .SendAsync("OrderStatusUpdated", new
                 {
+                    id = 0,
+                    userId = updatedOrder.UserId,
                     orderId = updatedOrder.Id,
                     status = updatedOrder.Status,
                     title = "Order status updated",

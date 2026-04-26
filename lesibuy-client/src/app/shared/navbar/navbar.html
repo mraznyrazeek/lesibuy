@@ -29,6 +29,65 @@
     </ng-container>
 
     <ng-template #loggedInBlock>
+      <div class="notification-wrapper">
+        <button
+          type="button"
+          class="notification-btn"
+          (click)="toggleNotificationMenu($event)"
+          aria-label="Notifications"
+        >
+          <span class="bell-icon">🔔</span>
+          <span class="notification-badge" *ngIf="unreadCount > 0">
+            {{ unreadCount }}
+          </span>
+        </button>
+
+        <div class="notification-dropdown" *ngIf="isNotificationOpen">
+          <div class="notification-header">
+            <span>Notifications</span>
+
+            <button
+              type="button"
+              class="mark-read-btn"
+              [disabled]="unreadCount === 0"
+              (click)="markAllNotificationsAsRead($event)"
+            >
+              Mark all read
+            </button>
+          </div>
+
+          <div class="notification-empty" *ngIf="notifications.length === 0">
+            No notifications yet.
+          </div>
+
+          <div class="notification-list" *ngIf="notifications.length > 0">
+            <button
+              type="button"
+              class="notification-item"
+              *ngFor="let notification of notifications"
+              [class.unread]="!notification.isRead"
+              (click)="openNotification(notification)"
+            >
+              <div class="notification-icon">📦</div>
+
+              <div class="notification-content">
+                <div class="notification-title">
+                  {{ notification.title }}
+                </div>
+
+                <div class="notification-message">
+                  {{ notification.message }}
+                </div>
+
+                <div class="notification-time">
+                  {{ notification.createdAt | date:'short' }}
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="user-menu-wrapper">
         <button
           type="button"
@@ -64,11 +123,7 @@
     </ng-template>
 
     <button type="button" class="cart-btn" (click)="goToCart()">
-      <img
-        src="/images/app-icons/cart.png"
-        alt="Cart"
-        class="cart-icon"
-      />
+      <img src="/images/app-icons/cart.png" alt="Cart" class="cart-icon" />
       <span class="cart-text">Cart</span>
       <span class="cart-badge">{{ cartCount }}</span>
     </button>
