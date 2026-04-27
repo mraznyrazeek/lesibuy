@@ -28,10 +28,16 @@ export class NotificationService {
   constructor(
     private router: Router,
     private http: HttpClient
-  ) {}
+  ) { }
 
   startConnection(): void {
-    const token = localStorage.getItem('lesibuy_token');
+    if (typeof window === 'undefined') return;
+
+    const userJson = localStorage.getItem('currentUser');
+    const user = userJson ? JSON.parse(userJson) : null;
+    const token = user?.token;
+
+    if (!token || this.hubConnection) return;
 
     if (!token || this.hubConnection) return;
 

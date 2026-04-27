@@ -50,3 +50,23 @@
   padding: 24px;
   background: #f9fafb;
 }
+
+.nav-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-badge {
+  background: #ef4444;
+  color: white;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

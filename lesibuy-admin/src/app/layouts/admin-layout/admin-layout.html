@@ -6,7 +6,13 @@
       <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
       <a routerLink="/products" routerLinkActive="active">Products</a>
       <a routerLink="/categories" routerLinkActive="active">Categories</a>
-      <a routerLink="/orders" routerLinkActive="active">Orders</a>
+      <a routerLink="/orders" routerLinkActive="active" class="nav-link">
+        <span>Orders</span>
+
+        <span *ngIf="unseenOrderCount > 0" class="order-badge">
+          {{ unseenOrderCount }}
+        </span>
+      </a>
     </nav>
 
     <button class="logout-btn" (click)="logout()">Logout</button>

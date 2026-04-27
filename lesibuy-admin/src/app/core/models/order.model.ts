@@ -28,4 +28,5 @@ export interface Order {
   createdAt: string;
   status: string;
   items: OrderItem[];
+  isSeenByAdmin: boolean;
 }

@@ -4,6 +4,7 @@ using LesiBuy.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LesiBuy.Infrastructure.Migrations
 {
     [DbContext(typeof(LesiBuyContext))]
-    partial class LesiBuyContextModelSnapshot : ModelSnapshot
+    [Migration("20260426224912_AddIsSeenByAdminToOrders")]
+    partial class AddIsSeenByAdminToOrders
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

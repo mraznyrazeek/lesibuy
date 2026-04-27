@@ -552,6 +552,22 @@
   min-width: 150px;
 }
 
+.unseen-order {
+  background: #eef4ff;
+  border-left: 4px solid #ef4444;
+  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.12);
+}
+
+.new-order-pill {
+  margin-left: 8px;
+  background: #ef4444;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .order-row {

@@ -166,6 +166,29 @@ namespace LesiBuy.Application.Services
             return true;
         }
 
+        public async Task<int> GetUnseenOrderCountAsync()
+        {
+            return await _uow.Repository<Order>()
+                .Query()
+                .CountAsync(o => !o.IsSeenByAdmin);
+        }
+
+        public async Task<bool> MarkOrderAsSeenAsync(int orderId)
+        {
+            var order = await _uow.Repository<Order>()
+                .Query()
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+                return false;
+
+            order.IsSeenByAdmin = true;
+
+            await _uow.CompleteAsync();
+
+            return true;
+        }
+
         private static OrderDto MapOrderToDto(Order order)
         {
             return new OrderDto
@@ -190,6 +213,7 @@ namespace LesiBuy.Application.Services
                 TotalAmount = order.TotalAmount,
                 CreatedAt = order.CreatedAt,
                 Status = order.Status,
+                IsSeenByAdmin = order.IsSeenByAdmin,
 
                 Items = order.Items.Select(i => new OrderItemDto
                 {

@@ -27,7 +27,7 @@ export class OrdersComponent implements OnInit {
   currentPage = 1;
   pageSize = 15;
 
-  constructor(private orderService: OrderService) {}
+  constructor(private orderService: OrderService) { }
 
   ngOnInit(): void {
     this.loadOrders();
@@ -180,6 +180,24 @@ export class OrdersComponent implements OnInit {
         console.error(err);
         alert('Failed to update order status.');
         this.isUpdatingStatus = false;
+      }
+    });
+  }
+
+  viewOrder(order: Order): void {
+    if (order.isSeenByAdmin) {
+      this.openDetails(order);
+      return;
+    }
+
+    this.orderService.markOrderAsSeen(order.id).subscribe({
+      next: () => {
+        order.isSeenByAdmin = true;
+        this.openDetails(order);
+      },
+      error: (err) => {
+        console.error(err);
+        this.openDetails(order);
       }
     });
   }

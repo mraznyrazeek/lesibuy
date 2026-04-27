@@ -12,5 +12,7 @@ namespace LesiBuy.Application.Services
         Task<OrderDto?> GetOrderByIdAsync(int id);
         Task<OrderDto?> UpdateOrderStatusAsync(int orderId, string status);
         Task<bool> CancelOrderAsync(int orderId, int userId);
+        Task<int> GetUnseenOrderCountAsync();
+        Task<bool> MarkOrderAsSeenAsync(int orderId);
     }
 }

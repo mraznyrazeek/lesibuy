@@ -117,5 +117,27 @@ namespace LesiBuy.API.Controllers
             var orders = await _orderService.GetAllOrdersAsync();
             return Ok(orders);
         }
+
+        [Authorize]
+        [HttpGet("admin/unseen-count")]
+        public async Task<IActionResult> GetUnseenOrderCount()
+        {
+            var count = await _orderService.GetUnseenOrderCountAsync();
+            return Ok(count);
+        }
+
+        [Authorize]
+        [HttpPut("admin/{id}/mark-seen")]
+        public async Task<IActionResult> MarkOrderAsSeen(int id)
+        {
+            var success = await _orderService.MarkOrderAsSeenAsync(id);
+
+            if (!success)
+                return NotFound(new { message = "Order not found." });
+
+            return Ok(new { message = "Order marked as seen." });
+        }
+
+
     }
 }

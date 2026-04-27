@@ -13,12 +13,8 @@
   <section class="toolbar-panel">
     <div class="toolbar-grid">
       <div class="filter-group search-group">
-        <input
-          type="text"
-          placeholder="Search by customer name or order ID..."
-          [(ngModel)]="searchTerm"
-          (ngModelChange)="onSearchChange()"
-        />
+        <input type="text" placeholder="Search by customer name or order ID..." [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()" />
       </div>
 
       <div class="filter-group">
@@ -57,7 +53,7 @@
     </div>
 
     <div *ngIf="!isLoading && !errorMessage && filteredOrders.length > 0" class="orders-list">
-      <div class="order-row" *ngFor="let order of paginatedOrders">
+      <div class="order-row" *ngFor="let order of paginatedOrders" [class.unseen-order]="!order.isSeenByAdmin">
         <div class="order-left">
           <div class="order-avatar">
             {{ getInitials(order.fullName) }}
@@ -67,6 +63,10 @@
             <div class="order-name">{{ order.fullName }}</div>
             <div class="order-meta">
               Order #{{ order.id }} • {{ order.email }}
+
+              <span *ngIf="!order.isSeenByAdmin" class="new-order-pill">
+                New
+              </span>
             </div>
           </div>
         </div>
@@ -98,7 +98,7 @@
             {{ order.status }}
           </span>
 
-          <button class="view-btn" (click)="openDetails(order)">
+          <button class="view-btn" (click)="viewOrder(order)">
             View
           </button>
         </div>
@@ -119,10 +119,7 @@
       <div class="pagination" *ngIf="filteredOrders.length > pageSize">
         <button (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
 
-        <button
-          *ngFor="let page of pageNumbers"
-          (click)="goToPage(page)"
-          [class.active]="currentPage === page">
+        <button *ngFor="let page of pageNumbers" (click)="goToPage(page)" [class.active]="currentPage === page">
           {{ page }}
         </button>
 
