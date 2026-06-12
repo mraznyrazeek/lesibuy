@@ -23,11 +23,12 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
                 "http://localhost:4200",
                 "http://localhost:57443"
-              )
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials());
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
 });
+
 
 // DbContext
 builder.Services.AddDbContext<LesiBuyContext>(opts =>
