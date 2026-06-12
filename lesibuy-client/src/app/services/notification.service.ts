@@ -21,7 +21,6 @@ export interface NotificationItem {
 export class NotificationService {
   private hubConnection?: signalR.HubConnection;
 
-  // Use Angular proxy instead of hardcoded backend URL
   private apiUrl = '/api/Notifications';
   private hubUrl = 'https://localhost:7225/hubs/notifications';
 
@@ -36,18 +35,20 @@ export class NotificationService {
   startConnection(): void {
     if (typeof window === 'undefined') return;
 
-    const token = localStorage.getItem('lesibuy_token');
+    const token = this.getToken();
 
     if (!token) {
       console.warn('No token found. SignalR connection not started.');
-      return;
-    }
-
-    if (this.hubConnection) {
+      this.notifications$.next([]);
+      this.unreadCount$.next(0);
       return;
     }
 
     this.loadNotifications();
+
+    if (this.hubConnection) {
+      return;
+    }
 
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(this.hubUrl, {
@@ -56,34 +57,43 @@ export class NotificationService {
       .withAutomaticReconnect()
       .build();
 
-    this.hubConnection
-      .start()
-      .then(() => console.log('SignalR connected'))
-      .catch(err => console.error('SignalR connection error:', err));
-
     this.hubConnection.on('OrderStatusUpdated', (data) => {
+      console.log('SignalR notification received:', data);
+
       const newNotification: NotificationItem = {
-        id: data.id ?? 0,
-        userId: data.userId ?? 0,
-        orderId: data.orderId,
-        title: data.title ?? 'Order Update',
-        message: data.message ?? 'Your order status has been updated.',
-        isRead: false,
-        createdAt: data.createdAt ?? new Date().toISOString()
+        id: data.id ?? data.Id ?? 0,
+        userId: data.userId ?? data.UserId ?? 0,
+        orderId: data.orderId ?? data.OrderId,
+        title: data.title ?? data.Title ?? 'Order Update',
+        message: data.message ?? data.Message ?? 'Your order status has been updated.',
+        isRead: data.isRead ?? data.IsRead ?? false,
+        createdAt: data.createdAt ?? data.CreatedAt ?? new Date().toISOString()
       };
 
       const current = this.notifications$.value;
-      const updated = [newNotification, ...current];
+
+      const alreadyExists =
+        newNotification.id !== 0 &&
+        current.some(n => n.id === newNotification.id);
+
+      const updated = alreadyExists
+        ? current
+        : [newNotification, ...current];
 
       this.notifications$.next(updated);
       this.unreadCount$.next(updated.filter(n => !n.isRead).length);
 
       this.showOrderPopup(data);
     });
+
+    this.hubConnection
+      .start()
+      .then(() => console.log('SignalR connected'))
+      .catch(err => console.error('SignalR connection error:', err));
   }
 
   loadNotifications(): void {
-    const token = localStorage.getItem('lesibuy_token');
+    const token = this.getToken();
 
     if (!token) {
       this.notifications$.next([]);
@@ -91,8 +101,10 @@ export class NotificationService {
       return;
     }
 
-    this.http.get<NotificationItem[]>(`${this.apiUrl}/my`).subscribe({
+    this.http.get<NotificationItem[]>(this.withAccessToken(`${this.apiUrl}/my`)).subscribe({
       next: (res) => {
+        console.log('Loaded notifications:', res);
+
         this.notifications$.next(res);
         this.unreadCount$.next(res.filter(n => !n.isRead).length);
       },
@@ -110,7 +122,7 @@ export class NotificationService {
       return;
     }
 
-    this.http.put(`${this.apiUrl}/${notification.id}/read`, {}).subscribe({
+    this.http.put(this.withAccessToken(`${this.apiUrl}/${notification.id}/read`), {}).subscribe({
       next: () => {
         const updated = this.notifications$.value.map(n =>
           n.id === notification.id ? { ...n, isRead: true } : n
@@ -126,7 +138,7 @@ export class NotificationService {
   }
 
   markAllAsRead(): void {
-    this.http.put(`${this.apiUrl}/mark-all-read`, {}).subscribe({
+    this.http.put(this.withAccessToken(`${this.apiUrl}/mark-all-read`), {}).subscribe({
       next: () => {
         const updated = this.notifications$.value.map(n => ({
           ...n,
@@ -160,8 +172,26 @@ export class NotificationService {
     this.unreadCount$.next(0);
   }
 
+  private getToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('lesibuy_token');
+  }
+
+  private withAccessToken(url: string): string {
+    const token = this.getToken();
+
+    if (!token) {
+      return url;
+    }
+
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}access_token=${encodeURIComponent(token)}`;
+  }
+
   private showOrderPopup(data: any): void {
-    const status = (data.status || '').toLowerCase();
+    const orderId = data.orderId ?? data.OrderId;
+    const statusValue = data.status ?? data.Status ?? '';
+    const status = statusValue.toLowerCase();
 
     let icon: any = 'info';
     let color = '#3b82f6';
@@ -193,12 +223,12 @@ export class NotificationService {
 
     Swal.fire({
       icon,
-      title: `Order #${data.orderId}`,
+      title: `Order #${orderId}`,
       html: `
         <div style="font-size:14px; color:#475569;">
           Status updated to
           <strong style="color:${color}; text-transform:capitalize;">
-            ${data.status}
+            ${statusValue}
           </strong>
         </div>
       `,
@@ -209,8 +239,8 @@ export class NotificationService {
       timerProgressBar: true,
       background: '#ffffff'
     }).then((result) => {
-      if (result.isConfirmed && data.orderId) {
-        this.router.navigate(['/order-details', data.orderId]);
+      if (result.isConfirmed && orderId) {
+        this.router.navigate(['/order-details', orderId]);
       }
     });
   }
