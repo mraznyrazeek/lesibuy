@@ -16,7 +16,7 @@
         <span (click)="selectCategory('iPhone')">iPhone</span>
         <span (click)="selectCategory('iPad')">iPad</span>
         <span (click)="selectCategory('MacBook')">MacBook</span>
-        <span (click)="selectCategory('Apple Watch')">Watch</span>
+        <span (click)="selectCategory('Watch')">Watch</span>
         <span (click)="selectCategory('Audio')">Audio</span>
       </div>
     </div>
@@ -83,7 +83,7 @@
         </div>
       </div>
 
-      <div class="category-tile" (click)="selectCategory('Apple Watch')">
+      <div class="category-tile" (click)="selectCategory('Watch')">
         <div class="category-icon-wrap">
           <span class="category-icon">⌚</span>
         </div>
@@ -115,62 +115,143 @@
   </div>
 
   <div class="filter-bar">
-    <button class="filter-btn" [class.active]="selectedCategory === 'All'" (click)="selectCategory('All')">All</button>
-    <button class="filter-btn" [class.active]="selectedCategory === 'iPhone'" (click)="selectCategory('iPhone')">iPhone</button>
-    <button class="filter-btn" [class.active]="selectedCategory === 'iPad'" (click)="selectCategory('iPad')">iPad</button>
-    <button class="filter-btn" [class.active]="selectedCategory === 'MacBook'" (click)="selectCategory('MacBook')">MacBook</button>
-    <button class="filter-btn" [class.active]="selectedCategory === 'Apple Watch'" (click)="selectCategory('Apple Watch')">Watch</button>
-    <button class="filter-btn" [class.active]="selectedCategory === 'Audio'" (click)="selectCategory('Audio')">Audio</button>
+    <button
+      class="filter-btn"
+      [class.active]="selectedCategory === 'All'"
+      (click)="selectCategory('All')"
+    >
+      All
+    </button>
+
+    <button
+      class="filter-btn"
+      [class.active]="selectedCategory === 'iPhone'"
+      (click)="selectCategory('iPhone')"
+    >
+      iPhone
+    </button>
+
+    <button
+      class="filter-btn"
+      [class.active]="selectedCategory === 'iPad'"
+      (click)="selectCategory('iPad')"
+    >
+      iPad
+    </button>
+
+    <button
+      class="filter-btn"
+      [class.active]="selectedCategory === 'MacBook'"
+      (click)="selectCategory('MacBook')"
+    >
+      MacBook
+    </button>
+
+    <button
+      class="filter-btn"
+      [class.active]="selectedCategory === 'Watch'"
+      (click)="selectCategory('Watch')"
+    >
+      Watch
+    </button>
+
+    <button
+      class="filter-btn"
+      [class.active]="selectedCategory === 'Audio'"
+      (click)="selectCategory('Audio')"
+    >
+      Audio
+    </button>
   </div>
 
   <div class="grid products-grid">
-  <div class="card product-card" *ngFor="let product of filteredProducts">
-    
-    <div class="image-wrap">
-      <img
-        [src]="getProductImage(product)"
-        [alt]="product.name"
-        class="product-img"
-        (error)="onImageError($event)"
-      />
+    <div class="card product-card" *ngFor="let product of paginatedProducts">
+      <div class="image-wrap">
+        <img
+          [src]="getProductImage(product)"
+          [alt]="product.name"
+          class="product-img"
+          (error)="onImageError($event)"
+        />
 
-      <div class="badge">
-        {{ product.condition }}
+        <div class="badge">
+          {{ product.condition }}
+        </div>
+
+        <div class="unavailable-badge" *ngIf="!product.isAvailable">
+          Unavailable
+        </div>
       </div>
 
-      <div class="unavailable-badge" *ngIf="!product.isAvailable">
-        Unavailable
+      <div class="product-body">
+        <h3>{{ product.name }}</h3>
+
+        <p class="desc">{{ product.description }}</p>
+
+        <p class="category">{{ getCategoryName(product) }}</p>
+
+        <p class="price">$ {{ product.price }}</p>
+
+        <p class="stock-status" [class.unavailable-text]="!product.isAvailable">
+          {{ product.isAvailable ? 'Available' : 'Unavailable' }}
+        </p>
+
+        <div class="product-actions">
+          <button class="btn" (click)="viewDetails(product.id)">
+            View Details
+          </button>
+
+          <button
+            class="btn btn-secondary"
+            [disabled]="!product.isAvailable"
+            [class.disabled-btn]="!product.isAvailable"
+            (click)="addToCart(product)"
+          >
+            {{ product.isAvailable ? 'Add to Cart' : 'Unavailable' }}
+          </button>
+        </div>
       </div>
     </div>
-
-    <div class="product-body">
-      <h3>{{ product.name }}</h3>ac
-      <p class="desc">{{ product.description }}</p>
-      <p class="category">{{ getCategoryName(product) }}</p>
-      <p class="price">$ {{ product.price }}</p>
-
-      <p class="stock-status" [class.unavailable-text]="!product.isAvailable">
-        {{ product.isAvailable ? 'Available' : 'Unavailable' }}
-      </p>
-
-      <div class="product-actions">
-        <button class="btn" (click)="viewDetails(product.id)">
-          View Details
-        </button>
-
-        <button
-          class="btn btn-secondary"
-          [disabled]="!product.isAvailable"
-          [class.disabled-btn]="!product.isAvailable"
-          (click)="addToCart(product)"
-        >
-          {{ product.isAvailable ? 'Add to Cart' : 'Unavailable' }}
-        </button>
-      </div>
-    </div>
-
   </div>
-</div>
+
+  <div class="pagination-wrapper" *ngIf="filteredProducts.length > itemsPerPage">
+    <div class="pagination-info">
+      Showing
+      {{ ((currentPage - 1) * itemsPerPage) + 1 }}
+      -
+      {{ currentPage * itemsPerPage > filteredProducts.length ? filteredProducts.length : currentPage * itemsPerPage }}
+      of {{ filteredProducts.length }} products
+    </div>
+
+    <div class="pagination">
+      <button
+        class="page-btn arrow-btn"
+        [disabled]="currentPage === 1"
+        [class.disabled]="currentPage === 1"
+        (click)="previousPage()"
+      >
+        ←
+      </button>
+
+      <button
+        class="page-btn"
+        *ngFor="let page of pages"
+        [class.active]="currentPage === page"
+        (click)="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+
+      <button
+        class="page-btn arrow-btn"
+        [disabled]="currentPage === totalPages"
+        [class.disabled]="currentPage === totalPages"
+        (click)="nextPage()"
+      >
+        →
+      </button>
+    </div>
+  </div>
 
   <div class="no-results" *ngIf="filteredProducts.length === 0">
     No products match your search or selected category.

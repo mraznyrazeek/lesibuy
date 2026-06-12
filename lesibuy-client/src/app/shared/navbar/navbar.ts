@@ -1,12 +1,11 @@
-import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+
 import { CartService, CartItem } from '../../services/cart';
 import { AuthService, AuthResponse } from '../../services/auth.service';
-import {
-  NotificationService,
-  NotificationItem,
-} from '../../services/notification.service';
+import { NotificationService } from '../../services/notification.service';
+import type { NotificationItem } from '../../services/notification.service';
 
 @Component({
   selector: 'app-navbar',
@@ -16,6 +15,8 @@ import {
   styleUrl: './navbar.css',
 })
 export class Navbar implements OnInit {
+  private notificationService = inject(NotificationService);
+
   cartCount = 0;
   currentUser: AuthResponse | null = null;
 
@@ -29,8 +30,7 @@ export class Navbar implements OnInit {
     private router: Router,
     private cartService: CartService,
     private authService: AuthService,
-    private notificationService: NotificationService,
-    private elementRef: ElementRef,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -39,20 +39,20 @@ export class Navbar implements OnInit {
     });
 
     this.authService.currentUser$.subscribe((user: AuthResponse | null) => {
-  this.currentUser = user;
+      this.currentUser = user;
 
-  if (user) {
-    this.notificationService.startConnection();
-  } else {
-    this.notificationService.stopConnection();
-  }
-});
+      if (user) {
+        this.notificationService.startConnection();
+      } else {
+        this.notificationService.stopConnection();
+      }
+    });
 
-    this.notificationService.notifications$.subscribe((items) => {
+    this.notificationService.notifications$.subscribe((items: NotificationItem[]) => {
       this.notifications = items;
     });
 
-    this.notificationService.unreadCount$.subscribe((count) => {
+    this.notificationService.unreadCount$.subscribe((count: number) => {
       this.unreadCount = count;
     });
   }
@@ -109,6 +109,7 @@ export class Navbar implements OnInit {
   goHome(): void {
     this.closeUserMenu();
     this.closeNotificationMenu();
+
     this.router.navigate(['/'], {
       queryParams: {},
       fragment: 'top',
@@ -118,6 +119,7 @@ export class Navbar implements OnInit {
   goToCategory(category: string): void {
     this.closeUserMenu();
     this.closeNotificationMenu();
+
     this.router.navigate(['/'], {
       queryParams: { category },
       fragment: 'featured-products',
@@ -158,14 +160,14 @@ export class Navbar implements OnInit {
   }
 
   logout(): void {
-  this.closeUserMenu();
-  this.closeNotificationMenu();
+    this.closeUserMenu();
+    this.closeNotificationMenu();
 
-  this.notificationService.stopConnection();
-  this.authService.logout();
+    this.notificationService.stopConnection();
+    this.authService.logout();
 
-  this.router.navigate(['/']);
-}
+    this.router.navigate(['/']);
+  }
 
   search(value: string): void {
     const trimmed = value.trim();
