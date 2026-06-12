@@ -3,14 +3,17 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { CartService, CartItem } from '../../services/cart';
 import { AuthService, AuthResponse } from '../../services/auth.service';
-import { NotificationService, NotificationItem } from '../../services/notification.service';
+import {
+  NotificationService,
+  NotificationItem,
+} from '../../services/notification.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css'
+  styleUrl: './navbar.css',
 })
 export class Navbar implements OnInit {
   cartCount = 0;
@@ -27,7 +30,7 @@ export class Navbar implements OnInit {
     private cartService: CartService,
     private authService: AuthService,
     private notificationService: NotificationService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
   ) {}
 
   ngOnInit(): void {
@@ -102,7 +105,7 @@ export class Navbar implements OnInit {
     this.closeNotificationMenu();
     this.router.navigate(['/'], {
       queryParams: {},
-      fragment: 'top'
+      fragment: 'top',
     });
   }
 
@@ -111,7 +114,7 @@ export class Navbar implements OnInit {
     this.closeNotificationMenu();
     this.router.navigate(['/'], {
       queryParams: { category },
-      fragment: 'featured-products'
+      fragment: 'featured-products',
     });
   }
 
@@ -153,6 +156,7 @@ export class Navbar implements OnInit {
     this.closeNotificationMenu();
     this.notificationService.stopConnection();
     this.authService.logout();
+    this.cartService.clearCartView();
     this.router.navigate(['/']);
   }
 
@@ -162,14 +166,14 @@ export class Navbar implements OnInit {
     if (!trimmed) {
       this.router.navigate(['/'], {
         queryParams: {},
-        fragment: 'top'
+        fragment: 'top',
       });
       return;
     }
 
     this.router.navigate(['/'], {
       queryParams: { search: trimmed },
-      fragment: 'featured-products'
+      fragment: 'featured-products',
     });
   }
 }

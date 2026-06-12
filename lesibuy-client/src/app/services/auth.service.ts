@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { CartService } from './cart';
 
 export interface RegisterRequest {
   fullName: string;
@@ -41,7 +42,7 @@ export interface ChangePasswordRequest {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = '/api/auth';
@@ -49,9 +50,18 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<AuthResponse | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private cartService: CartService,
+  ) {
     const user = this.getUserFromStorage();
     this.currentUserSubject.next(user);
+
+    if (user) {
+      this.cartService.loadCartForUser(user.id);
+    } else {
+      this.cartService.loadGuestCart();
+    }
   }
 
   register(data: RegisterRequest): Observable<AuthResponse> {
@@ -63,17 +73,22 @@ export class AuthService {
   }
 
   getMe(): Observable<AuthResponse> {
-    return this.http.get<AuthResponse>(this.withAccessToken(`${this.apiUrl}/me`));
+    return this.http.get<AuthResponse>(
+      this.withAccessToken(`${this.apiUrl}/me`),
+    );
   }
 
   updateProfile(data: UpdateProfileRequest): Observable<AuthResponse> {
-    return this.http.put<AuthResponse>(this.withAccessToken(`${this.apiUrl}/profile`), data);
+    return this.http.put<AuthResponse>(
+      this.withAccessToken(`${this.apiUrl}/profile`),
+      data,
+    );
   }
 
   changePassword(data: ChangePasswordRequest): Observable<{ message: string }> {
     return this.http.put<{ message: string }>(
       this.withAccessToken(`${this.apiUrl}/change-password`),
-      data
+      data,
     );
   }
 
@@ -84,6 +99,7 @@ export class AuthService {
     }
 
     this.currentUserSubject.next(user);
+    this.cartService.loadCartForUser(user.id);
   }
 
   updateCurrentUser(user: AuthResponse): void {
@@ -101,6 +117,12 @@ export class AuthService {
     }
 
     this.currentUserSubject.next(null);
+
+    // Hide the logged-in user's cart from the UI
+    this.cartService.clearCartView();
+
+    // Switch browser back to guest cart mode
+    this.cartService.loadGuestCart();
   }
 
   getToken(): string | null {

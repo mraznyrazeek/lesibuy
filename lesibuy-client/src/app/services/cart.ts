@@ -12,16 +12,32 @@ export interface CartItem {
   providedIn: 'root'
 })
 export class CartService {
-  private storageKey = 'lesibuy_cart';
   private platformId = inject(PLATFORM_ID);
   private isBrowser = isPlatformBrowser(this.platformId);
+
+  private currentStorageKey = 'lesibuy_cart_guest';
 
   private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
   cartItems$ = this.cartItemsSubject.asObservable();
 
   constructor() {
+    this.loadGuestCart();
+  }
+
+  loadCartForUser(userId: number): void {
+    this.currentStorageKey = `lesibuy_cart_user_${userId}`;
     const items = this.loadCartFromStorage();
     this.cartItemsSubject.next(items);
+  }
+
+  loadGuestCart(): void {
+    this.currentStorageKey = 'lesibuy_cart_guest';
+    const items = this.loadCartFromStorage();
+    this.cartItemsSubject.next(items);
+  }
+
+  clearCartView(): void {
+    this.cartItemsSubject.next([]);
   }
 
   addToCart(product: Product): void {
@@ -90,7 +106,7 @@ export class CartService {
     this.cartItemsSubject.next(items);
 
     if (this.isBrowser) {
-      localStorage.setItem(this.storageKey, JSON.stringify(items));
+      localStorage.setItem(this.currentStorageKey, JSON.stringify(items));
     }
   }
 
@@ -99,7 +115,7 @@ export class CartService {
       return [];
     }
 
-    const stored = localStorage.getItem(this.storageKey);
+    const stored = localStorage.getItem(this.currentStorageKey);
     return stored ? JSON.parse(stored) : [];
   }
 }
