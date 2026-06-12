@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProductService } from '../services/product.service';
 import { Product } from '../models/product.model';
@@ -13,6 +13,8 @@ import { CartService } from '../services/cart';
   styleUrl: './products.component.css'
 })
 export class ProductsComponent implements OnInit {
+   private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
   products: Product[] = [];
   filteredProducts: Product[] = [];
   selectedCategory: string = 'All';
@@ -26,21 +28,25 @@ export class ProductsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.productService.getProducts().subscribe({
-      next: (data) => {
-        this.products = data;
-
-        this.route.queryParams.subscribe(params => {
-          this.selectedCategory = params['category'] || 'All';
-          this.searchTerm = (params['search'] || '').toLowerCase().trim();
-          this.applyFilters();
-        });
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    });
+  if (!this.isBrowser) {
+    return;
   }
+
+  this.productService.getProducts().subscribe({
+    next: (data) => {
+      this.products = data;
+
+      this.route.queryParams.subscribe(params => {
+        this.selectedCategory = params['category'] || 'All';
+        this.searchTerm = (params['search'] || '').toLowerCase().trim();
+        this.applyFilters();
+      });
+    },
+    error: (err) => {
+      console.error(err);
+    }
+  });
+}
 
   getCategoryName(id: number): string {
     switch (id) {
