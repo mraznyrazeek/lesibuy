@@ -10,7 +10,6 @@
 
       <div class="hero-actions">
         <button class="btn" (click)="selectCategory('All')">Shop Collection</button>
-        <button class="btn btn-secondary">Sell Your Device</button>
       </div>
 
       <div class="hero-chips">
@@ -34,7 +33,7 @@
 
       <div class="floating-card card price-card">
         <p>Starting from</p>
-        <strong>Rs. 199.99</strong>
+        <strong>$ 199.99</strong>
       </div>
     </div>
   </section>
@@ -148,7 +147,7 @@
       <h3>{{ product.name }}</h3>
       <p class="desc">{{ product.description }}</p>
       <p class="category">{{ getCategoryName(product.categoryId) }}</p>
-      <p class="price">Rs. {{ product.price }}</p>
+      <p class="price">$ {{ product.price }}</p>
 
       <p class="stock-status" [class.unavailable-text]="!product.isAvailable">
         {{ product.isAvailable ? 'Available' : 'Unavailable' }}

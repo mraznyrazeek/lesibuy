@@ -33,3 +33,6 @@
 
 # Ignore oversized raw file
 Raw Dataset/gdelt_news.csv
+.DS_Store
+**/.DS_Store
+.idea/

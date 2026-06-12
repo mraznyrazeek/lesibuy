@@ -96,7 +96,7 @@
             <p>Qty: {{ item.quantity }}</p>
           </div>
         </div>
-        <div class="summary-price">Rs. {{ item.product.price * item.quantity }}</div>
+        <div class="summary-price"> {{ item.product.price * item.quantity }}</div>
       </div>
 
       <div class="summary-totals">
@@ -110,7 +110,7 @@
         </div>
         <div class="summary-row total-row">
           <span>Total</span>
-          <span>Rs. {{ total }}</span>
+          <span> {{ total }}</span>
         </div>
       </div>
 
