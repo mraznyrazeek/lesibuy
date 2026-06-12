@@ -5,6 +5,7 @@ export interface Product {
   price: number;
   imageUrl: string;
   categoryId: number;
+  categoryName?: string;
   condition: string;
   specifications: string;
   isAvailable: boolean;

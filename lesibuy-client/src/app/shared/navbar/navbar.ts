@@ -39,8 +39,14 @@ export class Navbar implements OnInit {
     });
 
     this.authService.currentUser$.subscribe((user: AuthResponse | null) => {
-      this.currentUser = user;
-    });
+  this.currentUser = user;
+
+  if (user) {
+    this.notificationService.startConnection();
+  } else {
+    this.notificationService.stopConnection();
+  }
+});
 
     this.notificationService.notifications$.subscribe((items) => {
       this.notifications = items;
@@ -152,13 +158,14 @@ export class Navbar implements OnInit {
   }
 
   logout(): void {
-    this.closeUserMenu();
-    this.closeNotificationMenu();
-    this.notificationService.stopConnection();
-    this.authService.logout();
-    this.cartService.clearCartView();
-    this.router.navigate(['/']);
-  }
+  this.closeUserMenu();
+  this.closeNotificationMenu();
+
+  this.notificationService.stopConnection();
+  this.authService.logout();
+
+  this.router.navigate(['/']);
+}
 
   search(value: string): void {
     const trimmed = value.trim();

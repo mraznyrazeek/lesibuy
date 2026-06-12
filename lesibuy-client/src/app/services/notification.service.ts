@@ -20,7 +20,10 @@ export interface NotificationItem {
 })
 export class NotificationService {
   private hubConnection?: signalR.HubConnection;
-  private apiUrl = 'https://localhost:7225/api/Notifications';
+
+  // Use Angular proxy instead of hardcoded backend URL
+  private apiUrl = '/api/Notifications';
+  private hubUrl = 'https://localhost:7225/hubs/notifications';
 
   notifications$ = new BehaviorSubject<NotificationItem[]>([]);
   unreadCount$ = new BehaviorSubject<number>(0);
@@ -28,58 +31,76 @@ export class NotificationService {
   constructor(
     private router: Router,
     private http: HttpClient
-  ) { }
+  ) {}
 
   startConnection(): void {
     if (typeof window === 'undefined') return;
 
-    const userJson = localStorage.getItem('currentUser');
-    const user = userJson ? JSON.parse(userJson) : null;
-    const token = user?.token;
+    const token = localStorage.getItem('lesibuy_token');
 
-    if (!token || this.hubConnection) return;
+    if (!token) {
+      console.warn('No token found. SignalR connection not started.');
+      return;
+    }
 
-    if (!token || this.hubConnection) return;
+    if (this.hubConnection) {
+      return;
+    }
 
     this.loadNotifications();
 
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:7225/hubs/notifications', {
+      .withUrl(this.hubUrl, {
         accessTokenFactory: () => token
       })
       .withAutomaticReconnect()
       .build();
 
-    this.hubConnection.start()
+    this.hubConnection
+      .start()
       .then(() => console.log('SignalR connected'))
-      .catch(err => console.error('SignalR error:', err));
+      .catch(err => console.error('SignalR connection error:', err));
 
     this.hubConnection.on('OrderStatusUpdated', (data) => {
       const newNotification: NotificationItem = {
         id: data.id ?? 0,
         userId: data.userId ?? 0,
         orderId: data.orderId,
-        title: data.title,
-        message: data.message,
+        title: data.title ?? 'Order Update',
+        message: data.message ?? 'Your order status has been updated.',
         isRead: false,
-        createdAt: data.createdAt
+        createdAt: data.createdAt ?? new Date().toISOString()
       };
 
       const current = this.notifications$.value;
-      this.notifications$.next([newNotification, ...current]);
-      this.unreadCount$.next(this.unreadCount$.value + 1);
+      const updated = [newNotification, ...current];
+
+      this.notifications$.next(updated);
+      this.unreadCount$.next(updated.filter(n => !n.isRead).length);
 
       this.showOrderPopup(data);
     });
   }
 
   loadNotifications(): void {
+    const token = localStorage.getItem('lesibuy_token');
+
+    if (!token) {
+      this.notifications$.next([]);
+      this.unreadCount$.next(0);
+      return;
+    }
+
     this.http.get<NotificationItem[]>(`${this.apiUrl}/my`).subscribe({
       next: (res) => {
         this.notifications$.next(res);
         this.unreadCount$.next(res.filter(n => !n.isRead).length);
       },
-      error: (err) => console.error('Failed to load notifications:', err)
+      error: (err) => {
+        console.error('Failed to load notifications:', err);
+        this.notifications$.next([]);
+        this.unreadCount$.next(0);
+      }
     });
   }
 
@@ -98,9 +119,9 @@ export class NotificationService {
         this.notifications$.next(updated);
         this.unreadCount$.next(updated.filter(n => !n.isRead).length);
 
-        this.openNotification(notification);
+        this.openNotification({ ...notification, isRead: true });
       },
-      error: (err) => console.error('Failed to mark as read:', err)
+      error: (err) => console.error('Failed to mark notification as read:', err)
     });
   }
 
@@ -115,19 +136,20 @@ export class NotificationService {
         this.notifications$.next(updated);
         this.unreadCount$.next(0);
       },
-      error: (err) => console.error('Failed to mark all as read:', err)
+      error: (err) => console.error('Failed to mark all notifications as read:', err)
     });
   }
 
   openNotification(notification: NotificationItem): void {
     if (notification.orderId) {
-      this.router.navigate(['/orders', notification.orderId]);
+      this.router.navigate(['/order-details', notification.orderId]);
     }
   }
 
   stopConnection(): void {
     if (this.hubConnection) {
-      this.hubConnection.stop()
+      this.hubConnection
+        .stop()
         .then(() => console.log('SignalR disconnected'))
         .catch(err => console.error('SignalR disconnect error:', err));
 
@@ -174,7 +196,7 @@ export class NotificationService {
       title: `Order #${data.orderId}`,
       html: `
         <div style="font-size:14px; color:#475569;">
-          Status updated to 
+          Status updated to
           <strong style="color:${color}; text-transform:capitalize;">
             ${data.status}
           </strong>
@@ -187,8 +209,8 @@ export class NotificationService {
       timerProgressBar: true,
       background: '#ffffff'
     }).then((result) => {
-      if (result.isConfirmed) {
-        this.router.navigate(['/orders', data.orderId]);
+      if (result.isConfirmed && data.orderId) {
+        this.router.navigate(['/order-details', data.orderId]);
       }
     });
   }

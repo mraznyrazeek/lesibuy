@@ -48,16 +48,20 @@ export class ProductsComponent implements OnInit {
   });
 }
 
-  getCategoryName(id: number): string {
-    switch (id) {
-      case 1: return 'iPhone';
-      case 2: return 'iPad';
-      case 3: return 'MacBook';
-      case 4: return 'Apple Watch';
-      case 5: return 'Audio';
-      default: return 'Unknown';
-    }
-  }
+  // getCategoryName(id: number): string {
+  //   switch (id) {
+  //     case 1: return 'iPhone';
+  //     case 2: return 'iPad';
+  //     case 3: return 'MacBook';
+  //     case 4: return 'Apple Watch';
+  //     case 5: return 'Audio';
+  //     default: return 'Unknown';
+  //   }
+  // }
+
+  getCategoryName(product: Product): string {
+  return product.categoryName || 'Unknown';
+}
 
   getProductImage(product: Product): string {
     if (!product.imageUrl) {
@@ -85,24 +89,26 @@ export class ProductsComponent implements OnInit {
   }
 
   applyFilters(): void {
-    this.filteredProducts = this.products.filter(product => {
-      const matchesCategory =
-        this.selectedCategory === 'All' ||
-        this.getCategoryName(product.categoryId) === this.selectedCategory;
+  this.filteredProducts = this.products.filter(product => {
+    const categoryName = this.getCategoryName(product);
 
-      const searchableText = `
-        ${product.name}
-        ${product.description}
-        ${this.getCategoryName(product.categoryId)}
-        ${product.condition}
-      `.toLowerCase();
+    const matchesCategory =
+      this.selectedCategory === 'All' ||
+      categoryName === this.selectedCategory;
 
-      const matchesSearch =
-        !this.searchTerm || searchableText.includes(this.searchTerm);
+    const searchableText = `
+      ${product.name}
+      ${product.description}
+      ${categoryName}
+      ${product.condition}
+    `.toLowerCase();
 
-      return matchesCategory && matchesSearch;
-    });
-  }
+    const matchesSearch =
+      !this.searchTerm || searchableText.includes(this.searchTerm);
+
+    return matchesCategory && matchesSearch;
+  });
+}
 
   selectCategory(category: string): void {
     this.selectedCategory = category;
