@@ -8,6 +8,7 @@ import { MyordersComponent } from './pages/my-orders/my-orders';
 import { LoginComponent } from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
 import { authGuard } from './guards/auth.guard';
+import { FavoritesComponent } from './pages/favorites/favorites';
 
 export const routes: Routes = [
   { path: '', component: ProductsComponent },
@@ -20,6 +21,10 @@ export const routes: Routes = [
   { path: 'checkout', component: CheckoutComponent, canActivate: [authGuard] },
   { path: 'order-success/:id', component: ordersuccessComponent, canActivate: [authGuard] },
   { path: 'my-orders', component: MyordersComponent, canActivate: [authGuard] },
+  {
+  path: 'favorites',
+  component: FavoritesComponent
+},
 
   {
     path: 'my-profile',

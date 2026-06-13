@@ -43,6 +43,35 @@
           Add to Cart
         </button>
       </div>
+
+      <div class="action-buttons">
+  <button
+    type="button"
+    class="favorite-details-btn"
+    [class.active]="isFavorite()"
+    (click)="toggleFavorite()"
+  >
+    <span>{{ isFavorite() ? '♥' : '♡' }}</span>
+
+    {{ isFavorite() ? 'Remove from Favorites' : 'Add to Favorites' }}
+  </button>
+
+  <button
+    class="btn"
+    (click)="buyNow()"
+    [disabled]="!product.isAvailable"
+  >
+    Buy Now
+  </button>
+
+  <button
+    class="btn btn-secondary"
+    (click)="addToCart()"
+    [disabled]="!product.isAvailable"
+  >
+    Add to Cart
+  </button>
+</div>
     </div>
 
   </div>

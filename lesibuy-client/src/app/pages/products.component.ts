@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { ProductService } from '../services/product.service';
 import { Product } from '../models/product.model';
 import { CartService } from '../services/cart';
+import { FavoriteService } from '../services/favorite.service';
 
 @Component({
   selector: 'app-products',
@@ -29,7 +30,8 @@ export class ProductsComponent implements OnInit {
     private productService: ProductService,
     private router: Router,
     private route: ActivatedRoute,
-    private cartService: CartService
+    private cartService: CartService,
+      private favoriteService: FavoriteService
   ) {}
 
   ngOnInit(): void {
@@ -173,4 +175,13 @@ export class ProductsComponent implements OnInit {
   viewDetails(id: number): void {
     this.router.navigate(['/products', id]);
   }
+
+  toggleFavorite(product: Product, event: MouseEvent): void {
+  event.stopPropagation();
+  this.favoriteService.toggleFavorite(product);
+}
+
+isFavorite(productId: number): boolean {
+  return this.favoriteService.isFavorite(productId);
+}
 }

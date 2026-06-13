@@ -209,6 +209,20 @@
           >
             {{ product.isAvailable ? 'Add to Cart' : 'Unavailable' }}
           </button>
+
+          <button
+  type="button"
+  class="favorite-btn"
+  [class.active]="isFavorite(product.id)"
+  (click)="toggleFavorite(product, $event)"
+  [attr.aria-label]="
+    isFavorite(product.id)
+      ? 'Remove from favorites'
+      : 'Add to favorites'
+  "
+>
+  {{ isFavorite(product.id) ? '♥' : '♡' }}
+</button>
         </div>
       </div>
     </div>

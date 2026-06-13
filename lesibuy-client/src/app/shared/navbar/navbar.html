@@ -88,6 +88,20 @@
         </div>
       </div>
 
+      <button
+  type="button"
+  class="favorite-nav-btn"
+  (click)="goToFavorites()"
+  aria-label="Favorites"
+>
+  <span class="favorite-nav-icon">♡</span>
+  <span class="favorite-nav-text">Favorites</span>
+
+  <span class="favorite-nav-badge" *ngIf="favoriteCount > 0">
+    {{ favoriteCount }}
+  </span>
+</button>
+
       <div class="user-menu-wrapper">
         <button
           type="button"

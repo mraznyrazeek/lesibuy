@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
 import { CartService } from '../../services/cart';
+import { FavoriteService } from '../../services/favorite.service';
 
 @Component({
   selector: 'app-product-details',
@@ -21,7 +22,8 @@ export class ProductDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
-    private cartService: CartService
+    private cartService: CartService,
+      private favoriteService: FavoriteService
   ) {}
 
   ngOnInit(): void {
@@ -122,4 +124,20 @@ onImageError(event: Event): void {
   goHome(): void {
     this.router.navigate(['/']);
   }
+
+  toggleFavorite(): void {
+  if (!this.product) {
+    return;
+  }
+
+  this.favoriteService.toggleFavorite(this.product);
+}
+
+isFavorite(): boolean {
+  if (!this.product) {
+    return false;
+  }
+
+  return this.favoriteService.isFavorite(this.product.id);
+}
 }

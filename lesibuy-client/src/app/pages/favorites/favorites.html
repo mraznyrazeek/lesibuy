@@ -1,0 +1,98 @@
+<div class="favorites-container">
+  <div class="favorites-heading">
+    <div>
+      <p class="favorites-kicker">Your saved products</p>
+      <h1>My Favorites</h1>
+      <p>
+        {{ favorites.length }}
+        {{ favorites.length === 1 ? 'product' : 'products' }} saved
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="continue-btn"
+      (click)="continueShopping()"
+    >
+      Continue Shopping
+    </button>
+  </div>
+
+  <div class="empty-favorites" *ngIf="favorites.length === 0">
+    <div class="empty-icon">♡</div>
+    <h2>Your favorites list is empty</h2>
+    <p>Save products you like and they will appear here.</p>
+
+    <button
+      type="button"
+      class="primary-btn"
+      (click)="continueShopping()"
+    >
+      Browse Products
+    </button>
+  </div>
+
+  <div class="favorites-grid" *ngIf="favorites.length > 0">
+    <article
+      class="favorite-card"
+      *ngFor="let product of favorites"
+    >
+      <div class="favorite-image-wrap">
+        <button
+          type="button"
+          class="remove-favorite-btn"
+          (click)="removeFavorite(product.id)"
+          aria-label="Remove from favorites"
+        >
+          ♥
+        </button>
+
+        <img
+          [src]="getProductImage(product)"
+          [alt]="product.name"
+          (error)="onImageError($event)"
+        />
+      </div>
+
+      <div class="favorite-content">
+        <span class="condition">
+          {{ product.condition }}
+        </span>
+
+        <h3>{{ product.name }}</h3>
+
+        <p class="description">
+          {{ product.description }}
+        </p>
+
+        <p class="price">$ {{ product.price }}</p>
+
+        <p
+          class="availability"
+          [class.unavailable]="!product.isAvailable"
+        >
+          {{ product.isAvailable ? 'Available' : 'Unavailable' }}
+        </p>
+
+        <div class="favorite-actions">
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="viewDetails(product.id)"
+          >
+            View Details
+          </button>
+
+          <button
+            type="button"
+            class="primary-btn"
+            [disabled]="!product.isAvailable"
+            (click)="addToCart(product)"
+          >
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>

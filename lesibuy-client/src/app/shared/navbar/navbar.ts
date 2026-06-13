@@ -1,23 +1,32 @@
-import { Component, OnInit, HostListener, ElementRef, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  HostListener,
+  ElementRef,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-
 import { CartService, CartItem } from '../../services/cart';
 import { AuthService, AuthResponse } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
 import type { NotificationItem } from '../../services/notification.service';
+import { FavoriteService } from '../../services/favorite.service';
+import { Product } from '../../models/product.model';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
+  styleUrl: './navbar.css'
 })
-export class Navbar implements OnInit {
+export class NavbarComponent implements OnInit {
   private notificationService = inject(NotificationService);
 
   cartCount = 0;
+  favoriteCount = 0;
+
   currentUser: AuthResponse | null = null;
 
   notifications: NotificationItem[] = [];
@@ -30,7 +39,8 @@ export class Navbar implements OnInit {
     private router: Router,
     private cartService: CartService,
     private authService: AuthService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private favoriteService: FavoriteService
   ) {}
 
   ngOnInit(): void {
@@ -48,12 +58,18 @@ export class Navbar implements OnInit {
       }
     });
 
-    this.notificationService.notifications$.subscribe((items: NotificationItem[]) => {
-      this.notifications = items;
-    });
+    this.notificationService.notifications$.subscribe(
+      (items: NotificationItem[]) => {
+        this.notifications = items;
+      },
+    );
 
     this.notificationService.unreadCount$.subscribe((count: number) => {
       this.unreadCount = count;
+    });
+
+    this.favoriteService.favorites$.subscribe((favorites: Product[]) => {
+      this.favoriteCount = favorites.length;
     });
   }
 
@@ -124,6 +140,12 @@ export class Navbar implements OnInit {
       queryParams: { category },
       fragment: 'featured-products',
     });
+  }
+
+  goToFavorites(): void {
+    this.closeUserMenu();
+    this.closeNotificationMenu();
+    this.router.navigate(['/favorites']);
   }
 
   goToCart(): void {
