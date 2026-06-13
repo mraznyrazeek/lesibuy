@@ -1,88 +1,152 @@
 <div class="container" *ngIf="product; else loadingState">
   <div class="details-card">
-
     <div class="details-image">
-      <img [src]="getProductImage()" [alt]="product.name" (error)="onImageError($event)" />
+      <img
+        [src]="getProductImage()"
+        [alt]="product.name"
+        (error)="onImageError($event)"
+      />
     </div>
 
     <div class="details-info">
-      <span class="condition-badge">{{ product.condition }}</span>
-      <p class="category">{{ getCategoryName(product.categoryId) }}</p>
+      <div class="product-top-row">
+        <span class="condition-badge">
+          {{ product.condition }}
+        </span>
+
+        <button
+          type="button"
+          class="favorite-icon-btn"
+          [class.active]="isFavorite()"
+          (click)="toggleFavorite()"
+          [attr.aria-label]="
+            isFavorite()
+              ? 'Remove from favorites'
+              : 'Add to favorites'
+          "
+        >
+          {{ isFavorite() ? '♥' : '♡' }}
+        </button>
+      </div>
+
+      <p class="category">
+        {{ getCategoryName(product.categoryId) }}
+      </p>
+
       <h1>{{ product.name }}</h1>
-      <p class="description">{{ product.description }}</p>
-      <p class="price">$ {{ product.price }}</p>
+
+      <p class="description">
+        {{ product.description }}
+      </p>
+
+      <p class="price">
+        $ {{ product.price }}
+      </p>
 
       <div class="meta">
         <p class="availability-row">
           <strong>Availability:</strong>
-          <span class="availability-badge" [class.out-of-stock]="!product.isAvailable">
+
+          <span
+            class="availability-badge"
+            [class.out-of-stock]="!product.isAvailable"
+          >
             {{ product.isAvailable ? 'In Stock' : 'Out of Stock' }}
           </span>
         </p>
-        <p><strong>Seller:</strong> {{ product.sellerType }}</p>
+
+        <p>
+          <strong>Seller:</strong>
+          {{ product.sellerType }}
+        </p>
       </div>
 
-      <h3>Specifications</h3>
+      <div class="specification-header">
+        <h3>Specifications</h3>
+        <span>{{ specifications.length }} details</span>
+      </div>
+
       <div class="spec-grid">
-        <div class="spec-item" *ngFor="let spec of specifications">
-          <span class="spec-key">{{ spec.key }}</span>
-          <span class="spec-value">{{ spec.value }}</span>
+        <div
+          class="spec-item"
+          *ngFor="let spec of specifications"
+        >
+          <span class="spec-key">
+            {{ spec.key }}
+          </span>
+
+          <span class="spec-value">
+            {{ spec.value }}
+          </span>
         </div>
       </div>
 
-      <div class="success-box" *ngIf="successMessage">
+      <div
+        class="success-box"
+        *ngIf="successMessage"
+      >
+        <span>✓</span>
         {{ successMessage }}
       </div>
 
       <div class="action-buttons">
-        <button class="btn" (click)="buyNow()" [disabled]="!product.isAvailable">
+        <button
+          type="button"
+          class="favorite-details-btn"
+          [class.active]="isFavorite()"
+          (click)="toggleFavorite()"
+        >
+          <span class="favorite-heart">
+            {{ isFavorite() ? '♥' : '♡' }}
+          </span>
+
+          {{
+            isFavorite()
+              ? 'Remove from Favorites'
+              : 'Add to Favorites'
+          }}
+        </button>
+
+        <button
+          type="button"
+          class="btn buy-btn"
+          (click)="buyNow()"
+          [disabled]="!product.isAvailable"
+        >
           Buy Now
         </button>
 
-        <button class="btn btn-secondary" (click)="addToCart()" [disabled]="!product.isAvailable">
+        <button
+          type="button"
+          class="btn btn-secondary cart-action-btn"
+          (click)="addToCart()"
+          [disabled]="!product.isAvailable"
+        >
           Add to Cart
         </button>
       </div>
-
-      <div class="action-buttons">
-  <button
-    type="button"
-    class="favorite-details-btn"
-    [class.active]="isFavorite()"
-    (click)="toggleFavorite()"
-  >
-    <span>{{ isFavorite() ? '♥' : '♡' }}</span>
-
-    {{ isFavorite() ? 'Remove from Favorites' : 'Add to Favorites' }}
-  </button>
-
-  <button
-    class="btn"
-    (click)="buyNow()"
-    [disabled]="!product.isAvailable"
-  >
-    Buy Now
-  </button>
-
-  <button
-    class="btn btn-secondary"
-    (click)="addToCart()"
-    [disabled]="!product.isAvailable"
-  >
-    Add to Cart
-  </button>
-</div>
     </div>
-
   </div>
 </div>
 
 <ng-template #loadingState>
   <div class="container">
-    <div class="empty-cart-card">
+    <div class="loading-card">
+      <div class="loading-icon">⌛</div>
+
       <h2>Loading product details...</h2>
-      <p>Please wait while we load the product.</p>
-      <button class="btn" (click)="goHome()">Back to Products</button>
+
+      <p>
+        Please wait while we load the product.
+      </p>
+
+      <button
+        type="button"
+        class="btn"
+        (click)="goHome()"
+      >
+        Back to Products
+      </button>
     </div>
   </div>
 </ng-template>

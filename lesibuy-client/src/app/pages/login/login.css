@@ -132,7 +132,7 @@ input:focus {
   font-weight: 700;
 }
 
-..forgot-password-row {
+.forgot-password-row {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -162,7 +162,7 @@ input:focus {
 }
 
 .forgot-password-link::before {
-  content: '🔐';
+  /* content: '🔐'; */
   font-size: 13px;
 }
 
