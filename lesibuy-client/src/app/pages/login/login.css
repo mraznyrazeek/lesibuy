@@ -132,6 +132,33 @@ input:focus {
   font-weight: 700;
 }
 
+.forgot-password-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -6px;
+  margin-bottom: 18px;
+}
+
+.forgot-password-link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #a16207;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.forgot-password-link:hover {
+  color: #d97706;
+  transform: translateX(2px);
+  text-decoration: underline;
+}
+
 @media (max-width: 640px) {
   .auth-card {
     padding: 24px;

@@ -36,7 +36,10 @@
           placeholder="Enter your password"
           [class.invalid]="f['password'].invalid && f['password'].touched"
         />
-        <small class="error" *ngIf="f['password'].invalid && f['password'].touched">
+        <small
+          class="error"
+          *ngIf="f['password'].invalid && f['password'].touched"
+        >
           Password must be at least 6 characteRs.
         </small>
       </div>
@@ -46,8 +49,18 @@
       </div>
 
       <button class="btn auth-btn" type="submit" [disabled]="isSubmitting">
-        {{ isSubmitting ? 'Signing In...' : 'Sign In' }}
+        {{ isSubmitting ? "Signing In..." : "Sign In" }}
       </button>
+
+      <div class="forgot-password-row">
+        <button
+          type="button"
+          class="forgot-password-link"
+          (click)="goToForgotPassword()"
+        >
+          Forgot password?
+        </button>
+      </div>
     </form>
 
     <div class="auth-footer">

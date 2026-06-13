@@ -138,6 +138,24 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  forgotPassword(email: string) {
+  return this.http.post<{ message: string }>(
+    '/api/auth/forgot-password',
+    { email }
+  );
+}
+
+resetPassword(data: {
+  email: string;
+  token: string;
+  newPassword: string;
+}) {
+  return this.http.post<{ message: string }>(
+    '/api/auth/reset-password',
+    data
+  );
+}
+
   private withAccessToken(url: string): string {
     const token = this.getToken();
 
@@ -159,4 +177,6 @@ export class AuthService {
   private isBrowser(): boolean {
     return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
   }
+
+  
 }
