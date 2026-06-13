@@ -10,5 +10,7 @@ namespace LesiBuy.Application.Services
         Task<AuthResponseDto> GetMeAsync(int userId);
         Task<AuthResponseDto> UpdateProfileAsync(int userId, UpdateProfileDto dto);
         Task ChangePasswordAsync(int userId, ChangePasswordDto dto);
+        Task ForgotPasswordAsync(ForgotPasswordRequest request);
+        Task ResetPasswordAsync(ResetPasswordRequest request);
     }
 }

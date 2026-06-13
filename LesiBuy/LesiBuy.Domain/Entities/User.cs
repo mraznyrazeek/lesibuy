@@ -17,5 +17,7 @@ namespace LesiBuy.Domain.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public ICollection<Order> Orders { get; set; } = new List<Order>();
         public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+        public ICollection<PasswordResetToken> PasswordResetTokens { get; set; }
+            = new List<PasswordResetToken>();
     }
 }

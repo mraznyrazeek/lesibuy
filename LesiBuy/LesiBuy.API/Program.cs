@@ -13,6 +13,8 @@ using System.Text;
 using LesiBuy.Application.Mapping;
 using Microsoft.Extensions.FileProviders;
 using LesiBuy.API.Hubs;
+using LesiBuy.Application.Services;
+using LesiBuy.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +60,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // JWT Auth
 var jwtKey = builder.Configuration["Jwt:Key"];

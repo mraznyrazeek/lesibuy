@@ -109,6 +109,59 @@ namespace LesiBuy.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        
+        [AllowAnonymous]
+        [HttpPost("forgot-password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ForgotPassword(
+            [FromBody] ForgotPasswordRequest request)
+        {
+            try
+            {
+                await _authService.ForgotPasswordAsync(request);
+
+                return Ok(new
+                {
+                    message =
+                        "If an account exists for that email, " +
+                        "a password reset link has been sent."
+                });
+            }
+            catch
+            {
+                return Ok(new
+                {
+                    message =
+                        "If an account exists for that email, " +
+                        "a password reset link has been sent."
+                });
+            }
+        }
+        
+        [AllowAnonymous]
+        [HttpPost("reset-password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ResetPassword(
+            [FromBody] ResetPasswordRequest request)
+        {
+            try
+            {
+                await _authService.ResetPasswordAsync(request);
+
+                return Ok(new
+                {
+                    message = "Password reset successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+        }
 
         private int GetUserId()
         {
