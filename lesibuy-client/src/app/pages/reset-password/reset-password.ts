@@ -12,6 +12,32 @@ import { finalize } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
 
+function strongPasswordValidator(
+  control: AbstractControl
+): ValidationErrors | null {
+  const value = control.value || '';
+
+  const valid =
+    value.length >= 8 &&
+    /[A-Z]/.test(value) &&
+    /[a-z]/.test(value) &&
+    /[0-9]/.test(value) &&
+    /[^A-Za-z0-9]/.test(value);
+
+  return valid ? null : { weakPassword: true };
+}
+
+function passwordsMatchValidator(
+  control: AbstractControl
+): ValidationErrors | null {
+  const newPassword = control.get('newPassword')?.value;
+  const confirmPassword = control.get('confirmPassword')?.value;
+
+  return newPassword === confirmPassword
+    ? null
+    : { passwordsDoNotMatch: true };
+}
+
 @Component({
   selector: 'app-reset-password',
   standalone: true,
@@ -27,6 +53,9 @@ export class ResetPasswordComponent implements OnInit {
   resetCompleted = false;
   errorMessage = '';
 
+  showNewPassword = false;
+  showConfirmPassword = false;
+
   resetForm;
 
   constructor(
@@ -41,20 +70,26 @@ export class ResetPasswordComponent implements OnInit {
           '',
           [
             Validators.required,
-            Validators.minLength(8)
+            strongPasswordValidator
           ]
         ],
-        confirmPassword: ['', Validators.required]
+        confirmPassword: [
+          '',
+          Validators.required
+        ]
       },
       {
-        validators: this.passwordsMatchValidator
+        validators: passwordsMatchValidator
       }
     );
   }
 
   ngOnInit(): void {
-    this.email = this.route.snapshot.queryParamMap.get('email') ?? '';
-    this.token = this.route.snapshot.queryParamMap.get('token') ?? '';
+    this.email =
+      this.route.snapshot.queryParamMap.get('email') ?? '';
+
+    this.token =
+      this.route.snapshot.queryParamMap.get('token') ?? '';
 
     if (!this.email || !this.token) {
       this.errorMessage =
@@ -70,15 +105,63 @@ export class ResetPasswordComponent implements OnInit {
     return this.resetForm.controls.confirmPassword;
   }
 
-  private passwordsMatchValidator(
-    control: AbstractControl
-  ): ValidationErrors | null {
-    const password = control.get('newPassword')?.value;
-    const confirmation = control.get('confirmPassword')?.value;
+  get passwordValue(): string {
+    return this.newPassword.value || '';
+  }
 
-    return password === confirmation
-      ? null
-      : { passwordsDoNotMatch: true };
+  get passwordChecks() {
+    const password = this.passwordValue;
+
+    return {
+      minLength: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      special: /[^A-Za-z0-9]/.test(password)
+    };
+  }
+
+  get passwordScore(): number {
+    return Object
+      .values(this.passwordChecks)
+      .filter(Boolean)
+      .length;
+  }
+
+  get passwordStrength(): string {
+    const score = this.passwordScore;
+
+    if (score <= 2) {
+      return 'Weak';
+    }
+
+    if (score <= 4) {
+      return 'Medium';
+    }
+
+    return 'Strong';
+  }
+
+  get passwordStrengthClass(): string {
+    const score = this.passwordScore;
+
+    if (score <= 2) {
+      return 'strength-weak';
+    }
+
+    if (score <= 4) {
+      return 'strength-medium';
+    }
+
+    return 'strength-strong';
+  }
+
+  toggleNewPassword(): void {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleConfirmPassword(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   submit(): void {
@@ -101,16 +184,21 @@ export class ResetPasswordComponent implements OnInit {
         token: this.token,
         newPassword: this.newPassword.value
       })
-      .pipe(finalize(() => {
-        this.isSubmitting = false;
-      }))
+      .pipe(
+        finalize(() => {
+          this.isSubmitting = false;
+        })
+      )
       .subscribe({
         next: () => {
           this.resetCompleted = true;
           this.resetForm.disable();
         },
-        error: (error) => {
-          console.error('Password reset failed:', error);
+        error: error => {
+          console.error(
+            'Password reset failed:',
+            error
+          );
 
           this.errorMessage =
             error.error?.message ??
