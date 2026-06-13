@@ -9,6 +9,8 @@ import { LoginComponent } from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
 import { authGuard } from './guards/auth.guard';
 import { FavoritesComponent } from './pages/favorites/favorites';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password';
 
 export const routes: Routes = [
   { path: '', component: ProductsComponent },
@@ -19,46 +21,64 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
 
   { path: 'checkout', component: CheckoutComponent, canActivate: [authGuard] },
-  { path: 'order-success/:id', component: ordersuccessComponent, canActivate: [authGuard] },
+  {
+    path: 'order-success/:id',
+    component: ordersuccessComponent,
+    canActivate: [authGuard],
+  },
   { path: 'my-orders', component: MyordersComponent, canActivate: [authGuard] },
   {
-  path: 'favorites',
-  component: FavoritesComponent
-},
+    path: 'favorites',
+    component: FavoritesComponent,
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent,
+  },
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent,
+  },
 
   {
     path: 'my-profile',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./pages/my-profile/my-profile').then(m => m.MyProfile)
+      import('./pages/my-profile/my-profile').then((m) => m.MyProfile),
   },
   {
     path: 'change-password',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./pages/change-password/change-password').then(m => m.ChangePassword)
+      import('./pages/change-password/change-password').then(
+        (m) => m.ChangePassword,
+      ),
   },
   {
     path: 'orders/:id',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./pages/order-details/order-details').then(m => m.OrderDetails)
+      import('./pages/order-details/order-details').then((m) => m.OrderDetails),
   },
   {
     path: 'contact-us',
     loadComponent: () =>
-      import('./pages/contact-us/contact-us').then(m => m.ContactUsComponent)
+      import('./pages/contact-us/contact-us').then((m) => m.ContactUsComponent),
   },
   {
     path: 'privacy-policy',
     loadComponent: () =>
-      import('./pages/privacy-policy/privacy-policy').then(m => m.PrivacyPolicyComponent)
+      import('./pages/privacy-policy/privacy-policy').then(
+        (m) => m.PrivacyPolicyComponent,
+      ),
   },
   {
     path: 'terms-and-conditions',
     loadComponent: () =>
-      import('./pages/terms-and-conditions/terms-and-conditions').then(m => m.TermsAndConditionsComponent)
+      import('./pages/terms-and-conditions/terms-and-conditions').then(
+        (m) => m.TermsAndConditionsComponent,
+      ),
   },
 
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: '' },
 ];
